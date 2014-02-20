@@ -1,0 +1,8 @@
+<sdf version="1.4">
+  <model name="turtlebot">
+    <!-- A turtlebot -->
+    <include>
+      <uri>model://turtlebot</uri>
+    </include>
+  </model>
+</sdf>
