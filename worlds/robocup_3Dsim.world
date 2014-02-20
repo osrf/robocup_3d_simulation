@@ -41,7 +41,7 @@
       <name>soccer_ball</name>
     </include>
 
-    <plugin name="game_controller" filename="libGameControllerPlugin.so">
+    <plugin name="game_controller" filename="librobocup_gamecontroller_plugin.so">
       <ball>soccer_ball</ball>
 
       <team>

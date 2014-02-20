@@ -54,7 +54,9 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES robocup_clients
-#  CATKIN_DEPENDS robocup_msgs roscpp
+  CATKIN_DEPENDS
+    robocup_msgs
+    roscpp
 #  DEPENDS system_lib
 )
 
@@ -79,7 +81,10 @@ add_executable(createAgent src/createAgent.cc)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(robocup_clients_node robocup_clients_generate_messages_cpp)
+add_dependencies(
+  createAgent
+  robocup_msgs_generate_messages_cpp
+)
 
 ## Specify libraries to link a library or executable target against
   target_link_libraries(createAgent
