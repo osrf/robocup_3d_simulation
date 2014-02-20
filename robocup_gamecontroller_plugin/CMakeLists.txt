@@ -60,6 +60,7 @@ catkin_package(
   LIBRARIES
     robocup_gamecontroller_plugin
   CATKIN_DEPENDS
+    robocup_msgs
     roscpp
   DEPENDS
     gazebo
@@ -87,7 +88,10 @@ add_library(robocup_gamecontroller_plugin
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(robocup_gamecontroller_plugin_node robocup_gamecontroller_plugin_generate_messages_cpp)
+add_dependencies(
+  robocup_gamecontroller_plugin
+  robocup_msgs_generate_messages_cpp
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(robocup_gamecontroller_plugin ${GAZEBO_LIBRARIES}
