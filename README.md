@@ -34,7 +34,7 @@ Installation
 
     . /opt/ros/setup.bash
      
-    . devel/setup.bash
+    . ~/robocup_ws/devel/setup.bash
 
     gazebo ~/robocup_3d_simulation/worlds/robocup_3Dsim.world
 
@@ -42,6 +42,6 @@ Installation
   
     . /opt/ros/setup.bash
      
-    . devel/setup.bash
+    . ~/robocup_ws/devel/setup.bash
 
     ~/robocup_ws/devel/lib/robocup_clients/createAgent
