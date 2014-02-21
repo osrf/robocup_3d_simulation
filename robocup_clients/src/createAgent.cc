@@ -1,28 +1,30 @@
 #include "ros/ros.h"
-#include "robocup_msgs/AddTwoInts.h"
+#include "robocup_msgs/InitAgent.h"
 #include <cstdlib>
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "add_two_ints_client");
-  if (argc != 3)
+  ros::init(argc, argv, "robocup_client");
+  if (argc != 4)
   {
-    ROS_INFO("usage: add_two_ints_client X Y");
+    ROS_INFO("usage: createAgent <path> <team_name> <player_number>");
     return 1;
   }
 
   ros::NodeHandle n;
-  ros::ServiceClient client = n.serviceClient<robocup_msgs::AddTwoInts>("add_two_ints");
-  robocup_msgs::AddTwoInts srv;
-  srv.request.a = atoll(argv[1]);
-  srv.request.b = atoll(argv[2]);
+  ros::ServiceClient client =
+    n.serviceClient<robocup_msgs::InitAgent>("/gameController/init_agent");
+  robocup_msgs::InitAgent srv;
+  srv.request.agent = argv[1];
+  srv.request.team_name = argv[2];
+  srv.request.player_number = atoi(argv[3]);
   if (client.call(srv))
   {
-    ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    ROS_INFO("Result: %d", (uint8_t)srv.response.result);
   }
   else
   {
-    ROS_ERROR("Failed to call service add_two_ints");
+    ROS_ERROR("Failed to call service init_agent");
     return 1;
   }
 

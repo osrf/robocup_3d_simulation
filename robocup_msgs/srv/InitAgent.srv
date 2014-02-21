@@ -1,0 +1,5 @@
+string agent
+string team_name
+uint8  player_number
+---
+uint8 result

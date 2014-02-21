@@ -23,7 +23,7 @@
 #include <string>
 #include "std_msgs/String.h"
 #include "robocup_gamecontroller_plugin/GameControllerPlugin.hh"
-#include "robocup_msgs/AddTwoInts.h"
+#include "robocup_msgs/InitAgent.h"
 
 using namespace gazebo;
 
@@ -80,8 +80,8 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->sub = this->node->subscribe<std_msgs::String>(
       "createEffector", 1000, &GameControllerPlugin::CreateEffector, this);
 
-  this->service_ = this->node->advertiseService("add_two_ints",
-    &GameControllerPlugin::add, this);
+  this->service_ = this->node->advertiseService("init_agent",
+    &GameControllerPlugin::InitAgent, this);
 
   sdf::ElementPtr elem;
 
@@ -141,25 +141,26 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       boost::bind(&GameControllerPlugin::UpdateStates, this, _1));
 }
 
-bool GameControllerPlugin::add(
-  robocup_msgs::AddTwoInts::Request  &req,
-  robocup_msgs::AddTwoInts::Response &res)
+bool GameControllerPlugin::InitAgent(
+  robocup_msgs::InitAgent::Request  &req,
+  robocup_msgs::InitAgent::Response &res)
 {
-  res.sum = req.a + req.b;
-  ROS_INFO("request: x=%ld, y=%ld", (long int)req.a, (long int)req.b);
-  ROS_INFO("sending back response: [%ld]", (long int)res.sum);
-  return true;
-}
+  std::string agent = req.agent;
+  std::string team = req.team_name;
+  int player = req.player_number;
 
-void GameControllerPlugin::CreateEffector(const std_msgs::String::ConstPtr& msg)
-{
-  ROS_INFO("subscriber got: [%s]", msg->data.c_str());
+  res.result = 0;
+
+  std::cout << "InitAgent called" << std::endl;
+  std::cout << "\tAgent: " << agent << std::endl;
+  std::cout << "\tTeam: " << team << std::endl;
+  std::cout << "\tNumber: " << player << std::endl;
 
   std::ifstream myfile;
   std::string sdfContent = "";
   std::string line;
 
-  myfile.open(msg->data.c_str());
+  myfile.open(agent.c_str());
   if (myfile.is_open())
   {
     while (getline(myfile, line))
@@ -173,6 +174,14 @@ void GameControllerPlugin::CreateEffector(const std_msgs::String::ConstPtr& msg)
     sphereSDF.SetFromString(sdfContent);
 
   this->world->InsertModelSDF(sphereSDF);
+
+  return true;
+}
+
+void GameControllerPlugin::CreateEffector(const std_msgs::String::ConstPtr& msg)
+{
+  ROS_INFO("subscriber got: [%s]", msg->data.c_str());
+
   //this->world->InsertModelFile("model://turtlebot");
 }
 

@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 #include "std_msgs/String.h"
-#include "robocup_msgs/AddTwoInts.h"
+#include "robocup_msgs/InitAgent.h"
 
 
 namespace gazebo
@@ -77,9 +77,9 @@ namespace gazebo
     /// \brief Update the robocup simulation state.
     public: void UpdateStates(const common::UpdateInfo &_info);
 
-    public: bool add(
-            robocup_msgs::AddTwoInts::Request  &req,
-            robocup_msgs::AddTwoInts::Response &res);
+    public: bool InitAgent(
+            robocup_msgs::InitAgent::Request  &req,
+            robocup_msgs::InitAgent::Response &res);
 
     private: void ClearPlayers(const math::Box &_box, double _minDist,
                  unsigned int _teamIndex);
