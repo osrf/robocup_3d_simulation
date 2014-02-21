@@ -24,13 +24,16 @@ Installation
     
     catkin_make
     
-3. Start roscore in a new terminal.
+Running
+=======
+    
+1. Start roscore in a new terminal.
 
     . /opt/ros/setup.bash
     
     roscore
 
-4. Start gazebo in a new terminal:
+2. Start gazebo in a new terminal:
 
     . /opt/ros/setup.bash
      
@@ -38,7 +41,7 @@ Installation
 
     gazebo ~/robocup_3d_simulation/worlds/robocup_3Dsim.world
 
-4. Run a robocup client in a new terminal:
+3. Run a robocup client in a new terminal:
   
     . /opt/ros/setup.bash
      
