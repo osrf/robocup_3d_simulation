@@ -44,4 +44,4 @@ Installation
      
     . ~/robocup_ws/devel/setup.bash
 
-    ~/robocup_ws/devel/lib/robocup_clients/createAgent
+    ~/robocup_ws/devel/lib/robocup_clients/createAgent ~/robocup_3d_simulation/models/agent.sdf team1 1
