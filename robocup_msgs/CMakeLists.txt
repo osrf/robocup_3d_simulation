@@ -53,7 +53,6 @@ add_message_files(
   Beam.msg
   Bearing.msg
   BodyPart.msg
-  CreateEffector.msg
   ForceResistant.msg
   GameStateMonitor.msg
   GameState.msg

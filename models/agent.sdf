@@ -4,5 +4,7 @@
     <include>
       <uri>model://turtlebot</uri>
     </include>
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
+    </plugin>
   </model>
 </sdf>

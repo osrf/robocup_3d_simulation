@@ -76,10 +76,6 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // ROS Nodehandle
   this->node = new ros::NodeHandle("~");
 
-  // ROS Subscriber
-  this->sub = this->node->subscribe<std_msgs::String>(
-      "createEffector", 1000, &GameControllerPlugin::CreateEffector, this);
-
   this->service_ = this->node->advertiseService("init_agent",
     &GameControllerPlugin::InitAgent, this);
 
@@ -176,13 +172,6 @@ bool GameControllerPlugin::InitAgent(
   this->world->InsertModelSDF(sphereSDF);
 
   return true;
-}
-
-void GameControllerPlugin::CreateEffector(const std_msgs::String::ConstPtr& msg)
-{
-  ROS_INFO("subscriber got: [%s]", msg->data.c_str());
-
-  //this->world->InsertModelFile("model://turtlebot");
 }
 
 /////////////////////////////////////////////////

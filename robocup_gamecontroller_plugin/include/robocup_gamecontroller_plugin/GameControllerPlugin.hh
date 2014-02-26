@@ -69,8 +69,6 @@ namespace gazebo
     // Documentation inherited.
     public: virtual void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
-    public: void CreateEffector(const std_msgs::String::ConstPtr& msg);
-
     // Documentation inherited.
     public: virtual void Init();
 
