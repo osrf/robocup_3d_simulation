@@ -15,14 +15,14 @@
  *
 */
 
+#include <gazebo/common/Time.hh>
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/physics/physics.hh>
 #include <fstream>
-#include <iostream>
 #include <ros/ros.h>
 #include <string>
-#include "std_msgs/String.h"
 #include "robocup_gamecontroller_plugin/GameControllerPlugin.hh"
+#include "robocup_msgs/GameStateMonitor.h"
 #include "robocup_msgs/InitAgent.h"
 
 using namespace gazebo;
@@ -33,6 +33,7 @@ using namespace gazebo;
 #define TEAM_RIGHT 1u
 #define FREE_KICK_MOVE_DIST 15.15
 #define FREE_KICK_DIST 9.15
+#define GOAL_WIDTH 2.1
 
 const math::Box FieldLeft(
     math::Vector3(-FIELD_HEIGHT*0.5, -FIELD_WIDTH*0.5, 0),
@@ -42,7 +43,88 @@ const math::Box FieldRight(
     math::Vector3(0, -FIELD_WIDTH*0.5, 0),
     math::Vector3(FIELD_HEIGHT*0.5, FIELD_WIDTH*0.5, 0));
 
+// Game state constant initialization
+const std::string GameControllerPlugin::Kickoff  = "kickoff";
+const std::string GameControllerPlugin::Playing  = "playing";
+const std::string GameControllerPlugin::Finished = "finished";
+const long GameControllerPlugin::SecondsEachHalf = 10;
+
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
+
+/////////////////////////////////////////////////
+State::State(const std::string &_name,
+             GameControllerPlugin *_plugin)
+  : name(_name), plugin(_plugin)
+{
+}
+
+/////////////////////////////////////////////////
+std::string State::GetName()
+{
+  return this->name;
+}
+
+/////////////////////////////////////////////////
+KickoffState::KickoffState(const std::string &_name,
+                           GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void KickoffState::Initialize()
+{
+  // Make sure the ball is at the center of the field
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
+
+  // Reposition the players
+
+}
+
+/////////////////////////////////////////////////
+void KickoffState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+PlayState::PlayState(const std::string &_name,
+                     GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void PlayState::Initialize()
+{
+  this->plugin->SetHalf(1);
+  this->plugin->ResetClock();
+}
+
+/////////////////////////////////////////////////
+void PlayState::Update()
+{
+  this->plugin->CheckTiming();
+  this->plugin->CheckBall();
+}
+
+/////////////////////////////////////////////////
+FinishedState::FinishedState(const std::string &_name,
+                             GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void FinishedState::Initialize()
+{
+  this->plugin->StopClock();
+}
+
+/////////////////////////////////////////////////
+void FinishedState::Update()
+{
+}
 
 /////////////////////////////////////////////////
 GameControllerPlugin::GameControllerPlugin()
@@ -52,13 +134,30 @@ GameControllerPlugin::GameControllerPlugin()
   int argc = 0;
   ros::init(argc, NULL, name);
 
-  ROS_INFO("RoboCup 3D simulator game controller running");
+  this->currentState = NULL;
+  this->kickoffState = new KickoffState(this->Kickoff, this);
+  this->playState = new PlayState(this->Playing, this);
+  this->finishedState = new FinishedState(this->Finished, this);
+  this->SetCurrent(this->finishedState);
+
+  gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
 
 /////////////////////////////////////////////////
 GameControllerPlugin::~GameControllerPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+
+  delete this->kickoffState;
+  this->kickoffState = NULL;
+  delete playState;
+  this->playState = NULL;
+  delete this->finishedState;
+  this->finishedState = NULL;
+  this->currentState = NULL;
+
+  delete this->node;
+  this->node = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -76,26 +175,30 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // ROS Nodehandle
   this->node = new ros::NodeHandle("~");
 
-  this->service_ = this->node->advertiseService("init_agent",
+  // Advertise all the services
+  this->initAgentService = this->node->advertiseService("init_agent",
     &GameControllerPlugin::InitAgent, this);
 
-  sdf::ElementPtr elem;
+  this->setGameStateService = this->node->advertiseService("set_game_state",
+    &GameControllerPlugin::SetGameState, this);
+
+  // Advertise all the messages
+  this->publisher =
+    this->node->advertise<robocup_msgs::GameStateMonitor>("game_state", 1000);
 
   this->world = _world;
 
   // Get a pointer to the soccer ball
-  /*this->ball = this->world->GetModel(_sdf->Get<std::string>("ball"));
+  this->ball = this->world->GetModel(_sdf->Get<std::string>("ball"));
 
   if (!this->ball)
   {
-    gzerr << "Unable to find the soccer ball with name[" <<
+    std::cerr << "Unable to find the soccer ball with name[" <<
       _sdf->Get<std::string>("ball") << "]\n";
     return;
   }
 
-  // Make sure the ball is at the center of the field
-  this->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
-
+  /*
   // Load all the teams
   sdf::ElementPtr teamElem = _sdf->GetElement("team");
   while (teamElem)
@@ -137,6 +240,48 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       boost::bind(&GameControllerPlugin::UpdateStates, this, _1));
 }
 
+////////////////////////////////////////////////
+uint8_t GameControllerPlugin::GetHalf()
+{
+  return this->half;
+}
+
+////////////////////////////////////////////////
+void GameControllerPlugin::SetHalf(uint8_t _newHalf)
+{
+  if ((_newHalf == 1) || (_newHalf == 2))
+    this->half = _newHalf;
+  else
+    gzerr << "Incorrect half value (" << _newHalf << ")" << std::endl;
+}
+
+////////////////////////////////////////////////
+void GameControllerPlugin::Initialize()
+{
+  if (this->currentState)
+    this->currentState->Initialize();
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::Update()
+{
+  if (currentState)
+    currentState->Update();
+}
+
+////////////////////////////////////////////////
+void GameControllerPlugin::SetCurrent(State *_newState)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  // Only update the state if _newState is different than the current state.
+  if (this->currentState != _newState)
+  {
+    this->currentState = _newState;
+    this->Initialize();
+  }
+}
+
 bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Request  &req,
   robocup_msgs::InitAgent::Response &res)
@@ -145,12 +290,10 @@ bool GameControllerPlugin::InitAgent(
   std::string team = req.team_name;
   int player = req.player_number;
 
-  res.result = 0;
-
-  std::cout << "InitAgent called" << std::endl;
-  std::cout << "\tAgent: " << agent << std::endl;
-  std::cout << "\tTeam: " << team << std::endl;
-  std::cout << "\tNumber: " << player << std::endl;
+  gzlog << "InitAgent called" << std::endl;
+  gzlog << "\tAgent: " << agent << std::endl;
+  gzlog << "\tTeam: " << team << std::endl;
+  gzlog << "\tNumber: " << player << std::endl;
 
   std::ifstream myfile;
   std::string sdfContent = "";
@@ -171,7 +314,58 @@ bool GameControllerPlugin::InitAgent(
 
   this->world->InsertModelSDF(sphereSDF);
 
+  res.result = 1;
   return true;
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::ResetClock()
+{
+  this->startTimeSim = this->world->GetSimTime();
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::StopClock()
+{
+  this->elapsedTimeSim = common::Time::Zero;
+}
+
+/////////////////////////////////////////////////
+bool GameControllerPlugin::SetGameState(
+  robocup_msgs::SetGameState::Request  &req,
+  robocup_msgs::SetGameState::Response &res)
+{
+  if (req.play_mode == this->Playing)
+    this->SetCurrent(this->playState);
+  else if (req.play_mode == this->Kickoff)
+    this->SetCurrent(this->kickoffState);
+  else if (req.play_mode == this->Finished)
+    this->SetCurrent(this->finishedState);
+  else
+  {
+    gzerr << "[GameControllerPlugin::SetGameState()] Unknown play mode ("
+          << req.play_mode << ")" << std::endl;
+    res.result = 0;
+    return false;
+  }
+
+  gzlog << "SetGameState called" << std::endl;
+  gzlog << "\tPlay mode: " << this->currentState->GetName() << std::endl;
+
+  res.result = 1;
+  return true;
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::Publish()
+{
+  robocup_msgs::GameStateMonitor msg;
+  msg.time = ros::Time(this->elapsedTimeSim.Double());
+  msg.half = this->GetHalf();
+  msg.score_left = this->scoreLeft;
+  msg.score_right = this->scoreRight;
+  msg.play_mode = this->currentState->GetName();
+  this->publisher.publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -184,14 +378,60 @@ void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
   //this->teams[0]->members[0]->SetLinearVel(math::Vector3(1, 0, 0));
 
+  this->Update();
+  this->Publish();
   ros::spinOnce();
 }
 
 /////////////////////////////////////////////////
-void GameControllerPlugin::ClearPlayers(const math::Box &_box, double _minDist,
+void GameControllerPlugin::CheckTiming()
+{
+  this->elapsedTimeSim = this->world->GetSimTime() - this->startTimeSim;
+
+  if ((this->half == 1) && (this->elapsedTimeSim >= this->SecondsEachHalf))
+  {
+    // End of the first half
+    this->SetHalf(2);
+    this->SetCurrent(this->kickoffState);
+    this->ResetClock();
+    this->SetCurrent(this->playState);
+  }
+  else if ((this->GetHalf() == 2) && (elapsedTimeSim >= this->SecondsEachHalf))
+  {
+    // End of the game
+    this->SetCurrent(this->finishedState);
+  }
+}
+
+void GameControllerPlugin::CheckBall()
+{
+  // Get the position of the ball in the field reference frame.
+  math::Pose ballPose = this->ball->GetWorldPose();
+
+  // Check if the ball is inside the goals.
+  if ((ballPose.pos.x < -FIELD_HEIGHT * 0.5) &&
+      (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))
+  {
+    this->scoreLeft++;
+    this->SetCurrent(this->kickoffState);
+    this->SetCurrent(this->playState);
+  }
+  else if ((ballPose.pos.x > FIELD_HEIGHT * 0.5) &&
+          (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))
+  {
+    this->scoreRight++;
+    this->SetCurrent(this->kickoffState);
+    this->SetCurrent(this->playState);
+  }
+
+  // Check if the ball is outside the field.
+}
+
+/////////////////////////////////////////////////
+/*void GameControllerPlugin::ClearPlayers(const math::Box &_box, double _minDist,
     unsigned int _teamIndex)
 {
-/*  if (_teamIndex >= this->teams.size())
+  if (_teamIndex >= this->teams.size())
   {
     gzerr << "Invalid team index[" << _teamIndex << "]. "
       << "Max value is[" << this->teams.size() - 1 << "]\n";
@@ -222,8 +462,8 @@ void GameControllerPlugin::ClearPlayers(const math::Box &_box, double _minDist,
 
       (*iter)->SetWorldPose(pose);
     }
-  }*/
-}
+  }
+}*/
 
 /////////////////////////////////////////////////
 /*void KickoffState::Init()
