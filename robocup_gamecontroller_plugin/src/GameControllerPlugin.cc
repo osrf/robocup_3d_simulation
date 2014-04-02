@@ -18,6 +18,7 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/physics/physics.hh>
+#include <algorithm>
 #include <fstream>
 #include <ros/ros.h>
 #include <string>
@@ -47,7 +48,7 @@ const math::Box FieldRight(
 const std::string GameControllerPlugin::Kickoff  = "kickoff";
 const std::string GameControllerPlugin::Playing  = "playing";
 const std::string GameControllerPlugin::Finished = "finished";
-const long GameControllerPlugin::SecondsEachHalf = 10;
+const long GameControllerPlugin::SecondsEachHalf = 10000;
 
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
 
@@ -392,6 +393,7 @@ void GameControllerPlugin::CheckTiming()
   {
     // End of the first half
     this->SetHalf(2);
+    std::swap(this->scoreLeft, this->scoreRight);
     this->SetCurrent(this->kickoffState);
     this->ResetClock();
     this->SetCurrent(this->playState);
@@ -408,23 +410,31 @@ void GameControllerPlugin::CheckBall()
   // Get the position of the ball in the field reference frame.
   math::Pose ballPose = this->ball->GetWorldPose();
 
-  // Check if the ball is inside the goals.
   if ((ballPose.pos.x < -FIELD_HEIGHT * 0.5) &&
       (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))
   {
-    this->scoreLeft++;
+    // The ball is inside the left goal.
+    this->scoreRight++;
     this->SetCurrent(this->kickoffState);
     this->SetCurrent(this->playState);
+    gzlog << "Right team goal" << std::endl;
   }
   else if ((ballPose.pos.x > FIELD_HEIGHT * 0.5) &&
           (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))
   {
-    this->scoreRight++;
+    // The ball is inside the right goal.
+    this->scoreLeft++;
     this->SetCurrent(this->kickoffState);
     this->SetCurrent(this->playState);
+    gzlog << "Left team goal" << std::endl;
   }
-
-  // Check if the ball is outside the field.
+  else if ((fabs(ballPose.pos.x) > FIELD_HEIGHT * 0.5) ||
+      (fabs(ballPose.pos.y) > FIELD_WIDTH * 0.5))
+  {
+    // The ball is outside of the field.
+    this->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
+    gzlog << "Out of bounds" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
