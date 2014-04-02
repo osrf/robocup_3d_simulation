@@ -18,7 +18,7 @@ Installation
     
     mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
 
-    ln -s ../robocup_3d_simulation
+    ln -s ../../robocup_3d_simulation
     
     cd ..
     
