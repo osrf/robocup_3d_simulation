@@ -53,6 +53,8 @@ namespace gazebo
     /// \brief Check the ball's position looking for goals or out of bounds.
     public: void CheckBall();
 
+    public: void CheckPlayerCollisions();
+
     /// \brief Reset the internal soccer game clock.
     public: void ResetClock();
 
@@ -100,7 +102,7 @@ namespace gazebo
     private: void UpdateStates(const common::UpdateInfo &_info);
 
     /// \brief Pointer to the world.
-    private: physics::WorldPtr world;
+    public: physics::WorldPtr world;
 
     /// \brief Pointer to the soccer ball.
     public: physics::ModelPtr ball;
@@ -158,21 +160,20 @@ namespace gazebo
                  unsigned int _teamIndex); */
 
     /// \brief A single team.
-    /*private: class Team
+    public: class Team
     {
+    //public: static std::vector<math::Pose> InitPose1;
+
       /// \brief Name of the team.
       public: std::string name;
 
       /// \brief All the members in the team.
-      public: std::vector<physics::ModelPtr> members;
-    };*/
+      ///public: std::vector<physics::ModelPtr> members;
+      public: std::vector<std::string> members;
+    };
 
     /// \brief All the teams.
-    //private: std::vector<Team *> teams;
-
-    /// \brief Current state
-    //private: State *state;
-
+    public: std::vector<Team *> teams;
   };
 
   // \brief State pattern used for the game mode.

@@ -53,6 +53,13 @@ const long GameControllerPlugin::SecondsEachHalf = 10000;
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
 
 /////////////////////////////////////////////////
+const math::Pose InitPose1(math::Pose(-0.5, 0, 0, 0, 0, 0));
+const math::Pose InitPose2(math::Pose(-0.5, -0.5, 0, 0, 0, 0));
+const math::Pose InitPose3(math::Pose(-0.5, 0.5, 0, 0, 0, 0));
+const math::Pose InitPose4(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0, 0, 0, 0));
+std::vector<math::Pose> InitialPoses(4);
+
+/////////////////////////////////////////////////
 State::State(const std::string &_name,
              GameControllerPlugin *_plugin)
   : name(_name), plugin(_plugin)
@@ -79,8 +86,21 @@ void KickoffState::Initialize()
   if (this->plugin->ball)
     this->plugin->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
 
-  // Reposition the players
+  std::cout << "Num teams: " << this->plugin->teams.size() << std::endl;
 
+  // Reposition the players
+  for (size_t i = 0; i < this->plugin->teams.size(); ++i)
+  {
+    for (size_t j = 0; j < this->plugin->teams.at(i)->members.size(); ++j)
+    {
+      std::string name = this->plugin->teams.at(i)->members.at(j);
+      physics::ModelPtr model = this->plugin->world->GetModel(name);
+      if (model != NULL)
+        model->SetWorldPose(InitialPoses.at(j));
+      else
+        std::cerr << "Model (" << name << ") not found." << std::endl;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -107,6 +127,7 @@ void PlayState::Update()
 {
   this->plugin->CheckTiming();
   this->plugin->CheckBall();
+  this->plugin->CheckPlayerCollisions();
 }
 
 /////////////////////////////////////////////////
@@ -130,6 +151,11 @@ void FinishedState::Update()
 /////////////////////////////////////////////////
 GameControllerPlugin::GameControllerPlugin()
 {
+  InitialPoses.push_back(InitPose1);
+  InitialPoses.push_back(InitPose2);
+  InitialPoses.push_back(InitPose3);
+  InitialPoses.push_back(InitPose4);
+
   // Start up ROS
   std::string name = "gameController";
   int argc = 0;
@@ -288,13 +314,38 @@ bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Response &res)
 {
   std::string agent = req.agent;
-  std::string team = req.team_name;
+  std::string teamName = req.team_name;
   int player = req.player_number;
+
+  std::cout << "New agent spawned" << std::endl;
 
   gzlog << "InitAgent called" << std::endl;
   gzlog << "\tAgent: " << agent << std::endl;
-  gzlog << "\tTeam: " << team << std::endl;
+  gzlog << "\tTeam: " << teamName << std::endl;
   gzlog << "\tNumber: " << player << std::endl;
+
+  // Create the team (if required)
+  if ((this->teams.size() == 0) ||
+      (this->teams.size() == 1) && this->teams.at(0)->name != teamName)
+  {
+    Team *aTeam = new Team;
+    aTeam->name = teamName;
+    this->teams.push_back(aTeam);
+    std::cout << "New team" << std::endl;
+  }
+
+  // Chose your team
+  Team *myTeam;
+  if (teamName == this->teams.at(0)->name)
+    myTeam = this->teams.at(0);
+  else if (teamName == this->teams.at(1)->name)
+    myTeam = this->teams.at(1);
+  else
+  {
+    gzerr << "Incorrect team name (" << teamName << "). It seems that you already"
+          << " registered two teams." << std::endl;
+          return false;
+  }
 
   std::ifstream myfile;
   std::string sdfContent = "";
@@ -309,11 +360,29 @@ bool GameControllerPlugin::InitAgent(
     }
     myfile.close();
   }
+  else
+  {
+    std::cerr << "File (" << agent.c_str() << " not found" << std::endl;
+    return false;
+  }
 
-  sdf::SDF sphereSDF;
-    sphereSDF.SetFromString(sdfContent);
+  sdf::SDF agentSDF;
+  agentSDF.SetFromString(sdfContent);
 
-  this->world->InsertModelSDF(sphereSDF);
+  std::string name;
+
+  if (agentSDF.root->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = agentSDF.root->GetElement("model");
+    if (modelElem->HasAttribute("name"))
+    {
+       name = modelElem->Get<std::string>("name");
+       std::cout << "Agent name: (" << name << ")" << std::endl;
+    }
+  }
+
+  this->world->InsertModelSDF(agentSDF);
+  myTeam->members.push_back(name);
 
   res.result = 1;
   return true;
@@ -434,6 +503,51 @@ void GameControllerPlugin::CheckBall()
     // The ball is outside of the field.
     this->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
     gzlog << "Out of bounds" << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::CheckPlayerCollisions()
+{
+  for (size_t i = 0; i < this->teams.size(); ++i)
+  {
+    for (size_t j = 0; j < this->teams.at(i)->members.size() - 1; ++j)
+    {
+      std::string name = this->teams.at(i)->members.at(j);
+      physics::ModelPtr model = this->world->GetModel(name);
+      math::Pose pose = model->GetWorldPose();
+
+      for (size_t k = j + 1; k < this->teams.at(i)->members.size(); ++k)
+      {
+        std::string otherName = this->teams.at(i)->members.at(k);
+        physics::ModelPtr otherModel = this->world->GetModel(otherName);
+        math::Pose otherPose = otherModel->GetWorldPose();
+
+        std::cout << "Distance: " << pose.pos.Distance(otherPose.pos) << std::endl;
+        if (pose.pos.Distance(otherPose.pos) < 0.20)
+        {
+          // Get the current pose of the member
+          pose.pos.x = pose.pos.x -
+              math::Rand::GetDblUniform(2, 2);
+
+          /*
+          // If the member is on the LEFT team, move the member's X position to
+          // the LEFT
+          if (_teamIndex == TEAM_LEFT)
+          {
+            pose.pos.x = _box.min.x -
+              math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
+          }
+          else
+          {
+            pose.pos.x = _box.max.x +
+              math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
+          }*/
+
+          model->SetWorldPose(pose);
+        }
+      }
+    }
   }
 }
 
