@@ -72,7 +72,9 @@ add_message_files(
 add_service_files(
   FILES
   InitAgent.srv
+  MoveAgentPose.srv
   SetGameState.srv
+  MoveBall.srv
 )
 
 ## Generate actions in the 'action' folder

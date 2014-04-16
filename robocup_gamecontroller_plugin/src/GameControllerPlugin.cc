@@ -15,13 +15,14 @@
  *
 */
 
+#include <ros/ros.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/physics/physics.hh>
 #include <algorithm>
 #include <fstream>
-#include <ros/ros.h>
 #include <string>
+#include <vector>
 #include "robocup_gamecontroller_plugin/GameControllerPlugin.hh"
 #include "robocup_msgs/GameStateMonitor.h"
 #include "robocup_msgs/InitAgent.h"
@@ -209,6 +210,12 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->setGameStateService = this->node->advertiseService("set_game_state",
     &GameControllerPlugin::SetGameState, this);
 
+  this->moveAgentService = this->node->advertiseService("move_agent",
+    &GameControllerPlugin::MoveAgentPose, this);
+
+  this->moveBallService = this->node->advertiseService("move_ball",
+    &GameControllerPlugin::MoveBall, this);
+
   // Advertise all the messages
   this->publisher =
     this->node->advertise<robocup_msgs::GameStateMonitor>("game_state", 1000);
@@ -324,12 +331,20 @@ bool GameControllerPlugin::InitAgent(
   gzlog << "\tTeam: " << teamName << std::endl;
   gzlog << "\tNumber: " << player << std::endl;
 
+  // Check the player id is correct.
+  if (player <= 0 || player > 11)
+  {
+    gzerr << "Incorrect player #(" << player << ")" << std::endl;
+    return false;
+  }
+
   // Create the team (if required)
   if ((this->teams.size() == 0) ||
       (this->teams.size() == 1) && this->teams.at(0)->name != teamName)
   {
     Team *aTeam = new Team;
     aTeam->name = teamName;
+    aTeam->members.resize(11);
     this->teams.push_back(aTeam);
     std::cout << "New team" << std::endl;
   }
@@ -342,8 +357,8 @@ bool GameControllerPlugin::InitAgent(
     myTeam = this->teams.at(1);
   else
   {
-    gzerr << "Incorrect team name (" << teamName << "). It seems that you already"
-          << " registered two teams." << std::endl;
+    gzerr << "Incorrect team name (" << teamName << "). It seems that you "
+          << "already registered two teams." << std::endl;
           return false;
   }
 
@@ -382,7 +397,7 @@ bool GameControllerPlugin::InitAgent(
   }
 
   this->world->InsertModelSDF(agentSDF);
-  myTeam->members.push_back(name);
+  myTeam->members[player] = name;
 
   res.result = 1;
   return true;
@@ -427,6 +442,72 @@ bool GameControllerPlugin::SetGameState(
 }
 
 /////////////////////////////////////////////////
+bool GameControllerPlugin::MoveAgentPose(
+  robocup_msgs::MoveAgentPose::Request  &req,
+  robocup_msgs::MoveAgentPose::Response &res)
+{
+  // Find the team
+  int index = -1;
+  for (size_t i = 0; i < this->teams.size(); ++i)
+    if (this->teams.at(i)->name == req.team_name)
+    {
+      index = i;
+      break;
+    }
+
+  // Team not found
+  if (index == -1)
+  {
+    gzlog << "Trying to move an agent from an unknown team ("
+          << req.team_name << ")" << std::endl;
+    return false;
+  }
+
+  // Wrong player #
+  if (req.player_id <= 0 || req.player_id > 11)
+  {
+    gzlog << "Trying to move an agent with a wrong id ("
+          << req.player_id << ")" << std::endl;
+    return false;
+  }
+
+  // Move the player
+  std::string name = this->teams.at(index)->members.at(req.player_id);
+  if (name != "")
+  {
+    physics::ModelPtr model = this->world->GetModel(name);
+    if (model != NULL)
+    {
+      math::Pose newPose(math::Pose(req.position.x, req.position.y, 0,
+                                    0, 0, req.position.theta));
+      model->SetWorldPose(newPose);
+      return true;
+    }
+    else
+      std::cerr << "MoveAgentPose(). Model (" << name << ") not found.\n";
+  }
+
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool GameControllerPlugin::MoveBall(
+  robocup_msgs::MoveBall::Request  &req,
+  robocup_msgs::MoveBall::Response &res)
+{
+  physics::ModelPtr model = this->world->GetModel("ball");
+  if (model != NULL)
+  {
+    math::Pose newPose(math::Pose(req.x, req.y, req.z, 0, 0, 0));
+    math::Vector3 newVel(req.vx, req.vy, req.vz);
+    model->SetWorldPose(newPose);
+    model->SetLinearVel(newVel);
+    return true;
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 void GameControllerPlugin::Publish()
 {
   robocup_msgs::GameStateMonitor msg;
@@ -446,7 +527,7 @@ void GameControllerPlugin::Init()
 /////////////////////////////////////////////////
 void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  //this->teams[0]->members[0]->SetLinearVel(math::Vector3(1, 0, 0));
+  // this->teams[0]->members[0]->SetLinearVel(math::Vector3(1, 0, 0));
 
   this->Update();
   this->Publish();
@@ -523,7 +604,8 @@ void GameControllerPlugin::CheckPlayerCollisions()
         physics::ModelPtr otherModel = this->world->GetModel(otherName);
         math::Pose otherPose = otherModel->GetWorldPose();
 
-        std::cout << "Distance: " << pose.pos.Distance(otherPose.pos) << std::endl;
+        std::cout << "Distance: " << pose.pos.Distance(otherPose.pos)
+                  << std::endl;
         if (pose.pos.Distance(otherPose.pos) < 0.20)
         {
           // Get the current pose of the member

@@ -23,6 +23,8 @@
 #include <string>
 #include "robocup_msgs/InitAgent.h"
 #include "robocup_msgs/SetGameState.h"
+#include "robocup_msgs/MoveAgentPose.h"
+#include "robocup_msgs/MoveBall.h"
 
 namespace gazebo
 {
@@ -94,6 +96,20 @@ namespace gazebo
     private: bool SetGameState(robocup_msgs::SetGameState::Request  &req,
                                robocup_msgs::SetGameState::Response &res);
 
+    /// \brief ROS service callback that move an agent.
+    /// \param[out] _req ROS service call request.
+    /// \param[out] _res ROS service call response.
+    /// \return True when the service call succeeds.
+    private: bool MoveAgentPose(robocup_msgs::MoveAgentPose::Request  &req,
+                                robocup_msgs::MoveAgentPose::Response &res);
+
+    /// \brief ROS service callback that move the ball.
+    /// \param[out] _req ROS service call request.
+    /// \param[out] _res ROS service call response.
+    /// \return True when the service call succeeds.
+    private: bool MoveBall(robocup_msgs::MoveBall::Request  &req,
+                           robocup_msgs::MoveBall::Response &res);
+
     /// \brief Executes the update on the current state.
     private: void Update();
 
@@ -121,6 +137,12 @@ namespace gazebo
 
     // ROS Service for change the state of the game.
     private: ros::ServiceServer setGameStateService;
+
+    // ROS Service for move a player.
+    private: ros::ServiceServer moveAgentService;
+
+    // ROS Service for move the ball.
+    private: ros::ServiceServer moveBallService;
 
     // ROS Publisher.
     private: ros::Publisher publisher;
