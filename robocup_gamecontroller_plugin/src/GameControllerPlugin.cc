@@ -29,11 +29,13 @@
 
 using namespace gazebo;
 
+#define G_SQUARE(a) ( (a) * (a) )
+
 #define FIELD_WIDTH 20.0
 #define FIELD_HEIGHT 30.0
 #define TEAM_LEFT 0u
 #define TEAM_RIGHT 1u
-#define FREE_KICK_MOVE_DIST 15.15
+#define FREE_KICK_MOVE_DIST 2
 #define FREE_KICK_DIST 9.15
 #define GOAL_WIDTH 2.1
 
@@ -216,6 +218,9 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->moveBallService = this->node->advertiseService("move_ball",
     &GameControllerPlugin::MoveBall, this);
 
+  this->dropBallService = this->node->advertiseService("drop_ball",
+    &GameControllerPlugin::DropBall, this);
+
   // Advertise all the messages
   this->publisher =
     this->node->advertise<robocup_msgs::GameStateMonitor>("game_state", 1000);
@@ -316,6 +321,7 @@ void GameControllerPlugin::SetCurrent(State *_newState)
   }
 }
 
+/////////////////////////////////////////////////
 bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Request  &req,
   robocup_msgs::InitAgent::Response &res)
@@ -495,7 +501,7 @@ bool GameControllerPlugin::MoveBall(
   robocup_msgs::MoveBall::Request  &req,
   robocup_msgs::MoveBall::Response &res)
 {
-  physics::ModelPtr model = this->world->GetModel("ball");
+  physics::ModelPtr model = this->world->GetModel("soccer_ball");
   if (model != NULL)
   {
     math::Pose newPose(math::Pose(req.x, req.y, req.z, 0, 0, 0));
@@ -505,6 +511,68 @@ bool GameControllerPlugin::MoveBall(
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
+                                    robocup_msgs::DropBall::Response &res)
+{
+  res.result = 0;
+
+  // Get ball position.
+  physics::ModelPtr model = this->world->GetModel("soccer_ball");
+  if (model == NULL)
+  {
+    std::cerr << "DropBall() error: Ball not found" << std::endl;
+    return false;
+  }
+
+  math::Vector3 ballPos = model->GetWorldPose().pos;
+
+  // Check if the player is withing FREE_KICK distance.
+  for (size_t i = 0; i < this->teams.size(); ++i)
+  {
+    for (size_t j = 0; j < this->teams.at(i)->members.size() - 1; ++j)
+    {
+      if (this->teams.at(i)->members.at(j) == "")
+        continue;
+
+      std::string name = this->teams.at(i)->members.at(j);
+      model = this->world->GetModel(name);
+      math::Pose playerPose = model->GetWorldPose();
+
+      // Move the player if it's close enough to the ball.
+      if (playerPose.pos.Distance(ballPos) < FREE_KICK_MOVE_DIST)
+      {
+        // Calculate the general form equation of a line from two points.
+        // a = y1 - y2
+        // b = x2 - x1
+        // c = (x1-x2)*y1 + (y2-y1)*x1
+        math::Vector3 v(ballPos.y - playerPose.pos.y,
+                        playerPose.pos.x - ballPos.x,
+                        (ballPos.x - playerPose.pos.x) * ballPos.y +
+                        (playerPose.pos.y - ballPos.y) * ballPos.x);
+        math::Vector3 int1;
+        math::Vector3 int2;
+        if (this->IntersectionCircunferenceLine(v, ballPos, FREE_KICK_MOVE_DIST,
+            int1, int2))
+        {
+          if (playerPose.pos.Distance(int1) < playerPose.pos.Distance(int2))
+            playerPose.pos = int1;
+          else
+            playerPose.pos = int2;
+
+          model->SetWorldPose(playerPose);
+        }
+        else
+          std::cerr << "DropBall() error: No intersection between circunference"
+                    << " and line. That shouldn't be happening" << std::endl;
+      }
+    }
+  }
+
+  res.result = 1;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -555,6 +623,7 @@ void GameControllerPlugin::CheckTiming()
   }
 }
 
+/////////////////////////////////////////////////
 void GameControllerPlugin::CheckBall()
 {
   // Get the position of the ball in the field reference frame.
@@ -678,3 +747,49 @@ void GameControllerPlugin::CheckPlayerCollisions()
   // this->rules->ClearPlayers(FieldRight, FREE_KICK_MOVE_DIST, TEAM_LEFT);
   // this->rules->ClearPlayers(FieldLeft, FREE_KICK_MOVE_DIST, TEAM_RIGHT);
 }*/
+
+bool GameControllerPlugin::IntersectionCircunferenceLine(const math::Vector3 &_v,
+                                                       const math::Vector3 &p_c,
+                                                       float r,
+                                                       math::Vector3 &int1,
+                                                       math::Vector3 &int2)
+{
+  // Solve equations:
+  // (x-px)^2 + (y - py)^2 = r^2
+  // Ax + By + C = 0
+
+  float i, j, k, A_2;
+  float a, b, c;
+  float tmp;
+  math::Vector3 v;
+
+  v = _v;
+
+  if(v.x == 0.0) {
+    // Avoid div by 0
+    v.x = 0.000001;
+  }
+
+  i = -2 * p_c.x;
+  j = -2 * p_c.y;
+  k = G_SQUARE(p_c.x) + G_SQUARE(p_c.y) - G_SQUARE(r);
+
+  A_2 = G_SQUARE(v.x);
+  a = G_SQUARE(-v.y) / A_2 + 1;
+  b = -2 * v.z * -v.y / A_2  - v.y * i / v.x + j;
+  c = G_SQUARE(v.z) / A_2 - v.z * i / v.x + k;
+
+  // Solve a*Y^2 + b+Y + c = 0
+  tmp = G_SQUARE(b) - 4 * a * c;
+  if(tmp < 0) {
+    // No intersection
+    return false;
+  }
+
+  tmp = sqrt(tmp);
+  int1.y = (-b + tmp) / (2 * a);
+  int2.y = (-b - tmp) / (2 * a);
+
+  int1.x = (-v.y * int1.y - v.z) / v.x;
+  int2.x = (-v.y * int2.y - v.z) / v.x;
+}

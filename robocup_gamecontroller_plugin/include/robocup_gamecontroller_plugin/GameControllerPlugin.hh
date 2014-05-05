@@ -21,6 +21,7 @@
 #include <gazebo/gazebo.hh>
 #include <boost/thread/mutex.hpp>
 #include <string>
+#include "robocup_msgs/DropBall.h"
 #include "robocup_msgs/InitAgent.h"
 #include "robocup_msgs/SetGameState.h"
 #include "robocup_msgs/MoveAgentPose.h"
@@ -110,12 +111,27 @@ namespace gazebo
     private: bool MoveBall(robocup_msgs::MoveBall::Request  &req,
                            robocup_msgs::MoveBall::Response &res);
 
+    /// \brief ROS service callback that drops the ball at its current position
+    /// and move all players away by the free kick radius. If the ball is off
+    /// the field, it is brought back within bounds.
+    /// \param[out] _req ROS service call request.
+    /// \param[out] _res ROS service call response.
+    /// \return True when the service call succeeds.
+    private: bool DropBall(robocup_msgs::DropBall::Request  &req,
+                           robocup_msgs::DropBall::Response &res);
+
     /// \brief Executes the update on the current state.
     private: void Update();
 
     /// \brief Update the robocup simulation state.
     /// \param[in] _info Information used in the update event.
     private: void UpdateStates(const common::UpdateInfo &_info);
+
+    private: bool IntersectionCircunferenceLine(const math::Vector3 &v,
+                                                const math::Vector3 &p_c,
+                                                float r,
+                                                math::Vector3 &int1,
+                                                math::Vector3 &int2);
 
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;
@@ -143,6 +159,9 @@ namespace gazebo
 
     // ROS Service for move the ball.
     private: ros::ServiceServer moveBallService;
+
+     // ROS Service for dropping the ball.
+    private: ros::ServiceServer dropBallService;
 
     // ROS Publisher.
     private: ros::Publisher publisher;

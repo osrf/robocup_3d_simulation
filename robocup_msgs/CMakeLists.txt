@@ -71,6 +71,7 @@ add_message_files(
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
+  DropBall.srv
   InitAgent.srv
   MoveAgentPose.srv
   SetGameState.srv
