@@ -23,6 +23,7 @@
 #include <string>
 #include "robocup_msgs/DropBall.h"
 #include "robocup_msgs/InitAgent.h"
+#include "robocup_msgs/KillAgent.h"
 #include "robocup_msgs/SetGameState.h"
 #include "robocup_msgs/MoveAgentPose.h"
 #include "robocup_msgs/MoveBall.h"
@@ -120,6 +121,14 @@ namespace gazebo
     private: bool DropBall(robocup_msgs::DropBall::Request  &req,
                            robocup_msgs::DropBall::Response &res);
 
+    /// \brief ROS service callback that removes the specified agent from
+    /// the simulation.
+    /// \param[out] _req ROS service call request.
+    /// \param[out] _res ROS service call response.
+    /// \return True when the service call succeeds.
+    private: bool KillAgent(robocup_msgs::KillAgent::Request  &req,
+                            robocup_msgs::KillAgent::Response &res);
+
     /// \brief Executes the update on the current state.
     private: void Update();
 
@@ -142,6 +151,12 @@ namespace gazebo
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
 
+    /// \brief Pointer to a node for communication.
+    private: transport::NodePtr gzNode;
+
+    /// \brief Request publisher.
+    private: transport::PublisherPtr requestPub;
+
     // ROS Node handler
     private: ros::NodeHandle* node;
 
@@ -160,8 +175,11 @@ namespace gazebo
     // ROS Service for move the ball.
     private: ros::ServiceServer moveBallService;
 
-     // ROS Service for dropping the ball.
+    // ROS Service for dropping the ball.
     private: ros::ServiceServer dropBallService;
+
+    // ROS Service for killing an agent.
+    private: ros::ServiceServer killAgentService;
 
     // ROS Publisher.
     private: ros::Publisher publisher;

@@ -202,6 +202,10 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     return;
   }
 
+  this->gzNode = transport::NodePtr(new transport::Node());
+  this->gzNode->Init();
+  this->requestPub = this->gzNode->Advertise<msgs::Request>("~/request");
+
   // ROS Nodehandle
   this->node = new ros::NodeHandle("~");
 
@@ -220,6 +224,9 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   this->dropBallService = this->node->advertiseService("drop_ball",
     &GameControllerPlugin::DropBall, this);
+
+  this->killAgentService = this->node->advertiseService("kill_agent",
+    &GameControllerPlugin::KillAgent, this);
 
   // Advertise all the messages
   this->publisher =
@@ -565,11 +572,63 @@ bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
           model->SetWorldPose(playerPose);
         }
         else
-          std::cerr << "DropBall() error: No intersection between circunference"
-                    << " and line. That shouldn't be happening" << std::endl;
+          gzerr << "DropBall() error: No intersection between circunference"
+                << " and line. That shouldn't be happening" << std::endl;
       }
     }
   }
+
+  res.result = 1;
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool GameControllerPlugin::KillAgent(robocup_msgs::KillAgent::Request  &req,
+                                     robocup_msgs::KillAgent::Response &res)
+{
+  res.result = 0;
+
+  // Find the team
+  int index = -1;
+  for (size_t i = 0; i < this->teams.size(); ++i)
+    if (this->teams.at(i)->name == req.team_name)
+    {
+      index = i;
+      break;
+    }
+
+  // Team not found
+  if (index == -1)
+  {
+    gzerr << "Trying to kill an agent from an unknown team ("
+          << req.team_name << ")" << std::endl;
+    return false;
+  }
+
+  // Wrong player #
+  if (req.player_number <= 0 || req.player_number > 11)
+  {
+    gzerr << "Trying to kill an agent with a wrong id ("
+          << req.player_number << ")" << std::endl;
+    return false;
+  }
+
+  // Kill the player
+  std::string name = this->teams.at(index)->members.at(req.player_number);
+  if (name != "")
+  {
+    physics::ModelPtr model = this->world->GetModel(name);
+    if (model != NULL)
+    {
+      msgs::Request *msg = msgs::CreateRequest("entity_delete", name);
+      this->requestPub->Publish(*msg);
+
+      this->teams.at(index)->members.at(req.player_number) = "";
+    }
+    else
+      gzerr << "KillAgent(). Model (" << name << ") not found.\n";
+  }
+
 
   res.result = 1;
   return true;

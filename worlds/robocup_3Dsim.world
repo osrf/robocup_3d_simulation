@@ -41,6 +41,9 @@
       <name>soccer_ball</name>
     </include>
 
+    <!-- Load the plugin for Razer Hydra -->
+    <!--<plugin name="hydra" filename="libHydraPlugin.so"></plugin>-->
+
     <plugin name="game_controller" filename="librobocup_gamecontroller_plugin.so">
       <ball>soccer_ball</ball>
 

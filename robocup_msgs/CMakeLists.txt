@@ -59,7 +59,6 @@ add_message_files(
   Hear.msg
   InitPlayer.msg
   Kickoff.msg
-  KillAgent.msg
   Landmark.msg
   MoveAgent.msg
   PlayMode.msg
@@ -72,6 +71,7 @@ add_message_files(
 add_service_files(
   FILES
   DropBall.srv
+  KillAgent.srv
   InitAgent.srv
   MoveAgentPose.srv
   SetGameState.srv
