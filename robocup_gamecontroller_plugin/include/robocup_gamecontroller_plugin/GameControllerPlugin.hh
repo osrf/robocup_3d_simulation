@@ -19,7 +19,9 @@
 #define _GAZEBO_GAME_CONTROLLER_PLUGIN_HH_
 
 #include <gazebo/gazebo.hh>
+#include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#include <map>
 #include <string>
 #include "robocup_msgs/DropBall.h"
 #include "robocup_msgs/InitAgent.h"
@@ -32,11 +34,27 @@ namespace gazebo
 {
   class State;
 
+  typedef std::vector<std::pair<int, std::string> > Members_V;
+  typedef Members_V::iterator Members_It;
+  typedef boost::shared_ptr<State> StatePtr;
+
   class GameControllerPlugin : public WorldPlugin
   {
-    public: static const std::string Kickoff;
-    public: static const std::string Playing;
-    public: static const std::string Finished;
+    public: static const std::string BeforeKickOff;
+    public: static const std::string KickOffLeft;
+    public: static const std::string KickOffRight;
+    public: static const std::string Play;
+    public: static const std::string KickInLeft;
+    public: static const std::string KickInRight;
+    public: static const std::string CornerKickLeft;
+    public: static const std::string CornerKickRight;
+    public: static const std::string GoalKickLeft;
+    public: static const std::string GoalKickRight;
+    public: static const std::string GameOver;
+    public: static const std::string GoalLeft;
+    public: static const std::string GoalRight;
+    public: static const std::string FreeKickLeft;
+    public: static const std::string FreeKickRight;
     public: static const long        SecondsEachHalf;
 
     /// \brief Constructor.
@@ -89,7 +107,7 @@ namespace gazebo
     /// \brief Set the current game state. If the new state is the same than
     /// the current one, the operation does not have any effect.
     /// \param [out] _newState
-    private: void SetCurrent(State *_newState);
+    private: void SetCurrent(const StatePtr &_newState);
 
     /// \brief ROS service callback that sets the state of the game.
     /// \param[out] _req ROS service call request.
@@ -158,7 +176,7 @@ namespace gazebo
     private: transport::PublisherPtr requestPub;
 
     // ROS Node handler
-    private: ros::NodeHandle* node;
+    private: boost::scoped_ptr<ros::NodeHandle> node;
 
     // ROS Subscriber
     private: ros::Subscriber sub;
@@ -197,16 +215,52 @@ namespace gazebo
     private: gazebo::common::Time startTimeSim;
 
     /// \brief Pointer to the current game state.
-    private: State *currentState;
+    private: StatePtr currentState;
 
     /// \brief Pointer to the kickoff state.
-    private: State *kickoffState;
+    private: StatePtr beforeKickOffState;
+
+    /// \brief Pointer to the kickoffLeft state.
+    private: StatePtr kickOffLeftState;
+
+    /// \brief Pointer to the kickoffRight state.
+    private: StatePtr kickOffRightState;
 
     /// \brief Pointer to the play state.
-    private: State *playState;
+    private: StatePtr playState;
 
-    /// \brief Pointer to the finished state.
-    private: State *finishedState;
+    /// \brief Pointer to the kickInLeft state.
+    private: StatePtr kickInLeftState;
+
+    /// \brief Pointer to the kickInRight state.
+    private: StatePtr kickInRightState;
+
+    /// \brief Pointer to the cornerKickLeft state.
+    private: StatePtr cornerKickLeftState;
+
+    /// \brief Pointer to the cornerKickRight state.
+    private: StatePtr cornerKickRightState;
+
+    /// \brief Pointer to the goalKickLeft state.
+    private: StatePtr goalKickLeftState;
+
+    /// \brief Pointer to the goalKickRight state.
+    private: StatePtr goalKickRightState;
+
+    /// \brief Pointer to the gameover state.
+    private: StatePtr gameOverState;
+
+    /// \brief Pointer to the goalLeft state.
+    private: StatePtr goalLeftState;
+
+    /// \brief Pointer to the goalRight state.
+    private: StatePtr goalRightState;
+
+    /// \brief Pointer to the freeKickLeft state.
+    private: StatePtr freeKickLeftState;
+
+    /// \brief Pointer to the freeKickRight state.
+    private: StatePtr freeKickRightState;
 
     /// \brief Game time.
     private: common::Time elapsedTimeSim;
@@ -214,6 +268,16 @@ namespace gazebo
     /// \brief Mutex to avoid race conditions while running updates and a ROS
     /// callback is executed.
     private: boost::mutex mutex;
+
+    struct CompareFirst
+    {
+      CompareFirst(int val) : val(val) {}
+      bool operator()(const std::pair<int, std::string>& _elem) const {
+        return val == _elem.first;
+      }
+      private:
+        int val;
+    };
 
    /* private: void ClearPlayers(const math::Box &_box, double _minDist,
                  unsigned int _teamIndex); */
@@ -228,7 +292,8 @@ namespace gazebo
 
       /// \brief All the members in the team.
       ///public: std::vector<physics::ModelPtr> members;
-      public: std::vector<std::string> members;
+      //public: std::vector<std::string> members;
+      public: std::vector<std::pair<int, std::string> > members;
     };
 
     /// \brief All the teams.
@@ -241,8 +306,7 @@ namespace gazebo
     /// \brief Class constructor.
     /// \param[in] _name Name of the state.
     /// \param[out] _plugin Reference to the GameControllerPlugin.
-    public: State(const std::string &_name,
-                  GameControllerPlugin *_plugin);
+    public: State(const std::string &_name, GameControllerPlugin *_plugin);
 
     /// \brief Initialize the state. Called once when the state is entered.
     public: virtual void Initialize() = 0;
@@ -261,11 +325,165 @@ namespace gazebo
     protected: std::string name;
   };
 
-  /// \brief State that handles finished.
-  class FinishedState : public State
+  /// \brief State that handles the initial state.
+  class BeforeKickOffState : public State
   {
     /// Documentation inherited.
-    public: FinishedState(const std::string &_name,
+    public: BeforeKickOffState(const std::string &_name,
+                               GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the left kickoff state.
+  class KickOffLeftState : public State
+  {
+    /// Documentation inherited.
+    public: KickOffLeftState(const std::string &_name,
+                             GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the right kickoff state.
+  class KickOffRightState : public State
+  {
+    /// Documentation inherited.
+    public: KickOffRightState(const std::string &_name,
+                              GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handels regular gameplay.
+  class PlayState : public State
+  {
+    /// Documentation inherited.
+    public: PlayState(const std::string &_name,
+                      GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the left kick in state.
+  class KickInLeftState : public State
+  {
+    /// Documentation inherited.
+    public: KickInLeftState(const std::string &_name,
+                            GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the right kick in state.
+  class KickInRightState : public State
+  {
+    /// Documentation inherited.
+    public: KickInRightState(const std::string &_name,
+                             GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the corner kick left state.
+  class CornerKickLeftState : public State
+  {
+    /// Documentation inherited.
+    public: CornerKickLeftState(const std::string &_name,
+                                GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the corner kick right state.
+  class CornerKickRightState : public State
+  {
+    /// Documentation inherited.
+    public: CornerKickRightState(const std::string &_name,
+                                 GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the goal kick left state.
+  class GoalKickLeftState : public State
+  {
+    /// Documentation inherited.
+    public: GoalKickLeftState(const std::string &_name,
+                              GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the goal kick right state.
+  class GoalKickRightState : public State
+  {
+    /// Documentation inherited.
+    public: GoalKickRightState(const std::string &_name,
+                               GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the gameover.
+  class GameOverStateState : public State
+  {
+    /// Documentation inherited.
+    public: GameOverStateState(const std::string &_name,
+                               GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the left goal state.
+  class GoalLeftState : public State
+  {
+    /// Documentation inherited.
+    public: GoalLeftState(const std::string &_name,
                           GameControllerPlugin *_plugin);
 
     /// Documentation inherited.
@@ -275,12 +493,12 @@ namespace gazebo
     public: virtual void Update();
   };
 
-  /// \brief State that handles kickoff.
-  class KickoffState : public State
+  /// \brief State that handles the right goal state.
+  class GoalRightState : public State
   {
     /// Documentation inherited.
-    public: KickoffState(const std::string &_name,
-                         GameControllerPlugin *_plugin);
+    public: GoalRightState(const std::string &_name,
+                           GameControllerPlugin *_plugin);
 
     /// Documentation inherited.
     public: virtual void Initialize();
@@ -289,12 +507,26 @@ namespace gazebo
     public: virtual void Update();
   };
 
-  /// \brief State that handels normal play.
-  class PlayState : public State
+  /// \brief State that handles the free kick left state.
+  class FreeKickLeftState : public State
   {
     /// Documentation inherited.
-    public: PlayState(const std::string &_name,
-                      GameControllerPlugin *_plugin);
+    public: FreeKickLeftState(const std::string &_name,
+                              GameControllerPlugin *_plugin);
+
+    /// Documentation inherited.
+    public: virtual void Initialize();
+
+    // Documentation inherited
+    public: virtual void Update();
+  };
+
+  /// \brief State that handles the free kick right state.
+  class FreeKickRightState : public State
+  {
+    /// Documentation inherited.
+    public: FreeKickRightState(const std::string &_name,
+                               GameControllerPlugin *_plugin);
 
     /// Documentation inherited.
     public: virtual void Initialize();

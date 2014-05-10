@@ -48,9 +48,22 @@ const math::Box FieldRight(
     math::Vector3(FIELD_HEIGHT*0.5, FIELD_WIDTH*0.5, 0));
 
 // Game state constant initialization
-const std::string GameControllerPlugin::Kickoff  = "kickoff";
-const std::string GameControllerPlugin::Playing  = "playing";
-const std::string GameControllerPlugin::Finished = "finished";
+const std::string GameControllerPlugin::BeforeKickOff   = "before_kickoff";
+const std::string GameControllerPlugin::KickOffLeft     = "kickoff_left";
+const std::string GameControllerPlugin::KickOffRight    = "kickoff_right";
+const std::string GameControllerPlugin::Play            = "play";
+const std::string GameControllerPlugin::KickInLeft      = "kickin_left";
+const std::string GameControllerPlugin::KickInRight     = "kickin_right";
+const std::string GameControllerPlugin::CornerKickLeft  = "corner_left";
+const std::string GameControllerPlugin::CornerKickRight = "corner_right";
+const std::string GameControllerPlugin::GoalKickLeft    = "goal_kick_left";
+const std::string GameControllerPlugin::GoalKickRight   = "goal_kick_right";
+const std::string GameControllerPlugin::GameOver        = "gameover";
+const std::string GameControllerPlugin::GoalLeft        = "goal_left";
+const std::string GameControllerPlugin::GoalRight       = "goal_right";
+const std::string GameControllerPlugin::FreeKickLeft    = "free_kick_left";
+const std::string GameControllerPlugin::FreeKickRight   = "kick_kick_right";
+
 const long GameControllerPlugin::SecondsEachHalf = 10000;
 
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
@@ -62,6 +75,13 @@ const math::Pose InitPose3(math::Pose(-0.5, 0.5, 0, 0, 0, 0));
 const math::Pose InitPose4(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0, 0, 0, 0));
 std::vector<math::Pose> InitialPoses(4);
 
+
+
+
+
+
+/////////////////////////////////////////////////
+//                STATES
 /////////////////////////////////////////////////
 State::State(const std::string &_name,
              GameControllerPlugin *_plugin)
@@ -76,14 +96,31 @@ std::string State::GetName()
 }
 
 /////////////////////////////////////////////////
-KickoffState::KickoffState(const std::string &_name,
-                           GameControllerPlugin *_plugin)
+BeforeKickOffState::BeforeKickOffState(const std::string &_name,
+                                       GameControllerPlugin *_plugin)
   : State(_name, _plugin)
 {
 }
 
 /////////////////////////////////////////////////
-void KickoffState::Initialize()
+void BeforeKickOffState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void BeforeKickOffState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+KickOffLeftState::KickOffLeftState(const std::string &_name,
+                                   GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void KickOffLeftState::Initialize()
 {
   // Make sure the ball is at the center of the field
   if (this->plugin->ball)
@@ -96,10 +133,13 @@ void KickoffState::Initialize()
   {
     for (size_t j = 0; j < this->plugin->teams.at(i)->members.size(); ++j)
     {
-      std::string name = this->plugin->teams.at(i)->members.at(j);
+      std::string name = this->plugin->teams.at(i)->members.at(j).second;
       physics::ModelPtr model = this->plugin->world->GetModel(name);
-      if (model != NULL)
-        model->SetWorldPose(InitialPoses.at(j));
+      if (model)
+      {
+        model->SetWorldPose(
+          InitialPoses.at(this->plugin->teams.at(i)->members.at(j).first));
+      }
       else
         std::cerr << "Model (" << name << ") not found." << std::endl;
     }
@@ -107,13 +147,29 @@ void KickoffState::Initialize()
 }
 
 /////////////////////////////////////////////////
-void KickoffState::Update()
+void KickOffLeftState::Update()
 {
 }
 
 /////////////////////////////////////////////////
-PlayState::PlayState(const std::string &_name,
-                     GameControllerPlugin *_plugin)
+KickOffRightState::KickOffRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void KickOffRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void KickOffRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+PlayState::PlayState(const std::string &_name, GameControllerPlugin *_plugin)
   : State(_name, _plugin)
 {
 }
@@ -134,25 +190,212 @@ void PlayState::Update()
 }
 
 /////////////////////////////////////////////////
-FinishedState::FinishedState(const std::string &_name,
-                             GameControllerPlugin *_plugin)
+KickInLeftState::KickInLeftState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
   : State(_name, _plugin)
 {
 }
 
 /////////////////////////////////////////////////
-void FinishedState::Initialize()
+void KickInLeftState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void KickInLeftState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+KickInRightState::KickInRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void KickInRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void KickInRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+CornerKickLeftState::CornerKickLeftState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void CornerKickLeftState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void CornerKickLeftState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+CornerKickRightState::CornerKickRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void CornerKickRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void CornerKickRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+GoalKickLeftState::GoalKickLeftState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void GoalKickLeftState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void GoalKickLeftState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+GoalKickRightState::GoalKickRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void GoalKickRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void GoalKickRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+GameOverStateState::GameOverStateState(const std::string &_name,
+                                       GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void GameOverStateState::Initialize()
 {
   this->plugin->StopClock();
 }
 
 /////////////////////////////////////////////////
-void FinishedState::Update()
+void GameOverStateState::Update()
 {
 }
 
 /////////////////////////////////////////////////
+GoalLeftState::GoalLeftState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void GoalLeftState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void GoalLeftState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+GoalRightState::GoalRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void GoalRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void GoalRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+FreeKickLeftState::FreeKickLeftState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void FreeKickLeftState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void FreeKickLeftState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+FreeKickRightState::FreeKickRightState(const std::string &_name,
+                         GameControllerPlugin *_plugin)
+  : State(_name, _plugin)
+{
+}
+
+/////////////////////////////////////////////////
+void FreeKickRightState::Initialize()
+{
+}
+
+/////////////////////////////////////////////////
+void FreeKickRightState::Update()
+{
+}
+
+/////////////////////////////////////////////////
+//                 PLUGIN
+/////////////////////////////////////////////////
 GameControllerPlugin::GameControllerPlugin()
+  : beforeKickOffState(new BeforeKickOffState(this->BeforeKickOff, this)),
+    kickOffLeftState(new KickOffLeftState(this->KickOffLeft, this)),
+    kickOffRightState(new KickOffRightState(this->KickOffRight, this)),
+    playState(new PlayState(this->Play, this)),
+    kickInLeftState(new KickInLeftState(this->KickInLeft, this)),
+    kickInRightState(new KickInRightState(this->KickInRight, this)),
+    cornerKickLeftState(new CornerKickLeftState(this->CornerKickLeft, this)),
+    cornerKickRightState(new CornerKickRightState(this->CornerKickRight, this)),
+    goalKickLeftState(new GoalKickLeftState(this->GoalKickLeft, this)),
+    goalKickRightState(new GoalKickRightState(this->GoalKickRight, this)),
+    gameOverState(new GameOverStateState(this->GameOver, this)),
+    goalLeftState(new GoalLeftState(this->GoalLeft, this)),
+    goalRightState(new GoalRightState(this->GoalRight, this)),
+    freeKickLeftState(new FreeKickLeftState(this->FreeKickLeft, this)),
+    freeKickRightState(new FreeKickRightState(this->FreeKickRight, this))
 {
   InitialPoses.push_back(InitPose1);
   InitialPoses.push_back(InitPose2);
@@ -164,11 +407,7 @@ GameControllerPlugin::GameControllerPlugin()
   int argc = 0;
   ros::init(argc, NULL, name);
 
-  this->currentState = NULL;
-  this->kickoffState = new KickoffState(this->Kickoff, this);
-  this->playState = new PlayState(this->Playing, this);
-  this->finishedState = new FinishedState(this->Finished, this);
-  this->SetCurrent(this->finishedState);
+  this->SetCurrent(this->beforeKickOffState);
 
   gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
@@ -177,17 +416,6 @@ GameControllerPlugin::GameControllerPlugin()
 GameControllerPlugin::~GameControllerPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-
-  delete this->kickoffState;
-  this->kickoffState = NULL;
-  delete playState;
-  this->playState = NULL;
-  delete this->finishedState;
-  this->finishedState = NULL;
-  this->currentState = NULL;
-
-  delete this->node;
-  this->node = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -207,7 +435,7 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->requestPub = this->gzNode->Advertise<msgs::Request>("~/request");
 
   // ROS Nodehandle
-  this->node = new ros::NodeHandle("~");
+  this->node.reset(new ros::NodeHandle("~"));
 
   // Advertise all the services
   this->initAgentService = this->node->advertiseService("init_agent",
@@ -316,12 +544,12 @@ void GameControllerPlugin::Update()
 }
 
 ////////////////////////////////////////////////
-void GameControllerPlugin::SetCurrent(State *_newState)
+void GameControllerPlugin::SetCurrent(const StatePtr &_newState)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Only update the state if _newState is different than the current state.
-  if (this->currentState != _newState)
+  if (this->currentState.get() != _newState.get())
   {
     this->currentState = _newState;
     this->Initialize();
@@ -357,7 +585,6 @@ bool GameControllerPlugin::InitAgent(
   {
     Team *aTeam = new Team;
     aTeam->name = teamName;
-    aTeam->members.resize(11);
     this->teams.push_back(aTeam);
     std::cout << "New team" << std::endl;
   }
@@ -410,7 +637,10 @@ bool GameControllerPlugin::InitAgent(
   }
 
   this->world->InsertModelSDF(agentSDF);
-  myTeam->members[player] = name;
+
+  // Add the player
+  // ToDo(caguero): Check that the player is not already existing.
+  myTeam->members.push_back(make_pair(player, name));
 
   res.result = 1;
   return true;
@@ -433,12 +663,12 @@ bool GameControllerPlugin::SetGameState(
   robocup_msgs::SetGameState::Request  &req,
   robocup_msgs::SetGameState::Response &res)
 {
-  if (req.play_mode == this->Playing)
+  if (req.play_mode == this->Play)
     this->SetCurrent(this->playState);
-  else if (req.play_mode == this->Kickoff)
-    this->SetCurrent(this->kickoffState);
-  else if (req.play_mode == this->Finished)
-    this->SetCurrent(this->finishedState);
+  else if (req.play_mode == this->KickOffLeft)
+    this->SetCurrent(this->kickOffLeftState);
+  else if (req.play_mode == this->KickOffRight)
+    this->SetCurrent(this->kickOffRightState);
   else
   {
     gzerr << "[GameControllerPlugin::SetGameState()] Unknown play mode ("
@@ -477,30 +707,31 @@ bool GameControllerPlugin::MoveAgentPose(
   }
 
   // Wrong player #
-  if (req.player_id <= 0 || req.player_id > 11)
+  Members_It it = std::find_if(this->teams.at(index)->members.begin(),
+                    this->teams.at(index)->members.end(),
+                    CompareFirst(req.player_id));
+
+  if (it == this->teams.at(index)->members.end())
+  //if (req.player_id <= 0 || req.player_id > 11)
   {
-    gzlog << "Trying to move an agent with a wrong id ("
+    gzlog << "Trying to move an agent with an unregistered id ("
           << req.player_id << ")" << std::endl;
     return false;
   }
 
   // Move the player
-  std::string name = this->teams.at(index)->members.at(req.player_id);
-  if (name != "")
+  std::string name = it->second;
+  physics::ModelPtr model = this->world->GetModel(name);
+  if (!model)
   {
-    physics::ModelPtr model = this->world->GetModel(name);
-    if (model != NULL)
-    {
-      math::Pose newPose(math::Pose(req.position.x, req.position.y, 0,
-                                    0, 0, req.position.theta));
-      model->SetWorldPose(newPose);
-      return true;
-    }
-    else
-      std::cerr << "MoveAgentPose(). Model (" << name << ") not found.\n";
+    std::cerr << "MoveAgentPose(). Model (" << name << ") not found.\n";
+    return false;
   }
 
-  return false;
+  math::Pose newPose(math::Pose(req.position.x, req.position.y, 0,
+                                0, 0, req.position.theta));
+  model->SetWorldPose(newPose);
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -528,7 +759,7 @@ bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
 
   // Get ball position.
   physics::ModelPtr model = this->world->GetModel("soccer_ball");
-  if (model == NULL)
+  if (!model)
   {
     std::cerr << "DropBall() error: Ball not found" << std::endl;
     return false;
@@ -536,45 +767,58 @@ bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
 
   math::Vector3 ballPos = model->GetWorldPose().pos;
 
+  std::cout << "Teams: " << this->teams.size() << std::endl;
+
   // Check if the player is withing FREE_KICK distance.
   for (size_t i = 0; i < this->teams.size(); ++i)
   {
-    for (size_t j = 0; j < this->teams.at(i)->members.size() - 1; ++j)
+    std::cout << this->teams.at(i)->members.size() << std::endl;
+    for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
     {
-      if (this->teams.at(i)->members.at(j) == "")
-        continue;
-
-      std::string name = this->teams.at(i)->members.at(j);
+      std::string name = this->teams.at(i)->members.at(j).second;
       model = this->world->GetModel(name);
-      math::Pose playerPose = model->GetWorldPose();
 
-      // Move the player if it's close enough to the ball.
-      if (playerPose.pos.Distance(ballPos) < FREE_KICK_MOVE_DIST)
+      if (model)
       {
-        // Calculate the general form equation of a line from two points.
-        // a = y1 - y2
-        // b = x2 - x1
-        // c = (x1-x2)*y1 + (y2-y1)*x1
-        math::Vector3 v(ballPos.y - playerPose.pos.y,
-                        playerPose.pos.x - ballPos.x,
-                        (ballPos.x - playerPose.pos.x) * ballPos.y +
-                        (playerPose.pos.y - ballPos.y) * ballPos.x);
-        math::Vector3 int1;
-        math::Vector3 int2;
-        if (this->IntersectionCircunferenceLine(v, ballPos, FREE_KICK_MOVE_DIST,
-            int1, int2))
-        {
-          if (playerPose.pos.Distance(int1) < playerPose.pos.Distance(int2))
-            playerPose.pos = int1;
-          else
-            playerPose.pos = int2;
+        std::cout << "Model not null" << std::endl;
+        math::Pose playerPose = model->GetWorldPose();
 
-          model->SetWorldPose(playerPose);
+        // Move the player if it's close enough to the ball.
+        if (playerPose.pos.Distance(ballPos) < FREE_KICK_MOVE_DIST)
+        {
+
+          std::cout << "Player close to the ball" << std::endl;
+          // Calculate the general form equation of a line from two points.
+          // a = y1 - y2
+          // b = x2 - x1
+          // c = (x1-x2)*y1 + (y2-y1)*x1
+          math::Vector3 v(ballPos.y - playerPose.pos.y,
+                          playerPose.pos.x - ballPos.x,
+                          (ballPos.x - playerPose.pos.x) * ballPos.y +
+                          (playerPose.pos.y - ballPos.y) * ballPos.x);
+          math::Vector3 int1;
+          math::Vector3 int2;
+          if (this->IntersectionCircunferenceLine(v, ballPos,
+                                                  FREE_KICK_MOVE_DIST,
+                                                  int1, int2))
+          {
+            if (playerPose.pos.Distance(int1) < playerPose.pos.Distance(int2))
+              playerPose.pos = int1;
+            else
+              playerPose.pos = int2;
+
+            model->SetWorldPose(playerPose);
+          }
+          else
+            gzerr << "DropBall() error: No intersection between circunference"
+                  << " and line. That shouldn't be happening" << std::endl;
         }
         else
-          gzerr << "DropBall() error: No intersection between circunference"
-                << " and line. That shouldn't be happening" << std::endl;
+          std::cout << "Player not close to the ball" << std::endl;
+
       }
+      else
+        std::cout << "Model is NULL" << std::endl;
     }
   }
 
@@ -606,29 +850,37 @@ bool GameControllerPlugin::KillAgent(robocup_msgs::KillAgent::Request  &req,
   }
 
   // Wrong player #
-  if (req.player_number <= 0 || req.player_number > 11)
+  Members_It it = std::find_if(this->teams.at(index)->members.begin(),
+                    this->teams.at(index)->members.end(),
+                    CompareFirst(req.player_number));
+
+  if (it == this->teams.at(index)->members.end())
   {
-    gzerr << "Trying to kill an agent with a wrong id ("
+    gzerr << "Trying to kill an agent with an unregistered id ("
           << req.player_number << ")" << std::endl;
     return false;
   }
 
   // Kill the player
-  std::string name = this->teams.at(index)->members.at(req.player_number);
-  if (name != "")
+  std::string name = it->second;
+  physics::ModelPtr model = this->world->GetModel(name);
+  if (!model)
   {
-    physics::ModelPtr model = this->world->GetModel(name);
-    if (model != NULL)
-    {
-      msgs::Request *msg = msgs::CreateRequest("entity_delete", name);
-      this->requestPub->Publish(*msg);
-
-      this->teams.at(index)->members.at(req.player_number) = "";
-    }
-    else
-      gzerr << "KillAgent(). Model (" << name << ") not found.\n";
+    gzerr << "KillAgent(). Model (" << name << ") not found.\n";
+    return false;
   }
 
+  msgs::Request *msg = msgs::CreateRequest("entity_delete", name);
+  this->requestPub->Publish(*msg);
+
+  // Remove the player from the map.
+  this->teams.at(index)->members.erase(
+      std::remove_if(this->teams.at(index)->members.begin(),
+                     this->teams.at(index)->members.end(),
+                     CompareFirst(req.player_number)),
+      this->teams.at(index)->members.end());
+  //this->teams.at(index)->members.erase(req.player_number);
+  //this->teams.at(index)->members.at(req.player_number) = "";
 
   res.result = 1;
   return true;
@@ -671,14 +923,14 @@ void GameControllerPlugin::CheckTiming()
     // End of the first half
     this->SetHalf(2);
     std::swap(this->scoreLeft, this->scoreRight);
-    this->SetCurrent(this->kickoffState);
+    this->SetCurrent(this->kickOffRightState);
     this->ResetClock();
     this->SetCurrent(this->playState);
   }
   else if ((this->GetHalf() == 2) && (elapsedTimeSim >= this->SecondsEachHalf))
   {
     // End of the game
-    this->SetCurrent(this->finishedState);
+    this->SetCurrent(this->gameOverState);
   }
 }
 
@@ -693,7 +945,7 @@ void GameControllerPlugin::CheckBall()
   {
     // The ball is inside the left goal.
     this->scoreRight++;
-    this->SetCurrent(this->kickoffState);
+    //this->SetCurrent(this->kickoffState);
     this->SetCurrent(this->playState);
     gzlog << "Right team goal" << std::endl;
   }
@@ -702,7 +954,7 @@ void GameControllerPlugin::CheckBall()
   {
     // The ball is inside the right goal.
     this->scoreLeft++;
-    this->SetCurrent(this->kickoffState);
+    //this->SetCurrent(this->kickoffState);
     this->SetCurrent(this->playState);
     gzlog << "Left team goal" << std::endl;
   }
@@ -716,45 +968,54 @@ void GameControllerPlugin::CheckBall()
 }
 
 /////////////////////////////////////////////////
+// ToDo(caguero): Fix this method.
 void GameControllerPlugin::CheckPlayerCollisions()
 {
   for (size_t i = 0; i < this->teams.size(); ++i)
   {
     for (size_t j = 0; j < this->teams.at(i)->members.size() - 1; ++j)
     {
-      std::string name = this->teams.at(i)->members.at(j);
+      std::string name = this->teams.at(i)->members.at(j).second;
       physics::ModelPtr model = this->world->GetModel(name);
-      math::Pose pose = model->GetWorldPose();
 
-      for (size_t k = j + 1; k < this->teams.at(i)->members.size(); ++k)
+      if (model)
       {
-        std::string otherName = this->teams.at(i)->members.at(k);
-        physics::ModelPtr otherModel = this->world->GetModel(otherName);
-        math::Pose otherPose = otherModel->GetWorldPose();
+        math::Pose pose = model->GetWorldPose();
 
-        std::cout << "Distance: " << pose.pos.Distance(otherPose.pos)
-                  << std::endl;
-        if (pose.pos.Distance(otherPose.pos) < 0.20)
+        for (size_t k = j + 1; k < this->teams.at(i)->members.size(); ++k)
         {
-          // Get the current pose of the member
-          pose.pos.x = pose.pos.x -
-              math::Rand::GetDblUniform(2, 2);
+          std::string otherName = this->teams.at(i)->members.at(k).second;
+          physics::ModelPtr otherModel = this->world->GetModel(otherName);
 
-          /*
-          // If the member is on the LEFT team, move the member's X position to
-          // the LEFT
-          if (_teamIndex == TEAM_LEFT)
+          if (otherModel)
           {
-            pose.pos.x = _box.min.x -
-              math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
+            math::Pose otherPose = otherModel->GetWorldPose();
+
+            //std::cout << "Distance: " << pose.pos.Distance(otherPose.pos)
+            //          << std::endl;
+            if (pose.pos.Distance(otherPose.pos) < 0.40)
+            {
+              // Get the current pose of the member
+              pose.pos.x = pose.pos.x -
+                  math::Rand::GetDblUniform(2, 2);
+
+              /*
+              // If the member is on the LEFT team, move the member's X position to
+              // the LEFT
+              if (_teamIndex == TEAM_LEFT)
+              {
+                pose.pos.x = _box.min.x -
+                  math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
+              }
+              else
+              {
+                pose.pos.x = _box.max.x +
+                  math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
+              }*/
+
+              model->SetWorldPose(pose);
+            }
           }
-          else
-          {
-            pose.pos.x = _box.max.x +
-              math::Rand::GetDblUniform(_minDist, _minDist * 2.0);
-          }*/
-
-          model->SetWorldPose(pose);
         }
       }
     }
