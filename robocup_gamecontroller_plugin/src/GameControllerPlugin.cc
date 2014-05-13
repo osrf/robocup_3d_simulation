@@ -211,6 +211,10 @@ void KickOffLeftState::Initialize()
 /////////////////////////////////////////////////
 void KickOffLeftState::Update()
 {
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrent(this->plugin->playState.get());
 }
 
 /////////////////////////////////////////////////
@@ -263,6 +267,10 @@ void KickOffRightState::Initialize()
 /////////////////////////////////////////////////
 void KickOffRightState::Update()
 {
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrent(this->plugin->playState.get());
 }
 
 /////////////////////////////////////////////////
@@ -499,11 +507,18 @@ GoalLeftState::GoalLeftState(const std::string &_name,
 void GoalLeftState::Initialize()
 {
   State::Initialize();
+
+  // Register the left team goal.
+  this->plugin->scoreLeft++;
 }
 
 /////////////////////////////////////////////////
 void GoalLeftState::Update()
 {
+  // After some time, go to right team kick off mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrent(this->plugin->kickOffRightState.get());
 }
 
 /////////////////////////////////////////////////
@@ -517,11 +532,18 @@ GoalRightState::GoalRightState(const std::string &_name,
 void GoalRightState::Initialize()
 {
   State::Initialize();
+
+  // Register the right team goal.
+  this->plugin->scoreRight++;
 }
 
 /////////////////////////////////////////////////
 void GoalRightState::Update()
 {
+  // After some time, go to left team kick off mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 2)
+    this->plugin->SetCurrent(this->plugin->kickOffLeftState.get());
 }
 
 /////////////////////////////////////////////////
@@ -540,6 +562,19 @@ void FreeKickLeftState::Initialize()
 /////////////////////////////////////////////////
 void FreeKickLeftState::Update()
 {
+  // The right team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(0);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
+}
+
+/////////////////////////////////////////////////
+void FreeKickLeftState::SetPos(const math::Vector3 &_pos)
+{
+  this->pos = _pos;
 }
 
 /////////////////////////////////////////////////
@@ -558,7 +593,21 @@ void FreeKickRightState::Initialize()
 /////////////////////////////////////////////////
 void FreeKickRightState::Update()
 {
+  // The left team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(1);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
 }
+
+/////////////////////////////////////////////////
+void FreeKickRightState::SetPos(const math::Vector3 &_pos)
+{
+  this->pos = _pos;
+}
+
 
 /////////////////////////////////////////////////
 //                 PLUGIN
@@ -1187,9 +1236,7 @@ void GameControllerPlugin::CheckBall()
       (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))
   {
     // The ball is inside the left goal.
-    this->scoreRight++;
     this->SetCurrent(this->goalRightState.get());
-    gzlog << "Right team goal" << std::endl;
   }
   else if ((ballPose.pos.x > FIELD_HEIGHT * 0.5) &&
           (fabs(ballPose.pos.y) < GOAL_WIDTH * 0.5))

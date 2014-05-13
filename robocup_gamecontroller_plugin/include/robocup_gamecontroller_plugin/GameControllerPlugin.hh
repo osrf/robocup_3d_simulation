@@ -235,10 +235,10 @@ namespace gazebo
     private: uint8_t half;
 
     /// \brief Left team score.
-    private: uint32_t scoreLeft;
+    public: uint32_t scoreLeft;
 
     /// \brief Right team score.
-    private: uint32_t scoreRight;
+    public: uint32_t scoreRight;
 
     /// \brief Sim time at which the game started.
     private: gazebo::common::Time startTimeSim;
@@ -247,49 +247,49 @@ namespace gazebo
     private: State *currentState;
 
     /// \brief Pointer to the kickoff state.
-    private: boost::shared_ptr<BeforeKickOffState> beforeKickOffState;
+    public: boost::shared_ptr<BeforeKickOffState> beforeKickOffState;
 
     /// \brief Pointer to the kickoffLeft state.
-    private: boost::shared_ptr<KickOffLeftState> kickOffLeftState;
+    public: boost::shared_ptr<KickOffLeftState> kickOffLeftState;
 
     /// \brief Pointer to the kickoffRight state.
-    private: boost::shared_ptr<KickOffRightState> kickOffRightState;
+    public: boost::shared_ptr<KickOffRightState> kickOffRightState;
 
     /// \brief Pointer to the play state.
     public: boost::shared_ptr<PlayState> playState;
 
     /// \brief Pointer to the kickInLeft state.
-    private: boost::shared_ptr<KickInLeftState> kickInLeftState;
+    public: boost::shared_ptr<KickInLeftState> kickInLeftState;
 
     /// \brief Pointer to the kickInRight state.
-    private: boost::shared_ptr<KickInRightState> kickInRightState;
+    public: boost::shared_ptr<KickInRightState> kickInRightState;
 
     /// \brief Pointer to the cornerKickLeft state.
-    private: boost::shared_ptr<CornerKickLeftState> cornerKickLeftState;
+    public: boost::shared_ptr<CornerKickLeftState> cornerKickLeftState;
 
     /// \brief Pointer to the cornerKickRight state.
-    private: boost::shared_ptr<CornerKickRightState> cornerKickRightState;
+    public: boost::shared_ptr<CornerKickRightState> cornerKickRightState;
 
     /// \brief Pointer to the goalKickLeft state.
-    private: boost::shared_ptr<GoalKickLeftState> goalKickLeftState;
+    public: boost::shared_ptr<GoalKickLeftState> goalKickLeftState;
 
     /// \brief Pointer to the goalKickRight state.
-    private: boost::shared_ptr<GoalKickRightState> goalKickRightState;
+    public: boost::shared_ptr<GoalKickRightState> goalKickRightState;
 
     /// \brief Pointer to the gameover state.
-    private: boost::shared_ptr<GameOverState> gameOverState;
+    public: boost::shared_ptr<GameOverState> gameOverState;
 
     /// \brief Pointer to the goalLeft state.
-    private: boost::shared_ptr<GoalLeftState> goalLeftState;
+    public: boost::shared_ptr<GoalLeftState> goalLeftState;
 
     /// \brief Pointer to the goalRight state.
-    private: boost::shared_ptr<GoalRightState> goalRightState;
+    public: boost::shared_ptr<GoalRightState> goalRightState;
 
     /// \brief Pointer to the freeKickLeft state.
-    private: boost::shared_ptr<FreeKickLeftState> freeKickLeftState;
+    public: boost::shared_ptr<FreeKickLeftState> freeKickLeftState;
 
     /// \brief Pointer to the freeKickRight state.
-    private: boost::shared_ptr<FreeKickRightState> freeKickRightState;
+    public: boost::shared_ptr<FreeKickRightState> freeKickRightState;
 
     /// \brief Game time.
     private: common::Time elapsedTimeSim;
@@ -567,6 +567,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetPos(const math::Vector3 &_pos);
+
+    private: math::Vector3 pos;
   };
 
   /// \brief State that handles the free kick right state.
@@ -581,6 +585,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetPos(const math::Vector3 &_pos);
+
+    private: math::Vector3 pos;
   };
 }
 #endif
