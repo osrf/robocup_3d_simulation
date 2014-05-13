@@ -461,6 +461,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetBallPos(const math::Vector3 &_ballPos);
+
+    private: math::Vector3 ballPos;
   };
 
   /// \brief State that handles the corner kick right state.
@@ -475,6 +479,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetBallPos(const math::Vector3 &_ballPos);
+
+    private: math::Vector3 ballPos;
   };
 
   /// \brief State that handles the goal kick left state.

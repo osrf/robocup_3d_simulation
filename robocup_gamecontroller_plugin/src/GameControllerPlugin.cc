@@ -345,7 +345,7 @@ void KickInRightState::Initialize()
 /////////////////////////////////////////////////
 void KickInRightState::Update()
 {
-  // The right team is not allowed to be close to the ball.
+  // The left team is not allowed to be close to the ball.
   this->plugin->DropBallImpl(1);
 
   // After some time, go to play mode.
@@ -368,14 +368,32 @@ CornerKickLeftState::CornerKickLeftState(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void CornerKickLeftState::SetBallPos(const math::Vector3 &_ballPos)
+{
+  this->ballPos = _ballPos;
+}
+
+/////////////////////////////////////////////////
 void CornerKickLeftState::Initialize()
 {
   State::Initialize();
+
+  // Move the ball to the corner.
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->ballPos.x,
+      this->ballPos.y, this->ballPos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
 void CornerKickLeftState::Update()
 {
+  // The right team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(0);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
 }
 
 /////////////////////////////////////////////////
@@ -386,14 +404,32 @@ CornerKickRightState::CornerKickRightState(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
+void CornerKickRightState::SetBallPos(const math::Vector3 &_ballPos)
+{
+  this->ballPos = _ballPos;
+}
+
+/////////////////////////////////////////////////
 void CornerKickRightState::Initialize()
 {
   State::Initialize();
+
+  // Move the ball to the corner.
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->ballPos.x,
+      this->ballPos.y, this->ballPos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
 void CornerKickRightState::Update()
 {
+  // The left team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(1);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
 }
 
 /////////////////////////////////////////////////
@@ -1171,13 +1207,25 @@ void GameControllerPlugin::CheckBall()
       ballPose.pos.z);
     this->kickInLeftState->SetPos(ballPos);
     this->SetCurrent(this->kickInLeftState.get());
-    gzlog << "Out of bounds" << std::endl;
   }
   else if ((fabs(ballPose.pos.x) > FIELD_HEIGHT * 0.5))
   {
     // The ball is outside of the field.
-    this->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
-    gzlog << "Goal kick" << std::endl;
+    math::Vector3 ballPos(
+      (fabs(ballPose.pos.x) / ballPose.pos.x) * FIELD_HEIGHT * 0.5,
+      (fabs(ballPose.pos.y) / ballPose.pos.y) * FIELD_WIDTH * 0.5,
+      ballPose.pos.z);
+
+    if (ballPose.pos.x < 0)
+    {
+      this->cornerKickRightState->SetBallPos(ballPos);
+      this->SetCurrent(this->cornerKickRightState.get());
+    }
+    else
+    {
+      this->cornerKickLeftState->SetBallPos(ballPos);
+      this->SetCurrent(this->cornerKickLeftState.get());
+    }
   }
 }
 
