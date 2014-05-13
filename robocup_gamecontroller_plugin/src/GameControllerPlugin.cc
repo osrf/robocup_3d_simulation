@@ -69,30 +69,56 @@ const long GameControllerPlugin::SecondsEachHalf = 10000;
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
 
 /////////////////////////////////////////////////
-const math::Pose InitPoseKickOff1(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff2(math::Pose(-0.5, -0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff3(math::Pose(-0.5, 0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff4(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff5(math::Pose(-1.5, -0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff6(math::Pose(-1.5, 0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff7(math::Pose(-1.5, 0, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff8(math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff9(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff10(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
-const math::Pose InitPoseKickOff11(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+const math::Pose LeftInitPoseKickOff1(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff2(math::Pose(-0.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff3(math::Pose(-0.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff4(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff5(math::Pose(-1.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff6(math::Pose(-1.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff7(math::Pose(-1.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff8(math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff9(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff10(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPoseKickOff11(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0,
     0, 0, 3.14));
 
-const math::Pose InitPose1(math::Pose(2.5, 0, 0, 0, 0, 0));
-const math::Pose InitPose2(math::Pose(2.5, -0.5, 0, 0, 0, 0));
-const math::Pose InitPose3(math::Pose(2.5, 0.5, 0, 0, 0, 0));
-const math::Pose InitPose4(math::Pose(2.5, 0, 0, 0, 0, 0));
-const math::Pose InitPose5(math::Pose(4.5, -0.5, 0, 0, 0, 0));
-const math::Pose InitPose6(math::Pose(4.5, 0.5, 0, 0, 0, 0));
-const math::Pose InitPose7(math::Pose(4.5, 0, 0, 0, 0, 0));
-const math::Pose InitPose8(math::Pose(6.5, -0.5, 0, 0, 0, 0));
-const math::Pose InitPose9(math::Pose(6.5, 0.5, 0, 0, 0, 0));
-const math::Pose InitPose10(math::Pose(6.5, 0, 0, 0, 0, 0));
-const math::Pose InitPose11(math::Pose(FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+const math::Pose LeftInitPose1(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose2(math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose3(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose4(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose5(math::Pose(-4.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose6(math::Pose(-4.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose7(math::Pose(-4.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose8(math::Pose(-6.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose9(math::Pose(-6.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose10(math::Pose(-6.5, 0, 0, 0, 0, 3.14));
+const math::Pose LeftInitPose11(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+    0, 0, 3.14));
+
+const math::Pose RightInitPoseKickOff1(math::Pose(0.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff2(math::Pose(0.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff3(math::Pose(0.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff4(math::Pose(0.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff5(math::Pose(1.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff6(math::Pose(1.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff7(math::Pose(1.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff8(math::Pose(2.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff9(math::Pose(2.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff10(math::Pose(2.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPoseKickOff11(math::Pose(FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+    0, 0, 0));
+
+const math::Pose RightInitPose1(math::Pose(2.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPose2(math::Pose(2.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose3(math::Pose(2.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose4(math::Pose(2.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPose5(math::Pose(4.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose6(math::Pose(4.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose7(math::Pose(4.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPose8(math::Pose(6.5, -0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose9(math::Pose(6.5, 0.5, 0, 0, 0, 0));
+const math::Pose RightInitPose10(math::Pose(6.5, 0, 0, 0, 0, 0));
+const math::Pose RightInitPose11(math::Pose(FIELD_HEIGHT*0.5 + 0.5, 0, 0,
     0, 0, 0));
 
 
@@ -152,12 +178,12 @@ void KickOffLeftState::Initialize()
     if (i == 0)
     {
       // Left team
-      initPoses = this->plugin->initialKickOffPoses;
+      initPoses = this->plugin->leftInitialKickOffPoses;
     }
     else
     {
       // Right team
-      initPoses = this->plugin->initialPoses;
+      initPoses = this->plugin->rightInitialPoses;
     }
 
     for (size_t j = 0; j < this->plugin->teams.at(i)->members.size(); ++j)
@@ -190,6 +216,41 @@ KickOffRightState::KickOffRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void KickOffRightState::Initialize()
 {
+  // Make sure the ball is at the center of the field
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
+
+  std::cout << "Num teams: " << this->plugin->teams.size() << std::endl;
+
+  // Reposition the players
+  for (size_t i = 0; i < this->plugin->teams.size(); ++i)
+  {
+    std::vector<math::Pose> initPoses;
+
+    if (i == 0)
+    {
+      // Left team
+      initPoses = this->plugin->leftInitialPoses;
+    }
+    else
+    {
+      // Right team
+      initPoses = this->plugin->rightInitialKickOffPoses;
+    }
+
+    for (size_t j = 0; j < this->plugin->teams.at(i)->members.size(); ++j)
+    {
+      std::string name = this->plugin->teams.at(i)->members.at(j).second;
+      physics::ModelPtr model = this->plugin->world->GetModel(name);
+      if (model)
+      {
+        model->SetWorldPose(
+          initPoses.at(this->plugin->teams.at(i)->members.at(j).first - 1));
+      }
+      else
+        std::cerr << "Model (" << name << ") not found." << std::endl;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -426,29 +487,53 @@ GameControllerPlugin::GameControllerPlugin()
     freeKickLeftState(new FreeKickLeftState(this->FreeKickLeft, this)),
     freeKickRightState(new FreeKickRightState(this->FreeKickRight, this))
 {
-  initialPoses.push_back(InitPose1);
-  initialPoses.push_back(InitPose2);
-  initialPoses.push_back(InitPose3);
-  initialPoses.push_back(InitPose4);
-  initialPoses.push_back(InitPose5);
-  initialPoses.push_back(InitPose6);
-  initialPoses.push_back(InitPose7);
-  initialPoses.push_back(InitPose8);
-  initialPoses.push_back(InitPose9);
-  initialPoses.push_back(InitPose10);
-  initialPoses.push_back(InitPose11);
+  leftInitialPoses.push_back(LeftInitPose1);
+  leftInitialPoses.push_back(LeftInitPose2);
+  leftInitialPoses.push_back(LeftInitPose3);
+  leftInitialPoses.push_back(LeftInitPose4);
+  leftInitialPoses.push_back(LeftInitPose5);
+  leftInitialPoses.push_back(LeftInitPose6);
+  leftInitialPoses.push_back(LeftInitPose7);
+  leftInitialPoses.push_back(LeftInitPose8);
+  leftInitialPoses.push_back(LeftInitPose9);
+  leftInitialPoses.push_back(LeftInitPose10);
+  leftInitialPoses.push_back(LeftInitPose11);
 
-  initialKickOffPoses.push_back(InitPoseKickOff1);
-  initialKickOffPoses.push_back(InitPoseKickOff2);
-  initialKickOffPoses.push_back(InitPoseKickOff3);
-  initialKickOffPoses.push_back(InitPoseKickOff4);
-  initialKickOffPoses.push_back(InitPoseKickOff5);
-  initialKickOffPoses.push_back(InitPoseKickOff6);
-  initialKickOffPoses.push_back(InitPoseKickOff7);
-  initialKickOffPoses.push_back(InitPoseKickOff8);
-  initialKickOffPoses.push_back(InitPoseKickOff9);
-  initialKickOffPoses.push_back(InitPoseKickOff10);
-  initialKickOffPoses.push_back(InitPoseKickOff11);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff1);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff2);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff3);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff4);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff5);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff6);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff7);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff8);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff9);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff10);
+  leftInitialKickOffPoses.push_back(LeftInitPoseKickOff11);
+
+  rightInitialPoses.push_back(RightInitPose1);
+  rightInitialPoses.push_back(RightInitPose2);
+  rightInitialPoses.push_back(RightInitPose3);
+  rightInitialPoses.push_back(RightInitPose4);
+  rightInitialPoses.push_back(RightInitPose5);
+  rightInitialPoses.push_back(RightInitPose6);
+  rightInitialPoses.push_back(RightInitPose7);
+  rightInitialPoses.push_back(RightInitPose8);
+  rightInitialPoses.push_back(RightInitPose9);
+  rightInitialPoses.push_back(RightInitPose10);
+  rightInitialPoses.push_back(RightInitPose11);
+
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff1);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff2);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff3);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff4);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff5);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff6);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff7);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff8);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff9);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff10);
+  rightInitialKickOffPoses.push_back(RightInitPoseKickOff11);
 
   // Start up ROS
   std::string name = "gameController";

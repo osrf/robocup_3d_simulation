@@ -2,8 +2,8 @@
   <model name="teamB_2">
 
     <!-- A turtlebot -->
+    <pose>1.5 11 0 0 0 1.57</pose>
     <include>
-    	<pose>0 0 0 0 0 0</pose>
       <uri>model://turtlebot</uri>
     </include>
     <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>

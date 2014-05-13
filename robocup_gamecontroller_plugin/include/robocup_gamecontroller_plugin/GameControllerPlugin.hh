@@ -161,8 +161,10 @@ namespace gazebo
                                                 math::Vector3 &int1,
                                                 math::Vector3 &int2);
 
-    public: std::vector<math::Pose> initialPoses;
-    public: std::vector<math::Pose> initialKickOffPoses;
+    public: std::vector<math::Pose> leftInitialPoses;
+    public: std::vector<math::Pose> leftInitialKickOffPoses;
+    public: std::vector<math::Pose> rightInitialPoses;
+    public: std::vector<math::Pose> rightInitialKickOffPoses;
 
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;
