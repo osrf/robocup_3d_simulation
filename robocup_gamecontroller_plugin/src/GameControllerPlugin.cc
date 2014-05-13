@@ -69,12 +69,31 @@ const long GameControllerPlugin::SecondsEachHalf = 10000;
 GZ_REGISTER_WORLD_PLUGIN(GameControllerPlugin)
 
 /////////////////////////////////////////////////
-const math::Pose InitPose1(math::Pose(-0.5, 0, 0, 0, 0, 0));
-const math::Pose InitPose2(math::Pose(-0.5, -0.5, 0, 0, 0, 0));
-const math::Pose InitPose3(math::Pose(-0.5, 0.5, 0, 0, 0, 0));
-const math::Pose InitPose4(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0, 0, 0, 0));
+const math::Pose InitPoseKickOff1(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff2(math::Pose(-0.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff3(math::Pose(-0.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff4(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff5(math::Pose(-1.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff6(math::Pose(-1.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff7(math::Pose(-1.5, 0, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff8(math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff9(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff10(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
+const math::Pose InitPoseKickOff11(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+    0, 0, 3.14));
 
-
+const math::Pose InitPose1(math::Pose(2.5, 0, 0, 0, 0, 0));
+const math::Pose InitPose2(math::Pose(2.5, -0.5, 0, 0, 0, 0));
+const math::Pose InitPose3(math::Pose(2.5, 0.5, 0, 0, 0, 0));
+const math::Pose InitPose4(math::Pose(2.5, 0, 0, 0, 0, 0));
+const math::Pose InitPose5(math::Pose(4.5, -0.5, 0, 0, 0, 0));
+const math::Pose InitPose6(math::Pose(4.5, 0.5, 0, 0, 0, 0));
+const math::Pose InitPose7(math::Pose(4.5, 0, 0, 0, 0, 0));
+const math::Pose InitPose8(math::Pose(6.5, -0.5, 0, 0, 0, 0));
+const math::Pose InitPose9(math::Pose(6.5, 0.5, 0, 0, 0, 0));
+const math::Pose InitPose10(math::Pose(6.5, 0, 0, 0, 0, 0));
+const math::Pose InitPose11(math::Pose(FIELD_HEIGHT*0.5 + 0.5, 0, 0,
+    0, 0, 0));
 
 
 /////////////////////////////////////////////////
@@ -128,6 +147,19 @@ void KickOffLeftState::Initialize()
   // Reposition the players
   for (size_t i = 0; i < this->plugin->teams.size(); ++i)
   {
+    std::vector<math::Pose> initPoses;
+
+    if (i == 0)
+    {
+      // Left team
+      initPoses = this->plugin->initialKickOffPoses;
+    }
+    else
+    {
+      // Right team
+      initPoses = this->plugin->initialPoses;
+    }
+
     for (size_t j = 0; j < this->plugin->teams.at(i)->members.size(); ++j)
     {
       std::string name = this->plugin->teams.at(i)->members.at(j).second;
@@ -135,7 +167,7 @@ void KickOffLeftState::Initialize()
       if (model)
       {
         model->SetWorldPose(
-          this->plugin->initialPoses.at(this->plugin->teams.at(i)->members.at(j).first));
+          initPoses.at(this->plugin->teams.at(i)->members.at(j).first - 1));
       }
       else
         std::cerr << "Model (" << name << ") not found." << std::endl;
@@ -398,6 +430,25 @@ GameControllerPlugin::GameControllerPlugin()
   initialPoses.push_back(InitPose2);
   initialPoses.push_back(InitPose3);
   initialPoses.push_back(InitPose4);
+  initialPoses.push_back(InitPose5);
+  initialPoses.push_back(InitPose6);
+  initialPoses.push_back(InitPose7);
+  initialPoses.push_back(InitPose8);
+  initialPoses.push_back(InitPose9);
+  initialPoses.push_back(InitPose10);
+  initialPoses.push_back(InitPose11);
+
+  initialKickOffPoses.push_back(InitPoseKickOff1);
+  initialKickOffPoses.push_back(InitPoseKickOff2);
+  initialKickOffPoses.push_back(InitPoseKickOff3);
+  initialKickOffPoses.push_back(InitPoseKickOff4);
+  initialKickOffPoses.push_back(InitPoseKickOff5);
+  initialKickOffPoses.push_back(InitPoseKickOff6);
+  initialKickOffPoses.push_back(InitPoseKickOff7);
+  initialKickOffPoses.push_back(InitPoseKickOff8);
+  initialKickOffPoses.push_back(InitPoseKickOff9);
+  initialKickOffPoses.push_back(InitPoseKickOff10);
+  initialKickOffPoses.push_back(InitPoseKickOff11);
 
   // Start up ROS
   std::string name = "gameController";
