@@ -23,6 +23,7 @@
 #include <boost/thread/mutex.hpp>
 #include <map>
 #include <string>
+#include <vector>
 #include "robocup_msgs/DropBall.h"
 #include "robocup_msgs/InitAgent.h"
 #include "robocup_msgs/KillAgent.h"
@@ -159,6 +160,8 @@ namespace gazebo
                                                 float r,
                                                 math::Vector3 &int1,
                                                 math::Vector3 &int2);
+
+    public: std::vector<math::Pose> initialPoses;
 
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;

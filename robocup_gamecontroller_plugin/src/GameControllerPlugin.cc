@@ -73,9 +73,6 @@ const math::Pose InitPose1(math::Pose(-0.5, 0, 0, 0, 0, 0));
 const math::Pose InitPose2(math::Pose(-0.5, -0.5, 0, 0, 0, 0));
 const math::Pose InitPose3(math::Pose(-0.5, 0.5, 0, 0, 0, 0));
 const math::Pose InitPose4(math::Pose(-FIELD_HEIGHT*0.5 + 0.5, 0, 0, 0, 0, 0));
-std::vector<math::Pose> InitialPoses(4);
-
-
 
 
 
@@ -138,7 +135,7 @@ void KickOffLeftState::Initialize()
       if (model)
       {
         model->SetWorldPose(
-          InitialPoses.at(this->plugin->teams.at(i)->members.at(j).first));
+          this->plugin->initialPoses.at(this->plugin->teams.at(i)->members.at(j).first));
       }
       else
         std::cerr << "Model (" << name << ") not found." << std::endl;
@@ -397,10 +394,10 @@ GameControllerPlugin::GameControllerPlugin()
     freeKickLeftState(new FreeKickLeftState(this->FreeKickLeft, this)),
     freeKickRightState(new FreeKickRightState(this->FreeKickRight, this))
 {
-  InitialPoses.push_back(InitPose1);
-  InitialPoses.push_back(InitPose2);
-  InitialPoses.push_back(InitPose3);
-  InitialPoses.push_back(InitPose4);
+  initialPoses.push_back(InitPose1);
+  initialPoses.push_back(InitPose2);
+  initialPoses.push_back(InitPose3);
+  initialPoses.push_back(InitPose4);
 
   // Start up ROS
   std::string name = "gameController";
@@ -663,12 +660,36 @@ bool GameControllerPlugin::SetGameState(
   robocup_msgs::SetGameState::Request  &req,
   robocup_msgs::SetGameState::Response &res)
 {
-  if (req.play_mode == this->Play)
-    this->SetCurrent(this->playState);
+  if (req.play_mode == this->BeforeKickOff)
+    this->SetCurrent(this->beforeKickOffState);
   else if (req.play_mode == this->KickOffLeft)
     this->SetCurrent(this->kickOffLeftState);
   else if (req.play_mode == this->KickOffRight)
     this->SetCurrent(this->kickOffRightState);
+  else if (req.play_mode == this->Play)
+    this->SetCurrent(this->playState);
+  else if (req.play_mode == this->KickInLeft)
+    this->SetCurrent(this->kickInLeftState);
+  else if (req.play_mode == this->KickInRight)
+    this->SetCurrent(this->kickInRightState);
+  else if (req.play_mode == this->CornerKickLeft)
+    this->SetCurrent(this->cornerKickLeftState);
+  else if (req.play_mode == this->CornerKickRight)
+    this->SetCurrent(this->cornerKickRightState);
+  else if (req.play_mode == this->GoalKickLeft)
+    this->SetCurrent(this->goalKickLeftState);
+  else if (req.play_mode == this->GoalKickRight)
+    this->SetCurrent(this->goalKickRightState);
+  else if (req.play_mode == this->GameOver)
+    this->SetCurrent(this->gameOverState);
+  else if (req.play_mode == this->GoalLeft)
+    this->SetCurrent(this->goalLeftState);
+  else if (req.play_mode == this->GoalRight)
+    this->SetCurrent(this->goalRightState);
+  else if (req.play_mode == this->FreeKickLeft)
+    this->SetCurrent(this->freeKickLeftState);
+  else if (req.play_mode == this->FreeKickRight)
+    this->SetCurrent(this->freeKickRightState);
   else
   {
     gzerr << "[GameControllerPlugin::SetGameState()] Unknown play mode ("
