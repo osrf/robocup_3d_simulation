@@ -1,0 +1,14 @@
+<sdf version="1.4">
+  <model name="teamA_1">
+
+    <!-- A turtlebot -->
+    <include>
+    	<pose>-1.5 11 0 0 0 1.57</pose>
+      <uri>model://turtlebot</uri>
+    </include>
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
+
+    <!-- Load a plugin to control the sphere with Hydra -->
+		<plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>
+  </model>
+</sdf>
