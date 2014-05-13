@@ -29,13 +29,13 @@ Running
     
 1. Start roscore in a new terminal.
 
-    . /opt/ros/setup.bash
+    . /opt/ros/hydro/setup.bash
     
     roscore
 
 2. Start gazebo in a new terminal:
 
-    . /opt/ros/setup.bash
+    . /opt/ros/hydro/setup.bash
      
     . ~/robocup_ws/devel/setup.bash
 
@@ -43,7 +43,7 @@ Running
 
 3. Run a robocup client in a new terminal:
   
-    . /opt/ros/setup.bash
+    . /opt/ros/hydro/setup.bash
      
     . ~/robocup_ws/devel/setup.bash
 
