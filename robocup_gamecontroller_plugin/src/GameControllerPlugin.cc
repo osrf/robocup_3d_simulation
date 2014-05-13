@@ -131,6 +131,12 @@ State::State(const std::string &_name,
 {
 }
 
+void State::Initialize()
+{
+  std::cout << "New state: " << this->name << std::endl;
+  this->timer.Start();
+}
+
 /////////////////////////////////////////////////
 std::string State::GetName()
 {
@@ -147,6 +153,7 @@ BeforeKickOffState::BeforeKickOffState(const std::string &_name,
 /////////////////////////////////////////////////
 void BeforeKickOffState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -164,11 +171,11 @@ KickOffLeftState::KickOffLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void KickOffLeftState::Initialize()
 {
+  State::Initialize();
+
   // Make sure the ball is at the center of the field
   if (this->plugin->ball)
     this->plugin->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
-
-  std::cout << "Num teams: " << this->plugin->teams.size() << std::endl;
 
   // Reposition the players
   for (size_t i = 0; i < this->plugin->teams.size(); ++i)
@@ -216,11 +223,11 @@ KickOffRightState::KickOffRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void KickOffRightState::Initialize()
 {
+  State::Initialize();
+
   // Make sure the ball is at the center of the field
   if (this->plugin->ball)
     this->plugin->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
-
-  std::cout << "Num teams: " << this->plugin->teams.size() << std::endl;
 
   // Reposition the players
   for (size_t i = 0; i < this->plugin->teams.size(); ++i)
@@ -267,6 +274,8 @@ PlayState::PlayState(const std::string &_name, GameControllerPlugin *_plugin)
 /////////////////////////////////////////////////
 void PlayState::Initialize()
 {
+  State::Initialize();
+
   this->plugin->SetHalf(1);
   this->plugin->ResetClock();
 }
@@ -289,11 +298,30 @@ KickInLeftState::KickInLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void KickInLeftState::Initialize()
 {
+  State::Initialize();
+
+  // Move the ball to the sideline
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->pos.x, this->pos.y,
+      this->pos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
 void KickInLeftState::Update()
 {
+  // The right team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(0);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
+}
+
+/////////////////////////////////////////////////
+void KickInLeftState::SetPos(const math::Vector3 &_pos)
+{
+  this->pos = _pos;
 }
 
 /////////////////////////////////////////////////
@@ -306,11 +334,30 @@ KickInRightState::KickInRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void KickInRightState::Initialize()
 {
+  State::Initialize();
+
+  // Move the ball to the sideline
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->pos.x, this->pos.y,
+      this->pos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
 void KickInRightState::Update()
 {
+  // The right team is not allowed to be close to the ball.
+  this->plugin->DropBallImpl(1);
+
+  // After some time, go to play mode.
+  common::Time elapsed = this->timer.GetElapsed();
+  if (elapsed.sec > 5)
+    this->plugin->SetCurrent(this->plugin->playState.get());
+}
+
+/////////////////////////////////////////////////
+void KickInRightState::SetPos(const math::Vector3 &_pos)
+{
+  this->pos = _pos;
 }
 
 /////////////////////////////////////////////////
@@ -323,6 +370,7 @@ CornerKickLeftState::CornerKickLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void CornerKickLeftState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -340,6 +388,7 @@ CornerKickRightState::CornerKickRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void CornerKickRightState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -357,6 +406,7 @@ GoalKickLeftState::GoalKickLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void GoalKickLeftState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -374,6 +424,7 @@ GoalKickRightState::GoalKickRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void GoalKickRightState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -382,20 +433,22 @@ void GoalKickRightState::Update()
 }
 
 /////////////////////////////////////////////////
-GameOverStateState::GameOverStateState(const std::string &_name,
-                                       GameControllerPlugin *_plugin)
+GameOverState::GameOverState(const std::string &_name,
+                             GameControllerPlugin *_plugin)
   : State(_name, _plugin)
 {
 }
 
 /////////////////////////////////////////////////
-void GameOverStateState::Initialize()
+void GameOverState::Initialize()
 {
+  State::Initialize();
+
   this->plugin->StopClock();
 }
 
 /////////////////////////////////////////////////
-void GameOverStateState::Update()
+void GameOverState::Update()
 {
 }
 
@@ -409,6 +462,7 @@ GoalLeftState::GoalLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void GoalLeftState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -426,6 +480,7 @@ GoalRightState::GoalRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void GoalRightState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -443,6 +498,7 @@ FreeKickLeftState::FreeKickLeftState(const std::string &_name,
 /////////////////////////////////////////////////
 void FreeKickLeftState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -460,6 +516,7 @@ FreeKickRightState::FreeKickRightState(const std::string &_name,
 /////////////////////////////////////////////////
 void FreeKickRightState::Initialize()
 {
+  State::Initialize();
 }
 
 /////////////////////////////////////////////////
@@ -481,7 +538,7 @@ GameControllerPlugin::GameControllerPlugin()
     cornerKickRightState(new CornerKickRightState(this->CornerKickRight, this)),
     goalKickLeftState(new GoalKickLeftState(this->GoalKickLeft, this)),
     goalKickRightState(new GoalKickRightState(this->GoalKickRight, this)),
-    gameOverState(new GameOverStateState(this->GameOver, this)),
+    gameOverState(new GameOverState(this->GameOver, this)),
     goalLeftState(new GoalLeftState(this->GoalLeft, this)),
     goalRightState(new GoalRightState(this->GoalRight, this)),
     freeKickLeftState(new FreeKickLeftState(this->FreeKickLeft, this)),
@@ -540,7 +597,7 @@ GameControllerPlugin::GameControllerPlugin()
   int argc = 0;
   ros::init(argc, NULL, name);
 
-  this->SetCurrent(this->beforeKickOffState);
+  this->SetCurrent(this->beforeKickOffState.get());
 
   gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
@@ -677,12 +734,12 @@ void GameControllerPlugin::Update()
 }
 
 ////////////////////////////////////////////////
-void GameControllerPlugin::SetCurrent(const StatePtr &_newState)
+void GameControllerPlugin::SetCurrent(State *_newState)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Only update the state if _newState is different than the current state.
-  if (this->currentState.get() != _newState.get())
+  if (this->currentState != _newState)
   {
     this->currentState = _newState;
     this->Initialize();
@@ -697,8 +754,6 @@ bool GameControllerPlugin::InitAgent(
   std::string agent = req.agent;
   std::string teamName = req.team_name;
   int player = req.player_number;
-
-  std::cout << "New agent spawned" << std::endl;
 
   gzlog << "InitAgent called" << std::endl;
   gzlog << "\tAgent: " << agent << std::endl;
@@ -719,7 +774,6 @@ bool GameControllerPlugin::InitAgent(
     Team *aTeam = new Team;
     aTeam->name = teamName;
     this->teams.push_back(aTeam);
-    std::cout << "New team" << std::endl;
   }
 
   // Chose your team
@@ -765,7 +819,6 @@ bool GameControllerPlugin::InitAgent(
     if (modelElem->HasAttribute("name"))
     {
        name = modelElem->Get<std::string>("name");
-       std::cout << "Agent name: (" << name << ")" << std::endl;
     }
   }
 
@@ -797,35 +850,35 @@ bool GameControllerPlugin::SetGameState(
   robocup_msgs::SetGameState::Response &res)
 {
   if (req.play_mode == this->BeforeKickOff)
-    this->SetCurrent(this->beforeKickOffState);
+    this->SetCurrent(this->beforeKickOffState.get());
   else if (req.play_mode == this->KickOffLeft)
-    this->SetCurrent(this->kickOffLeftState);
+    this->SetCurrent(this->kickOffLeftState.get());
   else if (req.play_mode == this->KickOffRight)
-    this->SetCurrent(this->kickOffRightState);
+    this->SetCurrent(this->kickOffRightState.get());
   else if (req.play_mode == this->Play)
-    this->SetCurrent(this->playState);
+    this->SetCurrent(this->playState.get());
   else if (req.play_mode == this->KickInLeft)
-    this->SetCurrent(this->kickInLeftState);
+    this->SetCurrent(this->kickInLeftState.get());
   else if (req.play_mode == this->KickInRight)
-    this->SetCurrent(this->kickInRightState);
+    this->SetCurrent(this->kickInRightState.get());
   else if (req.play_mode == this->CornerKickLeft)
-    this->SetCurrent(this->cornerKickLeftState);
+    this->SetCurrent(this->cornerKickLeftState.get());
   else if (req.play_mode == this->CornerKickRight)
-    this->SetCurrent(this->cornerKickRightState);
+    this->SetCurrent(this->cornerKickRightState.get());
   else if (req.play_mode == this->GoalKickLeft)
-    this->SetCurrent(this->goalKickLeftState);
+    this->SetCurrent(this->goalKickLeftState.get());
   else if (req.play_mode == this->GoalKickRight)
-    this->SetCurrent(this->goalKickRightState);
+    this->SetCurrent(this->goalKickRightState.get());
   else if (req.play_mode == this->GameOver)
-    this->SetCurrent(this->gameOverState);
+    this->SetCurrent(this->gameOverState.get());
   else if (req.play_mode == this->GoalLeft)
-    this->SetCurrent(this->goalLeftState);
+    this->SetCurrent(this->goalLeftState.get());
   else if (req.play_mode == this->GoalRight)
-    this->SetCurrent(this->goalRightState);
+    this->SetCurrent(this->goalRightState.get());
   else if (req.play_mode == this->FreeKickLeft)
-    this->SetCurrent(this->freeKickLeftState);
+    this->SetCurrent(this->freeKickLeftState.get());
   else if (req.play_mode == this->FreeKickRight)
-    this->SetCurrent(this->freeKickRightState);
+    this->SetCurrent(this->freeKickRightState.get());
   else
   {
     gzerr << "[GameControllerPlugin::SetGameState()] Unknown play mode ("
@@ -912,8 +965,16 @@ bool GameControllerPlugin::MoveBall(
 bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
                                     robocup_msgs::DropBall::Response &res)
 {
-  res.result = 0;
+  if (this->DropBallImpl(-1))
+    res.result = 1;
+  else
+    res.result = 0;
+  return true;
+}
 
+/////////////////////////////////////////////////
+bool GameControllerPlugin::DropBallImpl(const int _teamAllowed)
+{
   // Get ball position.
   physics::ModelPtr model = this->world->GetModel("soccer_ball");
   if (!model)
@@ -924,63 +985,52 @@ bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
 
   math::Vector3 ballPos = model->GetWorldPose().pos;
 
-  std::cout << "Teams: " << this->teams.size() << std::endl;
-
   // Check if the player is withing FREE_KICK distance.
   for (size_t i = 0; i < this->teams.size(); ++i)
   {
-    std::cout << this->teams.at(i)->members.size() << std::endl;
-    for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
+    if (i != _teamAllowed)
     {
-      std::string name = this->teams.at(i)->members.at(j).second;
-      model = this->world->GetModel(name);
-
-      if (model)
+      for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
       {
-        std::cout << "Model not null" << std::endl;
-        math::Pose playerPose = model->GetWorldPose();
+        std::string name = this->teams.at(i)->members.at(j).second;
+        model = this->world->GetModel(name);
 
-        // Move the player if it's close enough to the ball.
-        if (playerPose.pos.Distance(ballPos) < FREE_KICK_MOVE_DIST)
+        if (model)
         {
+          math::Pose playerPose = model->GetWorldPose();
 
-          std::cout << "Player close to the ball" << std::endl;
-          // Calculate the general form equation of a line from two points.
-          // a = y1 - y2
-          // b = x2 - x1
-          // c = (x1-x2)*y1 + (y2-y1)*x1
-          math::Vector3 v(ballPos.y - playerPose.pos.y,
-                          playerPose.pos.x - ballPos.x,
-                          (ballPos.x - playerPose.pos.x) * ballPos.y +
-                          (playerPose.pos.y - ballPos.y) * ballPos.x);
-          math::Vector3 int1;
-          math::Vector3 int2;
-          if (this->IntersectionCircunferenceLine(v, ballPos,
-                                                  FREE_KICK_MOVE_DIST,
-                                                  int1, int2))
+          // Move the player if it's close enough to the ball.
+          if (playerPose.pos.Distance(ballPos) < FREE_KICK_MOVE_DIST)
           {
-            if (playerPose.pos.Distance(int1) < playerPose.pos.Distance(int2))
-              playerPose.pos = int1;
+            // Calculate the general form equation of a line from two points.
+            // a = y1 - y2
+            // b = x2 - x1
+            // c = (x1-x2)*y1 + (y2-y1)*x1
+            math::Vector3 v(ballPos.y - playerPose.pos.y,
+                            playerPose.pos.x - ballPos.x,
+                            (ballPos.x - playerPose.pos.x) * ballPos.y +
+                            (playerPose.pos.y - ballPos.y) * ballPos.x);
+            math::Vector3 int1;
+            math::Vector3 int2;
+            if (this->IntersectionCircunferenceLine(v, ballPos,
+                                                    FREE_KICK_MOVE_DIST,
+                                                    int1, int2))
+            {
+              if (playerPose.pos.Distance(int1) < playerPose.pos.Distance(int2))
+                playerPose.pos = int1;
+              else
+                playerPose.pos = int2;
+
+              model->SetWorldPose(playerPose);
+            }
             else
-              playerPose.pos = int2;
-
-            model->SetWorldPose(playerPose);
+              gzerr << "DropBall() error: No intersection between circunference"
+                    << " and line. That shouldn't be happening" << std::endl;
           }
-          else
-            gzerr << "DropBall() error: No intersection between circunference"
-                  << " and line. That shouldn't be happening" << std::endl;
         }
-        else
-          std::cout << "Player not close to the ball" << std::endl;
-
       }
-      else
-        std::cout << "Model is NULL" << std::endl;
     }
   }
-
-  res.result = 1;
-  return true;
 }
 
 /////////////////////////////////////////////////
@@ -1080,14 +1130,14 @@ void GameControllerPlugin::CheckTiming()
     // End of the first half
     this->SetHalf(2);
     std::swap(this->scoreLeft, this->scoreRight);
-    this->SetCurrent(this->kickOffRightState);
+    this->SetCurrent(this->kickOffRightState.get());
     this->ResetClock();
-    this->SetCurrent(this->playState);
+    this->SetCurrent(this->playState.get());
   }
   else if ((this->GetHalf() == 2) && (elapsedTimeSim >= this->SecondsEachHalf))
   {
     // End of the game
-    this->SetCurrent(this->gameOverState);
+    this->SetCurrent(this->gameOverState.get());
   }
 }
 
@@ -1102,8 +1152,7 @@ void GameControllerPlugin::CheckBall()
   {
     // The ball is inside the left goal.
     this->scoreRight++;
-    //this->SetCurrent(this->kickoffState);
-    this->SetCurrent(this->playState);
+    this->SetCurrent(this->goalRightState.get());
     gzlog << "Right team goal" << std::endl;
   }
   else if ((ballPose.pos.x > FIELD_HEIGHT * 0.5) &&
@@ -1111,16 +1160,24 @@ void GameControllerPlugin::CheckBall()
   {
     // The ball is inside the right goal.
     this->scoreLeft++;
-    //this->SetCurrent(this->kickoffState);
-    this->SetCurrent(this->playState);
+    this->SetCurrent(this->goalLeftState.get());
     gzlog << "Left team goal" << std::endl;
   }
-  else if ((fabs(ballPose.pos.x) > FIELD_HEIGHT * 0.5) ||
-      (fabs(ballPose.pos.y) > FIELD_WIDTH * 0.5))
+  else if (fabs(ballPose.pos.y) > FIELD_WIDTH * 0.5)
+  {
+    // The ball is outside of the sideline.
+    math::Vector3 ballPos(ballPose.pos.x,
+      (fabs(ballPose.pos.y) / ballPose.pos.y) * FIELD_WIDTH * 0.5,
+      ballPose.pos.z);
+    this->kickInLeftState->SetPos(ballPos);
+    this->SetCurrent(this->kickInLeftState.get());
+    gzlog << "Out of bounds" << std::endl;
+  }
+  else if ((fabs(ballPose.pos.x) > FIELD_HEIGHT * 0.5))
   {
     // The ball is outside of the field.
     this->ball->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 0));
-    gzlog << "Out of bounds" << std::endl;
+    gzlog << "Goal kick" << std::endl;
   }
 }
 

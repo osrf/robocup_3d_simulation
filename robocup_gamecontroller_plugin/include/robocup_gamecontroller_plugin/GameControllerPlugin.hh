@@ -34,6 +34,21 @@
 namespace gazebo
 {
   class State;
+  class BeforeKickOffState;
+  class KickOffLeftState;
+  class KickOffRightState;
+  class PlayState;
+  class KickInLeftState;
+  class KickInRightState;
+  class CornerKickLeftState;
+  class CornerKickRightState;
+  class GoalKickLeftState;
+  class GoalKickRightState;
+  class GameOverState;
+  class GoalLeftState;
+  class GoalRightState;
+  class FreeKickLeftState;
+  class FreeKickRightState;
 
   typedef std::vector<std::pair<int, std::string> > Members_V;
   typedef Members_V::iterator Members_It;
@@ -108,7 +123,7 @@ namespace gazebo
     /// \brief Set the current game state. If the new state is the same than
     /// the current one, the operation does not have any effect.
     /// \param [out] _newState
-    private: void SetCurrent(const StatePtr &_newState);
+    public: void SetCurrent(State *_newState);
 
     /// \brief ROS service callback that sets the state of the game.
     /// \param[out] _req ROS service call request.
@@ -139,6 +154,14 @@ namespace gazebo
     /// \return True when the service call succeeds.
     private: bool DropBall(robocup_msgs::DropBall::Request  &req,
                            robocup_msgs::DropBall::Response &res);
+
+    /// \briedf Drops the ball at its current positionand move all players away
+    /// by the free kick radius. If the ball is off the field, it is brought
+    /// back within bounds.
+    /// \param[in] _teamAllowed 0 if the left team is allowed to be close to the
+    /// ball. 1 if the right team is allowed or any other number if none of the
+    // teams are allowed to be within the free kick radius.
+    public: bool DropBallImpl(const int _teamAllowed);
 
     /// \brief ROS service callback that removes the specified agent from
     /// the simulation.
@@ -221,52 +244,52 @@ namespace gazebo
     private: gazebo::common::Time startTimeSim;
 
     /// \brief Pointer to the current game state.
-    private: StatePtr currentState;
+    private: State *currentState;
 
     /// \brief Pointer to the kickoff state.
-    private: StatePtr beforeKickOffState;
+    private: boost::shared_ptr<BeforeKickOffState> beforeKickOffState;
 
     /// \brief Pointer to the kickoffLeft state.
-    private: StatePtr kickOffLeftState;
+    private: boost::shared_ptr<KickOffLeftState> kickOffLeftState;
 
     /// \brief Pointer to the kickoffRight state.
-    private: StatePtr kickOffRightState;
+    private: boost::shared_ptr<KickOffRightState> kickOffRightState;
 
     /// \brief Pointer to the play state.
-    private: StatePtr playState;
+    public: boost::shared_ptr<PlayState> playState;
 
     /// \brief Pointer to the kickInLeft state.
-    private: StatePtr kickInLeftState;
+    private: boost::shared_ptr<KickInLeftState> kickInLeftState;
 
     /// \brief Pointer to the kickInRight state.
-    private: StatePtr kickInRightState;
+    private: boost::shared_ptr<KickInRightState> kickInRightState;
 
     /// \brief Pointer to the cornerKickLeft state.
-    private: StatePtr cornerKickLeftState;
+    private: boost::shared_ptr<CornerKickLeftState> cornerKickLeftState;
 
     /// \brief Pointer to the cornerKickRight state.
-    private: StatePtr cornerKickRightState;
+    private: boost::shared_ptr<CornerKickRightState> cornerKickRightState;
 
     /// \brief Pointer to the goalKickLeft state.
-    private: StatePtr goalKickLeftState;
+    private: boost::shared_ptr<GoalKickLeftState> goalKickLeftState;
 
     /// \brief Pointer to the goalKickRight state.
-    private: StatePtr goalKickRightState;
+    private: boost::shared_ptr<GoalKickRightState> goalKickRightState;
 
     /// \brief Pointer to the gameover state.
-    private: StatePtr gameOverState;
+    private: boost::shared_ptr<GameOverState> gameOverState;
 
     /// \brief Pointer to the goalLeft state.
-    private: StatePtr goalLeftState;
+    private: boost::shared_ptr<GoalLeftState> goalLeftState;
 
     /// \brief Pointer to the goalRight state.
-    private: StatePtr goalRightState;
+    private: boost::shared_ptr<GoalRightState> goalRightState;
 
     /// \brief Pointer to the freeKickLeft state.
-    private: StatePtr freeKickLeftState;
+    private: boost::shared_ptr<FreeKickLeftState> freeKickLeftState;
 
     /// \brief Pointer to the freeKickRight state.
-    private: StatePtr freeKickRightState;
+    private: boost::shared_ptr<FreeKickRightState> freeKickRightState;
 
     /// \brief Game time.
     private: common::Time elapsedTimeSim;
@@ -315,7 +338,7 @@ namespace gazebo
     public: State(const std::string &_name, GameControllerPlugin *_plugin);
 
     /// \brief Initialize the state. Called once when the state is entered.
-    public: virtual void Initialize() = 0;
+    public: virtual void Initialize();
 
     /// \brief Update the state.
     public: virtual void Update() = 0;
@@ -329,6 +352,9 @@ namespace gazebo
 
     /// \brief Name of the state.
     protected: std::string name;
+
+    /// \brief Timer to measure the time elapsed in this state.
+    protected: common::Timer timer;
   };
 
   /// \brief State that handles the initial state.
@@ -399,6 +425,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetPos(const math::Vector3 &_pos);
+
+    private: math::Vector3 pos;
   };
 
   /// \brief State that handles the right kick in state.
@@ -413,6 +443,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: void SetPos(const math::Vector3 &_pos);
+
+    private: math::Vector3 pos;
   };
 
   /// \brief State that handles the corner kick left state.
@@ -472,11 +506,11 @@ namespace gazebo
   };
 
   /// \brief State that handles the gameover.
-  class GameOverStateState : public State
+  class GameOverState : public State
   {
     /// Documentation inherited.
-    public: GameOverStateState(const std::string &_name,
-                               GameControllerPlugin *_plugin);
+    public: GameOverState(const std::string &_name,
+                          GameControllerPlugin *_plugin);
 
     /// Documentation inherited.
     public: virtual void Initialize();
