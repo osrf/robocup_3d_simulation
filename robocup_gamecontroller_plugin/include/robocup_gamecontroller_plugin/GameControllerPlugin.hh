@@ -184,6 +184,8 @@ namespace gazebo
                                                 math::Vector3 &int1,
                                                 math::Vector3 &int2);
 
+    private: void OnBallContacts(ConstContactsPtr &_msg);
+
     public: std::vector<math::Pose> leftInitialPoses;
     public: std::vector<math::Pose> leftInitialKickOffPoses;
     public: std::vector<math::Pose> rightInitialPoses;
@@ -207,8 +209,8 @@ namespace gazebo
     // ROS Node handler
     private: boost::scoped_ptr<ros::NodeHandle> node;
 
-    // ROS Subscriber
-    private: ros::Subscriber sub;
+    // Gazebo subscription to contact messages on the ball.
+    private: transport::SubscriberPtr ballSub;
 
     // ROS Service for spawning new agents.
     private: ros::ServiceServer initAgentService;
@@ -297,6 +299,9 @@ namespace gazebo
     /// \brief Mutex to avoid race conditions while running updates and a ROS
     /// callback is executed.
     private: boost::mutex mutex;
+
+    /// \brief (left or right, player_name)
+    public: std::pair<int, std::string> lastPlayerTouchedBall;
 
     struct CompareFirst
     {

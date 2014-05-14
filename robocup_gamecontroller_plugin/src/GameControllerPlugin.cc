@@ -134,6 +134,19 @@ State::State(const std::string &_name,
 void State::Initialize()
 {
   std::cout << "New state: " << this->name << std::endl;
+
+  this->plugin->lastPlayerTouchedBall.first = -1;
+  this->plugin->lastPlayerTouchedBall.second = "None";
+
+  // Stop the ball
+  if (this->plugin->ball)
+  {
+    this->plugin->ball->SetLinearVel(math::Vector3(0, 0, 0));
+    this->plugin->ball->SetAngularVel(math::Vector3(0, 0, 0));
+    this->plugin->ball->SetLinearAccel(math::Vector3(0, 0, 0));
+    this->plugin->ball->SetAngularAccel(math::Vector3(0, 0, 0));
+  }
+
   this->timer.Start();
 }
 
@@ -557,6 +570,11 @@ FreeKickLeftState::FreeKickLeftState(const std::string &_name,
 void FreeKickLeftState::Initialize()
 {
   State::Initialize();
+
+  // Position the ball.
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->pos.x,
+      this->pos.y, this->pos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
@@ -588,6 +606,11 @@ FreeKickRightState::FreeKickRightState(const std::string &_name,
 void FreeKickRightState::Initialize()
 {
   State::Initialize();
+
+  // Position the ball.
+  if (this->plugin->ball)
+    this->plugin->ball->SetWorldPose(math::Pose(this->pos.x,
+      this->pos.y, this->pos.z, 0, 0, 0));
 }
 
 /////////////////////////////////////////////////
@@ -746,6 +769,12 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       _sdf->Get<std::string>("ball") << "]\n";
     return;
   }
+  std::cerr << this->ball->GetName() << std::endl;
+
+  // Register the callback for the ball contacts.
+  this->ballSub = this->gzNode->Subscribe(std::string("~/") +
+      this->ball->GetName() + "/ball/contacts",
+      &GameControllerPlugin::OnBallContacts, this);
 
   /*
   // Load all the teams
@@ -1248,30 +1277,66 @@ void GameControllerPlugin::CheckBall()
   }
   else if (fabs(ballPose.pos.y) > FIELD_WIDTH * 0.5)
   {
+    //std::cout << "Last one: " << this->lastPlayerTouchedBall.second << std::endl;
+
     // The ball is outside of the sideline.
     math::Vector3 ballPos(ballPose.pos.x,
       (fabs(ballPose.pos.y) / ballPose.pos.y) * FIELD_WIDTH * 0.5,
       ballPose.pos.z);
-    this->kickInLeftState->SetPos(ballPos);
-    this->SetCurrent(this->kickInLeftState.get());
+
+    // Choose team
+    if (this->lastPlayerTouchedBall.first == 0)
+    {
+      this->kickInRightState->SetPos(ballPos);
+      this->SetCurrent(this->kickInRightState.get());
+    }
+    else
+    {
+      this->kickInLeftState->SetPos(ballPos);
+      this->SetCurrent(this->kickInLeftState.get());
+    }
   }
   else if ((fabs(ballPose.pos.x) > FIELD_HEIGHT * 0.5))
   {
     // The ball is outside of the field.
-    math::Vector3 ballPos(
+    math::Vector3 cornerBallPos(
       (fabs(ballPose.pos.x) / ballPose.pos.x) * FIELD_HEIGHT * 0.5,
       (fabs(ballPose.pos.y) / ballPose.pos.y) * FIELD_WIDTH * 0.5,
       ballPose.pos.z);
 
+    math::Vector3 freeKickBallPos(
+      (fabs(ballPose.pos.x) / ballPose.pos.x) * FIELD_HEIGHT * 0.45,
+      0,
+      ballPose.pos.z);
+
     if (ballPose.pos.x < 0)
     {
-      this->cornerKickRightState->SetBallPos(ballPos);
-      this->SetCurrent(this->cornerKickRightState.get());
+      // Choose team
+      if (this->lastPlayerTouchedBall.first == 0)
+      {
+        this->cornerKickLeftState->SetBallPos(cornerBallPos);
+        this->SetCurrent(this->cornerKickLeftState.get());
+      }
+      else
+      {
+        this->freeKickLeftState->SetPos(freeKickBallPos);
+        this->SetCurrent(this->freeKickLeftState.get());
+      }
     }
     else
     {
-      this->cornerKickLeftState->SetBallPos(ballPos);
-      this->SetCurrent(this->cornerKickLeftState.get());
+      // Choose team
+      if (this->lastPlayerTouchedBall.first == 0)
+      {
+        this->freeKickRightState->SetPos(freeKickBallPos);
+        this->SetCurrent(this->freeKickRightState.get());
+
+      }
+      else
+      {
+        this->cornerKickRightState->SetBallPos(cornerBallPos);
+        this->SetCurrent(this->cornerKickRightState.get());
+      }
     }
   }
 }
@@ -1421,4 +1486,41 @@ bool GameControllerPlugin::IntersectionCircunferenceLine(const math::Vector3 &_v
 
   int1.x = (-v.y * int1.y - v.z) / v.x;
   int2.x = (-v.y * int2.y - v.z) / v.x;
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::OnBallContacts(ConstContactsPtr &_msg)
+{
+  for (int k = _msg->contact_size() - 1; k >= 0; --k)
+  {
+    std::size_t foundC1 =
+      _msg->contact(k).collision1().find("field::collision");
+
+    std::size_t foundC2 =
+      _msg->contact(k).collision2().find("field::collision");
+
+    if (foundC1 == std::string::npos && foundC2 == std::string::npos)
+    {
+      std::string collision;
+      if (foundC1 != std::string::npos)
+        collision = _msg->contact(k).collision1();
+      else
+        collision = _msg->contact(k).collision2();
+
+      for (size_t i = 0; i < this->teams.size(); ++i)
+      {
+        for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
+        {
+          std::string name = this->teams.at(i)->members.at(j).second;
+          if (collision.find(name) != std::string::npos)
+          {
+            // std::cout << name << " has touched the ball" << std::endl;
+            this->lastPlayerTouchedBall.first = i;
+            this->lastPlayerTouchedBall.second = name;
+            return;
+          }
+        }
+      }
+    }
+  }
 }
