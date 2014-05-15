@@ -186,6 +186,10 @@ namespace gazebo
 
     private: void OnBallContacts(ConstContactsPtr &_msg);
 
+    public: void ReleasePlayers();
+
+    public: void StopPlayers();
+
     public: std::vector<math::Pose> leftInitialPoses;
     public: std::vector<math::Pose> leftInitialKickOffPoses;
     public: std::vector<math::Pose> rightInitialPoses;

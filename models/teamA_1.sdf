@@ -6,9 +6,23 @@
     <include>
       <uri>model://turtlebot</uri>
     </include>
-    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
+
+    <!-- Joint used to lock the model to the world when needed -->
+    <joint name="world_joint" type="revolute">
+      <parent>world</parent>
+      <child>turtlebot::rack</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>0</upper>
+          <lower>0</lower>
+        </limit>
+      </axis>
+    </joint>
 
     <!-- Load a plugin to control the sphere with Hydra -->
-		<plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>
+    <plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>
+
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
   </model>
 </sdf>

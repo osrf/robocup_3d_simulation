@@ -172,6 +172,7 @@ void BeforeKickOffState::Initialize()
 /////////////////////////////////////////////////
 void BeforeKickOffState::Update()
 {
+  this->plugin->StopPlayers();
 }
 
 /////////////////////////////////////////////////
@@ -185,6 +186,8 @@ KickOffLeftState::KickOffLeftState(const std::string &_name,
 void KickOffLeftState::Initialize()
 {
   State::Initialize();
+
+  this->plugin->ReleasePlayers();
 
   // Make sure the ball is at the center of the field
   if (this->plugin->ball)
@@ -224,6 +227,8 @@ void KickOffLeftState::Initialize()
 /////////////////////////////////////////////////
 void KickOffLeftState::Update()
 {
+  this->plugin->StopPlayers();
+
   // After some time, go to play mode.
   common::Time elapsed = this->timer.GetElapsed();
   if (elapsed.sec > 2)
@@ -241,6 +246,8 @@ KickOffRightState::KickOffRightState(const std::string &_name,
 void KickOffRightState::Initialize()
 {
   State::Initialize();
+
+  this->plugin->ReleasePlayers();
 
   // Make sure the ball is at the center of the field
   if (this->plugin->ball)
@@ -280,6 +287,8 @@ void KickOffRightState::Initialize()
 /////////////////////////////////////////////////
 void KickOffRightState::Update()
 {
+  this->plugin->StopPlayers();
+
   // After some time, go to play mode.
   common::Time elapsed = this->timer.GetElapsed();
   if (elapsed.sec > 2)
@@ -296,6 +305,8 @@ PlayState::PlayState(const std::string &_name, GameControllerPlugin *_plugin)
 void PlayState::Initialize()
 {
   State::Initialize();
+
+  this->plugin->ReleasePlayers();
 
   this->plugin->SetHalf(1);
   this->plugin->ResetClock();
@@ -776,43 +787,6 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       this->ball->GetName() + "/ball/contacts",
       &GameControllerPlugin::OnBallContacts, this);
 
-  /*
-  // Load all the teams
-  sdf::ElementPtr teamElem = _sdf->GetElement("team");
-  while (teamElem)
-  {
-    // Create a new team
-    Team *team = new Team;
-    this->teams.push_back(team);
-
-    // Set the team name
-    team->name = teamElem->Get<std::string>("name");
-
-    // Get all the team members.
-    sdf::ElementPtr memberElem = teamElem->GetElement("member");
-    while (memberElem)
-    {
-      // Get the team member name
-      std::string memberName = memberElem->Get<std::string>();
-      physics::ModelPtr member = this->world->GetModel(memberName);
-      if (member)
-        team->members.push_back(member);
-      else
-        gzerr << "Unable to get team member with name[" << memberName << "]\n";
-      memberElem = memberElem->GetNextElement("member");
-    }
-
-    teamElem = teamElem->GetNextElement("team");
-  }
-
-  // Make sure that we have two teams.
-  if (this->teams.size() != 2)
-  {
-    gzerr << "Invalid number of teams[" << this->teams.size()
-      << "] for soccer.\n";
-    return;
-  }*/
-
   // Connect to the update event.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&GameControllerPlugin::UpdateStates, this, _1));
@@ -843,6 +817,8 @@ void GameControllerPlugin::Initialize()
 /////////////////////////////////////////////////
 void GameControllerPlugin::Update()
 {
+  //boost::mutex::scoped_lock lock(this->mutex);
+
   if (currentState)
     currentState->Update();
 }
@@ -1520,6 +1496,62 @@ void GameControllerPlugin::OnBallContacts(ConstContactsPtr &_msg)
             return;
           }
         }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::ReleasePlayers()
+{
+  for (size_t i = 0; i < this->teams.size(); ++i)
+  {
+    for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
+    {
+      std::string name = this->teams.at(i)->members.at(j).second;
+      physics::ModelPtr model = this->world->GetModel(name);
+
+      if (model)
+      {
+        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        if (!joint)
+        {
+          std::cerr << "ReleasePlayers() Joint (" << joint << ") not found\n";
+          continue;
+        }
+
+        joint->Detach();
+      }
+    }
+  }
+
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::StopPlayers()
+{
+  for (size_t i = 0; i < this->teams.size(); ++i)
+  {
+    for (size_t j = 0; j < this->teams.at(i)->members.size(); ++j)
+    {
+      std::string name = this->teams.at(i)->members.at(j).second;
+      physics::ModelPtr model = this->world->GetModel(name);
+
+      if (model)
+      {
+        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        if (!joint)
+        {
+          std::cerr << "StopPlayers() Joint (" << joint << ") not found\n";
+          continue;
+        }
+
+        joint->Attach(physics::LinkPtr(),
+          model->GetLink(name + "::turtlebot::rack"));
+
+        math::Pose pose = model->GetWorldPose();
+        model->Reset();
+        model->SetWorldPose(pose);
       }
     }
   }
