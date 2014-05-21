@@ -18,12 +18,28 @@
 #ifndef _GAZEBO_GAME_CONTROLLER_PLUGIN_HH_
 #define _GAZEBO_GAME_CONTROLLER_PLUGIN_HH_
 
+#include <ros/ros.h>
 #include <gazebo/gazebo.hh>
 #include <boost/scoped_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 #include <map>
 #include <string>
 #include <vector>
+#include "robocup_gamecontroller_plugin/states/BeforeKickOffState.hh"
+#include "robocup_gamecontroller_plugin/states/CornerKickLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/CornerKickRightState.hh"
+#include "robocup_gamecontroller_plugin/states/FreeKickLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/FreeKickRightState.hh"
+#include "robocup_gamecontroller_plugin/states/GameOverState.hh"
+#include "robocup_gamecontroller_plugin/states/GoalKickLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/GoalKickRightState.hh"
+#include "robocup_gamecontroller_plugin/states/GoalLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/GoalRightState.hh"
+#include "robocup_gamecontroller_plugin/states/KickInLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/KickInRightState.hh"
+#include "robocup_gamecontroller_plugin/states/KickOffLeftState.hh"
+#include "robocup_gamecontroller_plugin/states/KickOffRightState.hh"
+#include "robocup_gamecontroller_plugin/states/PlayState.hh"
 #include "robocup_msgs/DropBall.h"
 #include "robocup_msgs/InitAgent.h"
 #include "robocup_msgs/KillAgent.h"
@@ -31,25 +47,11 @@
 #include "robocup_msgs/MoveAgentPose.h"
 #include "robocup_msgs/MoveBall.h"
 
+#define TEAM_LEFT 0u
+#define TEAM_RIGHT 1u
+
 namespace gazebo
 {
-  class State;
-  class BeforeKickOffState;
-  class KickOffLeftState;
-  class KickOffRightState;
-  class PlayState;
-  class KickInLeftState;
-  class KickInRightState;
-  class CornerKickLeftState;
-  class CornerKickRightState;
-  class GoalKickLeftState;
-  class GoalKickRightState;
-  class GameOverState;
-  class GoalLeftState;
-  class GoalRightState;
-  class FreeKickLeftState;
-  class FreeKickRightState;
-
   typedef std::vector<std::pair<int, std::string> > Members_V;
   typedef Members_V::iterator Members_It;
   typedef boost::shared_ptr<State> StatePtr;
@@ -190,10 +192,9 @@ namespace gazebo
 
     public: void StopPlayers();
 
-    public: std::vector<math::Pose> leftInitialPoses;
-    public: std::vector<math::Pose> leftInitialKickOffPoses;
-    public: std::vector<math::Pose> rightInitialPoses;
-    public: std::vector<math::Pose> rightInitialKickOffPoses;
+    public: void MoveBall(const math::Pose &_pose);
+
+    public: math::Pose GetBall();
 
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;
@@ -304,7 +305,7 @@ namespace gazebo
     /// callback is executed.
     private: boost::mutex mutex;
 
-    /// \brief (left or right, player_name)
+    /// \brief (left or right, player_name).
     public: std::pair<int, std::string> lastPlayerTouchedBall;
 
     struct CompareFirst
@@ -317,287 +318,18 @@ namespace gazebo
         int val;
     };
 
-   /* private: void ClearPlayers(const math::Box &_box, double _minDist,
-                 unsigned int _teamIndex); */
-
     /// \brief A single team.
     public: class Team
     {
-    //public: static std::vector<math::Pose> InitPose1;
-
       /// \brief Name of the team.
       public: std::string name;
 
       /// \brief All the members in the team.
-      ///public: std::vector<physics::ModelPtr> members;
-      //public: std::vector<std::string> members;
       public: std::vector<std::pair<int, std::string> > members;
     };
 
     /// \brief All the teams.
     public: std::vector<Team *> teams;
-  };
-
-  // \brief State pattern used for the game mode.
-  class State
-  {
-    /// \brief Class constructor.
-    /// \param[in] _name Name of the state.
-    /// \param[out] _plugin Reference to the GameControllerPlugin.
-    public: State(const std::string &_name, GameControllerPlugin *_plugin);
-
-    /// \brief Initialize the state. Called once when the state is entered.
-    public: virtual void Initialize();
-
-    /// \brief Update the state.
-    public: virtual void Update() = 0;
-
-    /// \brief Get the name of the state.
-    /// \brief Returns the name of the state.
-    public: std::string GetName();
-
-    /// \brief Pointer to be able to access to the plugin inside the state.
-    protected: GameControllerPlugin *plugin;
-
-    /// \brief Name of the state.
-    protected: std::string name;
-
-    /// \brief Timer to measure the time elapsed in this state.
-    protected: common::Timer timer;
-  };
-
-  /// \brief State that handles the initial state.
-  class BeforeKickOffState : public State
-  {
-    /// Documentation inherited.
-    public: BeforeKickOffState(const std::string &_name,
-                               GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the left kickoff state.
-  class KickOffLeftState : public State
-  {
-    /// Documentation inherited.
-    public: KickOffLeftState(const std::string &_name,
-                             GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the right kickoff state.
-  class KickOffRightState : public State
-  {
-    /// Documentation inherited.
-    public: KickOffRightState(const std::string &_name,
-                              GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handels regular gameplay.
-  class PlayState : public State
-  {
-    /// Documentation inherited.
-    public: PlayState(const std::string &_name,
-                      GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the left kick in state.
-  class KickInLeftState : public State
-  {
-    /// Documentation inherited.
-    public: KickInLeftState(const std::string &_name,
-                            GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetPos(const math::Vector3 &_pos);
-
-    private: math::Vector3 pos;
-  };
-
-  /// \brief State that handles the right kick in state.
-  class KickInRightState : public State
-  {
-    /// Documentation inherited.
-    public: KickInRightState(const std::string &_name,
-                             GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetPos(const math::Vector3 &_pos);
-
-    private: math::Vector3 pos;
-  };
-
-  /// \brief State that handles the corner kick left state.
-  class CornerKickLeftState : public State
-  {
-    /// Documentation inherited.
-    public: CornerKickLeftState(const std::string &_name,
-                                GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetBallPos(const math::Vector3 &_ballPos);
-
-    private: math::Vector3 ballPos;
-  };
-
-  /// \brief State that handles the corner kick right state.
-  class CornerKickRightState : public State
-  {
-    /// Documentation inherited.
-    public: CornerKickRightState(const std::string &_name,
-                                 GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetBallPos(const math::Vector3 &_ballPos);
-
-    private: math::Vector3 ballPos;
-  };
-
-  /// \brief State that handles the goal kick left state.
-  class GoalKickLeftState : public State
-  {
-    /// Documentation inherited.
-    public: GoalKickLeftState(const std::string &_name,
-                              GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the goal kick right state.
-  class GoalKickRightState : public State
-  {
-    /// Documentation inherited.
-    public: GoalKickRightState(const std::string &_name,
-                               GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the gameover.
-  class GameOverState : public State
-  {
-    /// Documentation inherited.
-    public: GameOverState(const std::string &_name,
-                          GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the left goal state.
-  class GoalLeftState : public State
-  {
-    /// Documentation inherited.
-    public: GoalLeftState(const std::string &_name,
-                          GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the right goal state.
-  class GoalRightState : public State
-  {
-    /// Documentation inherited.
-    public: GoalRightState(const std::string &_name,
-                           GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-  };
-
-  /// \brief State that handles the free kick left state.
-  class FreeKickLeftState : public State
-  {
-    /// Documentation inherited.
-    public: FreeKickLeftState(const std::string &_name,
-                              GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetPos(const math::Vector3 &_pos);
-
-    private: math::Vector3 pos;
-  };
-
-  /// \brief State that handles the free kick right state.
-  class FreeKickRightState : public State
-  {
-    /// Documentation inherited.
-    public: FreeKickRightState(const std::string &_name,
-                               GameControllerPlugin *_plugin);
-
-    /// Documentation inherited.
-    public: virtual void Initialize();
-
-    // Documentation inherited
-    public: virtual void Update();
-
-    public: void SetPos(const math::Vector3 &_pos);
-
-    private: math::Vector3 pos;
   };
 }
 #endif
