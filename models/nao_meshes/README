@@ -1,0 +1,7 @@
+copy the folder share/alrobotmodel/meshes/nao from simulator-sdk-1.14.5-linux64.tar.gz
+from https://community.aldebaran-robotics.com/resources/file/1.14.5/simulator-sdk-1.14.5-linux64.tar.gz
+in the current folder
+
+Then run the converter.py script to get all the meshes
+
+Once generated, a package can be created inscluding the meshes folder and the package.xml

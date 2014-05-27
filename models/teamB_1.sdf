@@ -4,13 +4,15 @@
     <!-- A turtlebot -->
     <pose>0.5 11 0 0 0 1.57</pose>
     <include>
-      <uri>model://turtlebot</uri>
+      <!--<uri>model://turtlebot</uri>-->
+      <uri>model://nao_meshes</uri>
     </include>
 
     <!-- Joint used to lock the model to the world when needed -->
     <joint name="world_joint" type="revolute">
       <parent>world</parent>
-      <child>turtlebot::rack</child>
+      <!--<child>turtlebot::rack</child>-->
+      <child>Nao::base_link</child>
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
