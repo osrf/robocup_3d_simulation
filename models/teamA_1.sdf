@@ -25,11 +25,6 @@
     <!-- Load a plugin to control the sphere with Hydra -->
     <plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>
 
-    <!--<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/teamA_1</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-    </plugin> -->
-
     <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
       <robot_namespace>teamA_1</robot_namespace>
     </plugin>

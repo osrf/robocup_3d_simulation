@@ -21,6 +21,7 @@
 #include <ros/ros.h>
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+// #include "robocup_msgs/Say.h"
 #include "robocup_msgs/SendJoints.h"
 #include <string>
 #include <vector>
@@ -48,6 +49,11 @@ namespace gazebo
     private: bool SendJoints(robocup_msgs::SendJoints::Request  &_req,
                              robocup_msgs::SendJoints::Response &_res);
 
+    // Debugging
+    /// \brief ROS message callback to receive messages from other robots.
+    /// \param[in] _msg Message sent from other player.
+    // void OnMessageFromRobot(const robocup_msgs::Say::ConstPtr& _msg);
+
     // ROS Node handler
     private: boost::scoped_ptr<ros::NodeHandle> node;
 
@@ -57,6 +63,14 @@ namespace gazebo
 
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
+
+    // Debugging.
+    // ROS subscription for receiving other player messages.
+    // private: ros::Subscriber listenSub;
+
+    // Debugging.
+    // ROS publisher for sending messages to other players.
+    // private: ros::Publisher sayPub;
 
     // ROS Service for spawning new agents.
     private: ros::ServiceServer jointCommandsService;

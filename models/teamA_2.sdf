@@ -2,7 +2,7 @@
   <model name="teamA_2">
 
     <!-- A turtlebot -->
-    <pose>-1.5 11 0 0 0 1.57</pose>
+    <pose>-1.5 11 0.35 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
       <uri>model://nao_meshes</uri>
@@ -22,7 +22,9 @@
       </axis>
     </joint>
 
-    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
+      <robot_namespace>teamA_2</robot_namespace>
+    </plugin>
 
     <!-- Load a plugin to control the sphere with Hydra -->
 		<!--<plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>-->

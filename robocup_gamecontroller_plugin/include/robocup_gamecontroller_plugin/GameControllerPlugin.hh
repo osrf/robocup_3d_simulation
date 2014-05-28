@@ -46,6 +46,7 @@
 #include "robocup_msgs/SetGameState.h"
 #include "robocup_msgs/MoveAgentPose.h"
 #include "robocup_msgs/MoveBall.h"
+#include "robocup_msgs/Say.h"
 
 #define TEAM_LEFT 0u
 #define TEAM_RIGHT 1u
@@ -196,6 +197,13 @@ namespace gazebo
 
     public: math::Pose GetBall();
 
+    /// \brief ROS message callback to receive messages from other robots.
+    /// \param[in] _msg Message sent from other player.
+    void OnMessageFromRobot(
+      //const ros::MessageEvent<robocup_msgs::Say const> &_event);
+      const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
+      const std::string &_team);
+
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;
 
@@ -326,6 +334,12 @@ namespace gazebo
 
       /// \brief All the members in the team.
       public: std::vector<std::pair<int, std::string> > members;
+
+      /// \brief Publishers to send data to my teammates.
+      public: std::map<std::string, boost::shared_ptr<ros::Publisher> > pubs;
+
+      /// \brief Subscribers to receive the message from the agent.
+      public: std::map<std::string, boost::shared_ptr<ros::Subscriber> > subs;
     };
 
     /// \brief All the teams.

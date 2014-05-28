@@ -28,6 +28,7 @@
 #include "robocup_gamecontroller_plugin/SoccerField.hh"
 #include "robocup_msgs/GameStateMonitor.h"
 #include "robocup_msgs/InitAgent.h"
+#include "robocup_msgs/Say.h"
 
 using namespace gazebo;
 
@@ -278,6 +279,18 @@ bool GameControllerPlugin::InitAgent(
   // Add the player
   // ToDo(caguero): Check that the player is not already existing.
   myTeam->members.push_back(make_pair(player, name));
+
+  // Subscribe to the 'say' topic from this robot.
+  myTeam->subs[name].reset(new ros::Subscriber());
+  *myTeam->subs[name] = this->node->subscribe<robocup_msgs::Say>(
+    std::string("/" + name + "/say"), 1000,
+    boost::bind(&GameControllerPlugin::OnMessageFromRobot, this, _1,
+      std::string("/" + name + "/say"), myTeam->name));
+
+  // Advertise the 'listen' topic for this robot.
+  myTeam->pubs[name].reset(new ros::Publisher());
+  *myTeam->pubs[name] = this->node->advertise<
+    const robocup_msgs::Say>(std::string("/" + name + "/listen"), 1000);
 
   res.result = 1;
   return true;
@@ -536,6 +549,11 @@ bool GameControllerPlugin::KillAgent(robocup_msgs::KillAgent::Request  &req,
                      this->teams.at(index)->members.end(),
                      CompareFirst(req.player_number)),
       this->teams.at(index)->members.end());
+
+  // Remove the publisher and subscriber for the 'say' commands.
+  this->teams.at(index)->pubs.erase(name);
+  this->teams.at(index)->subs.erase(name);
+
   //this->teams.at(index)->members.erase(req.player_number);
   //this->teams.at(index)->members.at(req.player_number) = "";
 
@@ -837,4 +855,58 @@ math::Pose GameControllerPlugin::GetBall()
     return this->ball->GetWorldPose();
   else
     return math::Pose();
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::OnMessageFromRobot(
+ const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
+ const std::string &_team)
+{
+  // Remove the first "/".
+  std::string sender = _topic.substr(1, _topic.size() - 1);
+
+  // Get the robot name.
+  unsigned pos = sender.find("/");
+  sender = sender.substr(0, pos);
+
+  physics::ModelPtr senderModel = this->world->GetModel(sender);
+  if (!senderModel)
+  {
+    std::cerr << "OnMessageFromRobot() Unknown sender [" << senderModel
+              << "]" << std::endl;
+    return;
+  }
+  // Get the sender's location.
+  math::Pose senderPose = senderModel->GetWorldPose();
+
+  // Forward the messages to the closer teammates.
+  for (size_t i = 0; i < this->teams.size(); ++i)
+  {
+    // Find the correct team.
+    if (this->teams.at(i)->name != _team)
+      continue;
+
+    for (size_t j = 0; j < this->teams.at(i)->members.size() - 1; ++j)
+    {
+      std::string name = this->teams.at(i)->members.at(j).second;
+
+      // Don't forward the message to the sender.
+      if (name == sender)
+        continue;
+
+      physics::ModelPtr model = this->world->GetModel(name);
+
+      if (model)
+      {
+        // Get the teammates' pose.
+        math::Pose pose = model->GetWorldPose();
+
+        if (pose.pos.Distance(senderPose.pos) <= 50.0)
+        {
+          // Forward the message.
+          this->teams.at(i)->pubs[name]->publish(_msg);
+        }
+      }
+    }
+  }
 }

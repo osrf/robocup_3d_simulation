@@ -19,7 +19,7 @@
 #include <gazebo/physics/physics.hh>
 #include "robocup_agent_plugin/AgentPlugin.hh"
 #include "robocup_msgs/SendJoints.h"
-
+// #include "robocup_msgs/Say.h"
 
 using namespace gazebo;
 
@@ -83,27 +83,27 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->node->advertiseService("/" + this->modelName + "/send_joints",
     &AgentPlugin::SendJoints, this);
 
-  // Self collide
-  for (int i = 0; i < 22; ++i)
-	{
-		// Get the joint.
-		physics::JointPtr joint =
-		  this->model->GetJoint(this->modelName + "::Nao::" + this->jointNames[i]);
-    if (!joint)
-    {
-      std::cerr << "SendJoints() Joint [" << this->modelName << "::Nao::"
-                << this->jointNames[i] << "] not found" << std::endl;
-      continue;
-    }
+  /* Info: The agent has to advertise a topic '/<robot_name>/say' and publish
+   a message in this topic each the agent wants to "say" something. The
+   game controller plugin is subscribed to this topic and will forward the
+   message to the rest of the teammates.
 
-		// Set the force for this joint.
-    joint->SetForce(0, jointValues[i]);
+   In a similar way, each agent has to subscribe to a topic
+   '/<robot_name>/listen', where the gamecontroller will forward the messages
+   coming from other robots.*/
 
-    // Debug.
-    // std::cout << "New joint command [" << this->modelName << "::Nao::"
-    //           << this->jointNames[i] << ": " << jointValues[i] << std::endl;
+   // Debugging.
+   // Register the callback for the 'listen' message.
+  /* this->listenSub = this->node->subscribe<robocup_msgs::Say>(
+    std::string("/" + this->modelName + "/listen"), 1000,
+    &AgentPlugin::OnMessageFromRobot, this);*/
 
-	}
+  // Debugging
+  // Advertise the topic for sending messages to other robots.
+  // this->sayPub = this->node->advertise<robocup_msgs::Say>(
+  //  std::string("/" + this->modelName + "/say"), 10);
+  // robocup_msgs::Say msg;
+  //	this->sayPub.publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -132,10 +132,14 @@ bool AgentPlugin::SendJoints(
 
 		// Set the force for this joint.
     joint->SetForce(0, jointValues[i]);
-
-    // Debug.
-    // std::cout << "New joint command [" << this->modelName << "::Nao::"
-    //           << this->jointNames[i] << ": " << jointValues[i] << std::endl;
-
 	}
 }
+
+/////////////////////////////////////////////////
+// Debugging
+/*void AgentPlugin::OnMessageFromRobot(const robocup_msgs::Say::ConstPtr& _msg)
+{
+	boost::array<signed char, 20> message = _msg->message;
+	std::cout << this->modelName << ": New message received from other robot."
+	          << std::endl;
+}*/
