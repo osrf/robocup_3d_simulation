@@ -74,6 +74,7 @@ add_service_files(
   KillAgent.srv
   InitAgent.srv
   MoveAgentPose.srv
+  SendJoints.srv
   SetGameState.srv
   MoveBall.srv
 )

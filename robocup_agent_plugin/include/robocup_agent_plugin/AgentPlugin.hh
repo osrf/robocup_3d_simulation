@@ -18,8 +18,12 @@
 #ifndef _GAZEBO_GAME_CONTROLLER_PLUGIN_HH_
 #define _GAZEBO_GAME_CONTROLLER_PLUGIN_HH_
 
+#include <ros/ros.h>
 #include <gazebo/gazebo.hh>
-
+#include <gazebo/physics/physics.hh>
+#include "robocup_msgs/SendJoints.h"
+#include <string>
+#include <vector>
 
 namespace gazebo
 {
@@ -36,6 +40,35 @@ namespace gazebo
 
     // Documentation inherited.
     public: virtual void Init();
+
+    /// \brief ROS service callback to send joint commands to the simulation.
+    /// \param[out] _req ROS service call request.
+    /// \param[out] _res ROS service call result.
+    /// \return True when the service call succeeds.
+    private: bool SendJoints(robocup_msgs::SendJoints::Request  &_req,
+                             robocup_msgs::SendJoints::Response &_res);
+
+    // ROS Node handler
+    private: boost::scoped_ptr<ros::NodeHandle> node;
+
+    /// \brief Mutex to avoid race conditions while running updates and a ROS
+    /// callback is executed.
+    private: boost::mutex mutex;
+
+    /// \brief Pointer to a node for communication.
+    private: transport::NodePtr gzNode;
+
+    // ROS Service for spawning new agents.
+    private: ros::ServiceServer jointCommandsService;
+
+    /// \brief Pointer to the model.
+    private: physics::ModelPtr model;
+
+    /// \brief Model name.
+    private: std::string modelName;
+
+    /// \brief Vector with all the joint names.
+    private: std::vector<std::string> jointNames;
   };
 }
 #endif

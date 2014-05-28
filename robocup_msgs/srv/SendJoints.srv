@@ -1,0 +1,28 @@
+# Array of joint values with the following order:
+
+# HeadYaw
+# HeadPitch
+# LHipYawPitch
+# LHipRoll
+# LHipPitch
+# LKneePitch
+# LAnklePitch
+# LAnkleRoll
+# LShoulderPitch
+# LShoulderRoll
+# LElbowYaw
+# LWristYaw
+# RHipYawPitch
+# RHipRoll
+# RHipPitch
+# RKneePitch
+# RAnklePitch
+# RAnkleRoll
+# RShoulderPitch
+# RShoulderRoll
+# RElbowYaw
+# RWristYaw
+
+float32[22] joints
+---
+uint8 result

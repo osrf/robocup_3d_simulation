@@ -1,8 +1,8 @@
 <sdf version="1.4">
   <model name="teamA_1">
 
-    <!-- A turtlebot -->
-    <pose>-0.5 11 0 0 0 1.57</pose>
+    <!-- A robot-->
+    <pose>-0.5 11 0.35 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
       <uri>model://nao_meshes</uri>
@@ -25,6 +25,14 @@
     <!-- Load a plugin to control the sphere with Hydra -->
     <plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>
 
-    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
+    <!--<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/teamA_1</robotNamespace>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin> -->
+
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
+      <robot_namespace>teamA_1</robot_namespace>
+    </plugin>
+
   </model>
 </sdf>
