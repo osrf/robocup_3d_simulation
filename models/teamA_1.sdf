@@ -1,12 +1,17 @@
 <sdf version="1.4">
   <model name="teamA_1">
+    <pose>-1 0 0 0 0 1.57</pose>
 
     <!-- A turtlebot -->
     <include>
-    	<pose>-1.5 11 0 0 0 1.57</pose>
       <uri>model://turtlebot</uri>
     </include>
-    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so"></plugin>
+    <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
+      <view_angle>120</view_angle>
+      <imu_sensor>turtlebot::rack::imu_sensor</imu_sensor>
+      <touch_sensor>turtlebot::rack::touch_sensor</touch_sensor>
+      <force_sensors>turtlebot::wheel::force_sensor</force_sensor>
+    </plugin>
 
     <!-- Load a plugin to control the sphere with Hydra -->
 		<plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>

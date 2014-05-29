@@ -42,8 +42,10 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>robocup_msgs</build_depend>
+  <build_depend>gazebo</build_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>robocup_msgs</run_depend>
+  <run_depend>gazebo</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

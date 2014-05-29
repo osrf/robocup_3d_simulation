@@ -60,6 +60,7 @@ add_message_files(
   InitPlayer.msg
   Kickoff.msg
   Landmark.msg
+  Line.msg
   MoveAgent.msg
   PlayMode.msg
   RobocupSyntheticVision.msg
