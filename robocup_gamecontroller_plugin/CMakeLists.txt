@@ -81,6 +81,8 @@ include_directories(
 ## Declare a cpp library
 add_library(robocup_gamecontroller_plugin
   src/GameControllerPlugin.cc
+  src/MonitorIface.cc
+  src/Socket.cc
   src/states/State.cc
   src/states/BeforeKickOffState.cc
   src/states/CornerKickLeftState.cc
