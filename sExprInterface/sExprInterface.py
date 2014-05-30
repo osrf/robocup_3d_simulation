@@ -7,7 +7,7 @@
 import os
 import sys
 import math
-import struct 
+import struct
 import socket   #for sockets
 import threading
 import rospy
@@ -20,7 +20,7 @@ class agentInterface:
     self._agentTree = []
     self._initializeAgentValues()
 
-    # Server internal data values 
+    # Server internal data values
     self._serverTree = []
     self._initializeServerValues()
 
@@ -36,7 +36,7 @@ class agentInterface:
       if symbol != "":
         current.append(symbol)
       symbol = ""
-      for i in range(len(t)):    
+      for i in range(len(t)):
         if '(' == t[i]:
           if symbol != "":
             current.append(symbol)
@@ -47,7 +47,7 @@ class agentInterface:
           symbol = ""
         elif ')' == t[i]:
           if symbol != "":
-            current.append(symbol)      
+            current.append(symbol)
           symbol = ""
           current = stack.pop()
         else:
@@ -80,7 +80,7 @@ class agentInterface:
         self._agentSay = i[1]
       elif i[0] != 'syn':
         print "Unknown agent message type: " + i[0]
-        
+
   # == Public agent methods ==
 
   def printAgentValues(self):
@@ -131,7 +131,7 @@ class agentInterface:
     self._serverMyPos = None
     self._serverMyOrien = None
     self._serverBallPos = None
- 
+
 
   def _populateServerValuesFromTree(self):
     self._initializeServerValues()
@@ -188,9 +188,9 @@ class agentInterface:
           elif j[0] == 'myorien':
             self._serverMyOrien = j[1]
           elif j[0] == 'ballpos':
-            self._serverBallPos = (j[1], j[2], j[3]) 
+            self._serverBallPos = (j[1], j[2], j[3])
           else:
-            print "Unknown server vision type: " + j[0] 
+            print "Unknown server vision type: " + j[0]
       else:
         print "Unknown server message type: " + i[0]
 
@@ -267,11 +267,11 @@ class agentInterface:
     msg = ""
     if self._serverTime != None:
       msg = msg + self.makeTimeSExpr(self._serverTime)
-    if self._serverGameStateTime != None and self._serverGameStatePlayMode != None:  
+    if self._serverGameStateTime != None and self._serverGameStatePlayMode != None:
       msg = msg + self.makeGameStateSExpr(self._serverGameStateTime, self._serverGameStatePlayMode, self._serverGameStateScoreLeft, self._serverGameStateScoreRight, self._serverGameStateID, self._serverGameStateSide)
     if self._serverGyro != None:
       msg = msg + self.makeGyroSExpr(self._serverGyro[0], self._serverGyro[1], self._serverGyro[2], self._serverGyro[3])
-    if self._serverAccel != None: 
+    if self._serverAccel != None:
       msg = msg + self.makeAccelSExpr(self._serverAccel[0], self._serverAccel[1], self._serverAccel[2], self._serverAccel[3])
     if len(self._serverSeenObjects) > 0 or len(self._serverSeenPlayers) > 0 or len(self._serverSeenLines) > 0 or self._serverMyPos != None or self._serverMyOrien != None or self._serverBallPos != None:
       visionMsgs = ""
@@ -286,7 +286,7 @@ class agentInterface:
       if self._serverMyOrien != None:
         visionMsgs = visionMsgs + self.makeGroundTruthMyOrienSExpr(self._serverMyOrien)
       if self._serverBallPos != None:
-        visionMsgs = visionMsgs + self.makeGroundTruthBallPosSExpr(self._serverBallPos[0], self._serverBallPos[1], self._serverBallPos[2]) 
+        visionMsgs = visionMsgs + self.makeGroundTruthBallPosSExpr(self._serverBallPos[0], self._serverBallPos[1], self._serverBallPos[2])
       msg = msg + self.makeSeeSExpr(visionMsgs)
     for i in self._serverForceResistancePerceptors:
       msg = msg + self.makeForceResistancePerceptorSExpr(i[0], i[1][0], i[1][1], i[1][2], i[2][0], i[2][1], i[2][2])
@@ -296,14 +296,16 @@ class agentInterface:
       else:
         msg = msg + self.makeHearSExpr(self._serverHear[0], self._serverHear[1], self._serverHear[2], self._serverHear[3])
     for i in self._serverHingeJoints:
-      msg = msg + self.makeHingeJointSExpr(i[0], i[1])   
+      msg = msg + self.makeHingeJointSExpr(i[0], i[1])
     return msg
-        
-  def callback(data):
-    print "callback"
+
+  def callback(self, data):
+    print data.joint_angle_1
     #rospy.loginfo(rospy.get_caller_id()+"I heard %s",data.data)
 
   def run(self, s):
+    rospy.Subscriber("/teamA_1/state", AgentState, self.callback)
+
     msgSize = s.recv(4)
     msgSize = struct.unpack("!L", msgSize)
     #print msgSize[0]
@@ -317,8 +319,7 @@ class agentInterface:
     host = socket.gethostbyname("localhost")
     #print host
     sserver.connect((host, 3100))
-    rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber("state", AgentState, callback)
+
     while True:
       msgToServer = struct.pack("!I", len(msg)) + msg
       sserver.send(msgToServer)
@@ -350,7 +351,7 @@ class agentInterface:
 
 
 
-#sys.argv = [sys.argv[0], 'localhost', 3400]    
+#sys.argv = [sys.argv[0], 'localhost', 3400]
 
 
 if len(sys.argv) > 1 and sys.argv[1] == "--help":
@@ -375,16 +376,17 @@ except socket.error, msg:
     sys.exit();
 
 serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
- 
+
 try:
     host = socket.gethostbyname( host )
- 
+
 except socket.gaierror:
     #could not resolve
     print 'Hostname could not be resolved. Exiting'
     sys.exit()
-     
- 
+
+rospy.init_node('listener', anonymous=True)
+
 #Connect to remote server
 serversocket.bind((host, port))
 serversocket.listen(22)
@@ -397,7 +399,7 @@ while True:
     print 'Got connection from', address
     aI = agentInterface()
     #aI.run(clientsocket)
-    t = threading.Thread(target = aI.run, args = (clientsocket,))   
+    t = threading.Thread(target = aI.run, args = (clientsocket,))
     t.start()
     #ct = client_thread(clientsocket)
     #ct.run()

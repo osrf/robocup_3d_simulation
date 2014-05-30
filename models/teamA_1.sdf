@@ -27,7 +27,7 @@
 
     <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
       <robot_namespace>teamA_1</robot_namespace>
-	  <view_angle>120</view_angle>
+	    <view_angle>120</view_angle>
       <imu_sensor>turtlebot::rack::imu_sensor</imu_sensor>
       <touch_sensor>turtlebot::rack::touch_sensor</touch_sensor>
       <force_sensors>turtlebot::wheel::force_sensor</force_sensor>
