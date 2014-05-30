@@ -124,7 +124,23 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("view_angle"))
     this->viewAngle = _sdf->Get<double>("view_angle");
 
-  std::cout << "VIEW ANGLE[" << this->viewAngle;
+  if (_sdf->HasElement("head_link"))
+  {
+    this->headLink = this->model->GetLink(_sdf->Get<std::string>("head_link"));
+    if (!this->headLink)
+    {
+      gzerr << "Unable to get head link with name ["
+        << _sdf->Get<std::string>("head_link") << "]\n";
+    }
+  }
+  else
+  {
+    gzerr << "<head_link> not specified\n";
+    return;
+  }
+
+
+
   // Get all the hinge joints that are not fixed.
   for (physics::Joint_V::const_iterator iter = _model->GetJoints().begin();
        iter != _model->GetJoints().end(); ++iter)
@@ -137,44 +153,76 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
   }
 
-  sdf::ElementPtr imuElem = _sdf->GetElement("imu_sensor");
-  while(imuElem)
+  // Get all the imu sensors.
+  if (_sdf->HasElement("imu_sensor"))
   {
-    std::string sensorName = _model->GetWorld()->GetName() + "::" +
-                             _model->GetName() + "::" +
-                             imuElem->Get<std::string>();
-    sensors::SensorPtr sensor =
-      sensors::SensorManager::Instance()->GetSensor(sensorName);
-
-    if (!sensor)
-      gzerr << "Unable to get sensor with name[" << sensorName << "]\n";
-    else
+    sdf::ElementPtr imuElem = _sdf->GetElement("imu_sensor");
+    while(imuElem)
     {
-      this->imuSensors.push_back(
-          boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor));
-    }
+      std::string sensorName = _model->GetWorld()->GetName() + "::" +
+        _model->GetName() + "::" +
+        imuElem->Get<std::string>();
+      sensors::SensorPtr sensor =
+        sensors::SensorManager::Instance()->GetSensor(sensorName);
 
-    imuElem = imuElem->GetNextElement("imu_sensor");
+      if (!sensor)
+        gzerr << "Unable to get sensor with name[" << sensorName << "]\n";
+      else
+      {
+        this->imuSensors.push_back(
+            boost::dynamic_pointer_cast<sensors::ImuSensor>(sensor));
+      }
+
+      imuElem = imuElem->GetNextElement("imu_sensor");
+    }
   }
 
-  sdf::ElementPtr touchElem = _sdf->GetElement("touch_sensor");
-  while(touchElem)
+  // Get all the touch sensors.
+  if (_sdf->HasElement("touch_sensor"))
   {
-    std::string sensorName = _model->GetWorld()->GetName() + "::" +
-                             _model->GetName() + "::" +
-                             touchElem->Get<std::string>();
-    sensors::SensorPtr sensor =
-      sensors::SensorManager::Instance()->GetSensor(sensorName);
-
-    if (!sensor)
-      gzerr << "Unable to get sensor with name[" << sensorName << "]\n";
-    else
+    sdf::ElementPtr touchElem = _sdf->GetElement("touch_sensor");
+    while(touchElem)
     {
-      this->touchSensors.push_back(
-          boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor));
-    }
+      std::string sensorName = _model->GetWorld()->GetName() + "::" +
+        _model->GetName() + "::" +
+        touchElem->Get<std::string>();
+      sensors::SensorPtr sensor =
+        sensors::SensorManager::Instance()->GetSensor(sensorName);
 
-    touchElem = touchElem->GetNextElement("touch_sensor");
+      if (!sensor)
+        gzerr << "Unable to get sensor with name[" << sensorName << "]\n";
+      else
+      {
+        this->touchSensors.push_back(
+            boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor));
+      }
+
+      touchElem = touchElem->GetNextElement("touch_sensor");
+    }
+  }
+
+  // Get all the force sensors.
+  if (_sdf->HasElement("force_sensor"))
+  {
+    sdf::ElementPtr forceElem = _sdf->GetElement("force_sensor");
+    while(forceElem)
+    {
+      std::string sensorName = _model->GetWorld()->GetName() + "::" +
+        _model->GetName() + "::" +
+        forceElem->Get<std::string>();
+      sensors::SensorPtr sensor =
+        sensors::SensorManager::Instance()->GetSensor(sensorName);
+
+      if (!sensor)
+        gzerr << "Unable to get sensor with name[" << sensorName << "]\n";
+      else
+      {
+        this->forceSensors.push_back(
+            boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor));
+      }
+
+      forceElem = forceElem->GetNextElement("force_sensor");
+    }
   }
 
   // Make sure the ROS node for Gazebo has already been initialized
@@ -356,7 +404,8 @@ void AgentPlugin::SendState()
           value.y += citer->second.wrench[i].body1Force.y;
           value.z += citer->second.wrench[i].body1Force.z;
         }
-        else {
+        else
+        {
           value.x += citer->second.wrench[i].body2Force.x;
           value.y += citer->second.wrench[i].body2Force.y;
           value.z += citer->second.wrench[i].body2Force.z;
@@ -385,7 +434,8 @@ void AgentPlugin::SendState()
   landmarks["B"] = this->ball->GetWorldPose().pos;
 
   // \todo: Make this the camera pose
-  math::Pose cameraPose = this->model->GetWorldPose() + this->cameraPoseNoise;
+  math::Pose cameraPose = this->headLink->GetWorldPose() +
+    this->cameraPoseNoise;
   math::Angle cameraYaw = cameraPose.rot.GetAsEuler().z;
   math::Angle cameraPitch = cameraPose.rot.GetAsEuler().y;
 
@@ -438,7 +488,8 @@ void AgentPlugin::SendState()
 void AgentPlugin::SendLines(robocup_msgs::AgentState &_msg)
 {
   // \todo: Make this the camera pose
-  math::Pose cameraPose = this->model->GetWorldPose() + this->cameraPoseNoise;
+  math::Pose cameraPose = this->headLink->GetWorldPose() +
+    this->cameraPoseNoise;
   math::Angle cameraYaw = cameraPose.rot.GetAsEuler().z;
   math::Angle cameraPitch = cameraPose.rot.GetAsEuler().y;
 
