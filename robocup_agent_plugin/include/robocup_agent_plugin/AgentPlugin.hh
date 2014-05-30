@@ -201,19 +201,16 @@ namespace gazebo
                 std::vector<math::Vector2d> pts;
                 if (line1.Intersect(_line, pt))
                 {
-                  std::cout << "Intersect 1[" << pt.x << " " << pt.y << "]\n";
                   pts.push_back(pt);
                 }
 
                 if (line2.Intersect(_line, pt))
                 {
-                  std::cout << "Intersect 2[" << pt.x << " " << pt.y << "]\n";
                   pts.push_back(pt);
                 }
 
                 if (line3.Intersect(_line, pt))
                 {
-                  std::cout << "Intersect 3[" << pt.x << " " << pt.y << "]\n";
                   pts.push_back(pt);
                 }
 
@@ -266,6 +263,7 @@ namespace gazebo
     private: std::vector<std::string> jointNames;
 
     private: std::vector<Line> lines;
+    private: gazebo::physics::LinkPtr headLink;
 
     private: std::map<std::string, std::string> toAgent;
     private: std::map<std::string, std::string> toServer;
