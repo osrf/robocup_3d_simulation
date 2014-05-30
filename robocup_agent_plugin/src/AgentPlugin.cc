@@ -115,6 +115,24 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->lines.push_back(Line(-13.2,3, -15,3));
   this->lines.push_back(Line(-13.2,-3, -15,-3));
 
+  // center circle ring
+  this->lines.push_back(Line(2,0, 1.618033989, 1.175570505));
+  this->lines.push_back(Line(1.618033989, 1.175570505,
+                             0.618033989, 1.902113033));
+  this->lines.push_back(Line(0.618033989, 1.902113033,
+                             -0.618033989, 1.902113033));
+  this->lines.push_back(Line(-0.618033989, 1.902113033,
+                             -1.618033989, 1.175570505));
+  this->lines.push_back(Line(-1.618033989, 1.175570505, -2, 0));
+  this->lines.push_back(Line(-2, 0, -1.618033989, -1.175570505));
+  this->lines.push_back(Line(-1.618033989, -1.175570505,
+                             -0.618033989, -1.902113033));
+  this->lines.push_back(Line(-0.618033989, -1.902113033,
+                             0.618033989, -1.902113033));
+  this->lines.push_back(Line(0.618033989, -1.902113033,
+                             1.618033989, -1.175570505));
+  this->lines.push_back(Line(1.618033989, -1.175570505, 2,0));
+
   if (!this->ball)
   {
     gzerr << "Unable to get the ball model\n";
