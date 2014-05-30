@@ -265,7 +265,10 @@ namespace gazebo
     /// \brief Vector with all the joint names.
     private: std::vector<std::string> jointNames;
 
-  private: std::vector<Line> lines;
+    private: std::vector<Line> lines;
+
+    private: std::map<std::string, std::string> toAgent;
+    private: std::map<std::string, std::string> toServer;
   };
 }
 #endif

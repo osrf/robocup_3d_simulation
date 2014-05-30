@@ -12,6 +12,7 @@ import socket   #for sockets
 import threading
 import rospy
 from robocup_msgs.msg import AgentState
+from robocup_msgs.srv import *
 
 
 class agentInterface:
@@ -114,8 +115,10 @@ class agentInterface:
 
   def _initializeServerValues(self):
     self._serverTime = None
-    self._serverGameStateID = None
-    self._serverGameStateSide = None
+    #self._serverGameStateID = None
+    self._serverGameStateID = 1
+    #self._serverGameStateSide = None
+    self._serverGameStateSide = 'left'
     self._serverGameStateTime = None
     self._serverGameStatePlayMode = None
     self._serverGameStateScoreLeft = None
@@ -300,8 +303,62 @@ class agentInterface:
     return msg
 
   def callback(self, data):
-    print data.joint_angle_1
-    #rospy.loginfo(rospy.get_caller_id()+"I heard %s",data.data)
+    # Clear all values
+    self._initializeServerValues()
+
+    for i in range(len(data.joint_name)):
+      # Populating the joints
+      self._serverHingeJoints.append(data.joint_name[i], data.joint_angle_1[i])
+
+      # Set the gyro values
+
+      # Set the force sensor values
+
+      # Set the perception
+
+  def sendJoints(self):
+    rospy.wait_for_service('/teamA_1/send_joints')
+    try:
+        # if the list of joint commands is not 22, just return.
+        if len(self._agentJointRequests) != 22:
+          return
+
+        send_joints_f = rospy.ServiceProxy('/teamA_1/send_joints', SendJoints)
+
+        # Create a dictionary from the list
+        toServer = {}
+        for joint in self._agentJointRequests:
+          toServer[joint[0]] = joint[1]
+
+        newJoints = []
+        newJoints.append(toServer['hj1'])
+        newJoints.append(toServer['hj2'])
+        newJoints.append(toServer['llj1'])
+        newJoints.append(toServer['llj2'])
+        newJoints.append(toServer['llj3'])
+        newJoints.append(toServer['llj4'])
+        newJoints.append(toServer['llj5'])
+        newJoints.append(toServer['llj6'])
+        newJoints.append(toServer['laj1'])
+        newJoints.append(toServer['laj2'])
+        newJoints.append(toServer['laj4'])
+        newJoints.append(toServer['laj3'])
+        newJoints.append(toServer['rlj1'])
+        newJoints.append(toServer['rlj2'])
+        newJoints.append(toServer['rlj3'])
+        newJoints.append(toServer['rlj4'])
+        newJoints.append(toServer['rlj5'])
+        newJoints.append(toServer['rlj6'])
+        newJoints.append(toServer['raj1'])
+        newJoints.append(toServer['raj2'])
+        newJoints.append(toServer['raj4'])
+        newJoints.append(toServer['raj3'])
+
+        resp1 = send_joints_f(newJoints)
+        return resp1.sum
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
+
 
   def run(self, s):
     rospy.Subscriber("/teamA_1/state", AgentState, self.callback)
@@ -315,22 +372,31 @@ class agentInterface:
     self._populateAgentValuesFromTree()
     #print self.agentTree
     #self.printAgentValues()
-    sserver = socket.socket()         # Create a socket object
-    host = socket.gethostbyname("localhost")
+
+    #sserver = socket.socket()         # Create a sock et object
+    #host = socket.gethostbyname("localhost")
     #print host
-    sserver.connect((host, 3100))
+    #sserver.connect((host, 3100))
 
     while True:
-      msgToServer = struct.pack("!I", len(msg)) + msg
-      sserver.send(msgToServer)
-      msgSize = sserver.recv(4)
-      msgSize = struct.unpack("!L", msgSize)
+
+      # Send joints to the server
+
+
+      #msgToServer = struct.pack("!I", len(msg)) + msg
+      #sserver.send(msgToServer)
+      #msgSize = sserver.recv(4)
+      #msgSize = struct.unpack("!L", msgSize)
       #print msgSize[0]
-      msgFromServer = sserver.recv(msgSize[0])
+      #msgFromServer = sserver.recv(msgSize[0])
       #print "From server: " + msgFromServer
-      self._serverTree = self._getTreeFromSExpr(msgFromServer)
+      #self._serverTree = self._getTreeFromSExpr(msgFromServer)
       #print self._serverTree
-      self._populateServerValuesFromTree()
+      #self._populateServerValuesFromTree()
+
+      # Hardcoding the uniform number and side.
+
+
       msgForAgent = self.makeSExprForAgent()
       #print "Message for agent: " + msgForAgent
       msgToAgent = struct.pack("!I", len(msgForAgent)) + msgForAgent

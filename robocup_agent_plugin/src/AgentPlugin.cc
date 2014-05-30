@@ -44,6 +44,7 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("LShoulderPitch");
   this->jointNames.push_back("LShoulderRoll");
   this->jointNames.push_back("LElbowYaw");
+  this->jointNames.push_back("LElbowRoll");
   this->jointNames.push_back("LWristYaw");
   this->jointNames.push_back("RHipYawPitch");
   this->jointNames.push_back("RHipRoll");
@@ -54,7 +55,58 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("RShoulderPitch");
   this->jointNames.push_back("RShoulderRoll");
   this->jointNames.push_back("RElbowYaw");
+  this->jointNames.push_back("RElbowRoll");
   this->jointNames.push_back("RWristYaw");
+
+  this->toAgent["HeadYaw"]        = "hj1";
+  this->toAgent["HeadPitch"]      = "hj2";
+  this->toAgent["LHipYawPitch"]   = "llj1";
+  this->toAgent["LHipRoll"]       = "llj2";
+  this->toAgent["LHipPitch"]      = "llj3";
+  this->toAgent["LKneePitch"]     = "llj4";
+  this->toAgent["LAnklePitch"]    = "llj5";
+  this->toAgent["LAnkleRoll"]     = "llj6";
+  this->toAgent["LShoulderPitch"] = "laj1";
+  this->toAgent["LShoulderRoll"]  = "laj2";
+  this->toAgent["LElbowYaw"]      = "laj4";
+  this->toAgent["LElbowRoll"]     = "laj3";
+  this->toAgent["LWristYaw"]      = "LWristYaw";
+  this->toAgent["RHipYawPitch"]   = "rlj1";
+  this->toAgent["RHipRoll"]       = "rlj2";
+  this->toAgent["RHipPitch"]      = "rlj3";
+  this->toAgent["RKneePitch"]     = "rlj4";
+  this->toAgent["RAnklePitch"]    = "rlj5";
+  this->toAgent["RAnkleRoll"]     = "rlj6";
+  this->toAgent["RShoulderPitch"] = "raj1";
+  this->toAgent["RShoulderRoll"]  = "raj2";
+  this->toAgent["RElbowYaw"]      = "raj4";
+  this->toAgent["RElbowRoll"]     = "raj3";
+  this->toAgent["RWristYaw"]      = "RWristYaw";
+
+  this->toServer["he1"]       = "HeadYaw";
+  this->toServer["he2"]       = "HeadPitch";
+  this->toServer["lle1"]      = "LHipYawPitch";
+  this->toServer["lle2"]      = "LHipRoll";
+  this->toServer["lle3"]      = "LHipPitch";
+  this->toServer["lle4"]      = "LKneePitch";
+  this->toServer["lle5"]      = "LAnklePitch";
+  this->toServer["lle6"]      = "LAnkleRoll";
+  this->toServer["lae1"]      = "LShoulderPitch";
+  this->toServer["lae2"]      = "LShoulderRoll";
+  this->toServer["lae4"]      = "LElbowYaw";
+  this->toServer["lae3"]      = "LElbowRoll";
+  this->toServer["LWristYaw"] = "LWristYaw";
+  this->toServer["rle1"]      = "RHipYawPitch";
+  this->toServer["rle2"]      = "RHipRoll";
+  this->toServer["rle3"]      = "RHipPitch";
+  this->toServer["rle4"]      = "RKneePitch";
+  this->toServer["rle5"]      = "RAnklePitch";
+  this->toServer["rle6"]      = "RAnkleRoll";
+  this->toServer["rae1"]      = "RShoulderPitch";
+  this->toServer["rae2"]      = "RShoulderRoll";
+  this->toServer["rae4"]      = "RElbowYaw";
+  this->toServer["raj3"]      = "RElbowRoll";
+  this->toServer["RWristYaw"] = "RWristYaw";
 
   // Start up ROS
   std::string name = "set_joints";
@@ -241,7 +293,8 @@ bool AgentPlugin::SendJoints(
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint(this->modelName + "::Nao::" + this->jointNames[i]);
+      this->model->GetJoint(this->modelName + "::Nao::" +
+        this->toServer[this->jointNames[i]]);
     if (!joint)
     {
       std::cerr << "SendJoints() Joint [" << this->modelName << "::Nao::"
@@ -285,12 +338,16 @@ void AgentPlugin::SendState()
   for (std::vector<physics::JointPtr>::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    msg.joint_name.push_back((*iter)->GetName());
-    msg.joint_angle_1.push_back((*iter)->GetAngle(0).Degree());
-    if ((*iter)->HasType(physics::Base::UNIVERSAL_JOINT))
-      msg.joint_angle_2.push_back((*iter)->GetAngle(1).Degree());
-    else
-      msg.joint_angle_2.push_back(0);
+    // Ignore the wrists.
+    if ((*iter)->GetName().find("Wrist") == std::string::npos)
+    {
+      msg.joint_name.push_back(this->toAgent[(*iter)->GetName()]);
+      msg.joint_angle_1.push_back((*iter)->GetAngle(0).Degree());
+      if ((*iter)->HasType(physics::Base::UNIVERSAL_JOINT))
+        msg.joint_angle_2.push_back((*iter)->GetAngle(1).Degree());
+      else
+        msg.joint_angle_2.push_back(0);
+    }
   }
 
   // Output IMU data
