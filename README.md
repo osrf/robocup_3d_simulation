@@ -39,6 +39,9 @@ Running
 
     . ~/robocup_ws/devel/setup.bash
 
+    . ~/robocup_3d_simulation/models/nao_meshes/setup.sh (make sure that the
+    paths match your directories, username, etc.).
+
     gazebo ~/robocup_3d_simulation/worlds/robocup_3Dsim.world
 
 3. Manually spawn a team of agents:
