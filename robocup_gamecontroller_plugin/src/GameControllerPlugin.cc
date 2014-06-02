@@ -382,8 +382,8 @@ bool GameControllerPlugin::MoveAgentPose(
 
   // Wrong player #
   Members_It it = std::find_if(this->teams.at(index)->members.begin(),
-                    this->teams.at(index)->members.end(),
-                    CompareFirst(req.player_id));
+                  this->teams.at(index)->members.end(),
+                  CompareFirst(req.player_id));
 
   if (it == this->teams.at(index)->members.end())
   //if (req.player_id <= 0 || req.player_id > 11)
@@ -794,7 +794,7 @@ void GameControllerPlugin::ReleasePlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
         if (!joint)
         {
           std::cerr << "ReleasePlayers() Joint (" << joint << ") not found\n";
@@ -820,7 +820,7 @@ void GameControllerPlugin::StopPlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
         if (!joint)
         {
           std::cerr << "StopPlayers() Joint (" << joint << ") not found\n";
@@ -829,7 +829,7 @@ void GameControllerPlugin::StopPlayers()
 
         joint->Attach(physics::LinkPtr(),
           //model->GetLink(name + "::turtlebot::rack"));
-          model->GetLink(name + "::Nao::HeadPitchLink"));
+          model->GetLink("default::" + name + "::Nao::HeadPitchLink"));
 
         math::Pose pose = model->GetWorldPose();
         model->Reset();

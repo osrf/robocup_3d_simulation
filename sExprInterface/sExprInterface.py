@@ -4,15 +4,14 @@
 # Written by Patrick MacAlpine (patmac@cs.utexas.edu)
 # Usage: ./sExprInterface.py <logFile> [host] [port]
 
-import os
 import sys
-import math
 import struct
 import socket   #for sockets
 import threading
 import rospy
+from threading import Lock
 from robocup_msgs.msg import AgentState
-from robocup_msgs.srv import *
+from robocup_msgs.srv import SendJoints
 
 
 class agentInterface:
@@ -24,6 +23,10 @@ class agentInterface:
     # Server internal data values
     self._serverTree = []
     self._initializeServerValues()
+
+    self._serverTime = 0
+
+    self.mutex = Lock()
 
   # Get tree from s-expression
   def _getTreeFromSExpr(self, sExpr):
@@ -114,18 +117,22 @@ class agentInterface:
   # == Private server methods ==
 
   def _initializeServerValues(self):
-    self._serverTime = None
+    #self._serverTime = None
+    #self._serverTime = 0
     #self._serverGameStateID = None
     self._serverGameStateID = 1
     #self._serverGameStateSide = None
     self._serverGameStateSide = 'left'
-    self._serverGameStateTime = None
-    self._serverGameStatePlayMode = None
+    #self._serverGameStateTime = None
+    self._serverGameStateTime = 0
+    #self._serverGameStatePlayMode = None
+    self._serverGameStatePlayMode = 'BeforeKickOff'
     self._serverGameStateScoreLeft = None
     self._serverGameStateScoreRight = None
     self._serverGyro = None
     self._serverAccel = None
-    self._serverForceResistancePerceptors = []
+    #self._serverForceResistancePerceptors = []
+    self._serverForceResistancePerceptors = [('lf', (0, 0, 0), (0, 0, 0)), ('rf', (0, 0, 0), (0, 0, 0))]
     self._serverHingeJoints = []
     self._serverHear = None
     self._serverSeenObjects = []
@@ -269,6 +276,7 @@ class agentInterface:
   def makeSExprForAgent(self):
     msg = ""
     if self._serverTime != None:
+      self._serverTime += 0.02
       msg = msg + self.makeTimeSExpr(self._serverTime)
     if self._serverGameStateTime != None and self._serverGameStatePlayMode != None:
       msg = msg + self.makeGameStateSExpr(self._serverGameStateTime, self._serverGameStatePlayMode, self._serverGameStateScoreLeft, self._serverGameStateScoreRight, self._serverGameStateID, self._serverGameStateSide)
@@ -303,18 +311,37 @@ class agentInterface:
     return msg
 
   def callback(self, data):
+    self.mutex.acquire()
+
     # Clear all values
     self._initializeServerValues()
 
+    # Changing the time
+    #self._serverTime += 0.02
+
     for i in range(len(data.joint_name)):
       # Populating the joints
-      self._serverHingeJoints.append(data.joint_name[i], data.joint_angle_1[i])
+      self._serverHingeJoints.append((data.joint_name[i], data.joint_angle_1[i]))
 
-      # Set the gyro values
+    # Set the gyro values
+    #print self._serverGyro
+    if self._serverGyro != None:
+      self._serverGyro = ('torso', data.gyro_angular[0].x, data.gyro_angular[0].y, data.gyro_angular[0].z)
 
-      # Set the force sensor values
+    if self._serverAccel != None:
+      self._serverAccel = ('torso', data.gyro_linear[0].x, data.gyro_linear[0].y, data.gyro_linear[0].z)
 
-      # Set the perception
+    # Set the force sensor values
+
+    # Set the perception
+    for landmark in data.landmarks:
+      self._serverSeenObjects.append((landmark.name, landmark.bearing.distance, landmark.bearing.angle1, landmark.bearing.angle2))
+
+    for line in data.lines:
+      self._serverSeenLines.append(((line.bearings[0].distance, line.bearings[0].angle1, line.bearings[0].angle2), (line.bearings[1].distance, line.bearings[1].angle1, line.bearings[1].angle2)))
+
+    self.mutex.release()
+
 
   def sendJoints(self):
     rospy.wait_for_service('/teamA_1/send_joints')
@@ -327,35 +354,38 @@ class agentInterface:
 
         # Create a dictionary from the list
         toServer = {}
+        print 'agent joint request:'
+        print self._agentJointRequests
         for joint in self._agentJointRequests:
-          toServer[joint[0]] = joint[1]
+          print 'joint:'
+          print joint
+          toServer[joint[0]] = float(joint[1])
 
         newJoints = []
-        newJoints.append(toServer['hj1'])
-        newJoints.append(toServer['hj2'])
-        newJoints.append(toServer['llj1'])
-        newJoints.append(toServer['llj2'])
-        newJoints.append(toServer['llj3'])
-        newJoints.append(toServer['llj4'])
-        newJoints.append(toServer['llj5'])
-        newJoints.append(toServer['llj6'])
-        newJoints.append(toServer['laj1'])
-        newJoints.append(toServer['laj2'])
-        newJoints.append(toServer['laj4'])
-        newJoints.append(toServer['laj3'])
-        newJoints.append(toServer['rlj1'])
-        newJoints.append(toServer['rlj2'])
-        newJoints.append(toServer['rlj3'])
-        newJoints.append(toServer['rlj4'])
-        newJoints.append(toServer['rlj5'])
-        newJoints.append(toServer['rlj6'])
-        newJoints.append(toServer['raj1'])
-        newJoints.append(toServer['raj2'])
-        newJoints.append(toServer['raj4'])
-        newJoints.append(toServer['raj3'])
+        newJoints.append(toServer['he1'])
+        newJoints.append(toServer['he2'])
+        newJoints.append(toServer['lle1'])
+        newJoints.append(toServer['lle2'])
+        newJoints.append(toServer['lle3'])
+        newJoints.append(toServer['lle4'])
+        newJoints.append(toServer['lle5'])
+        newJoints.append(toServer['lle6'])
+        newJoints.append(toServer['lae1'])
+        newJoints.append(toServer['lae2'])
+        newJoints.append(toServer['lae4'])
+        newJoints.append(toServer['lae3'])
+        newJoints.append(toServer['rle1'])
+        newJoints.append(toServer['rle2'])
+        newJoints.append(toServer['rle3'])
+        newJoints.append(toServer['rle4'])
+        newJoints.append(toServer['rle5'])
+        newJoints.append(toServer['rle6'])
+        newJoints.append(toServer['rae1'])
+        newJoints.append(toServer['rae2'])
+        newJoints.append(toServer['rae4'])
+        newJoints.append(toServer['rae3'])
 
-        resp1 = send_joints_f(newJoints)
-        return resp1.sum
+        send_joints_f(newJoints)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
@@ -381,7 +411,7 @@ class agentInterface:
     while True:
 
       # Send joints to the server
-
+      #self.sendJoints()
 
       #msgToServer = struct.pack("!I", len(msg)) + msg
       #sserver.send(msgToServer)
@@ -398,7 +428,7 @@ class agentInterface:
 
 
       msgForAgent = self.makeSExprForAgent()
-      #print "Message for agent: " + msgForAgent
+      print "Message for agent: " + msgForAgent
       msgToAgent = struct.pack("!I", len(msgForAgent)) + msgForAgent
       #msgToAgent = struct.pack("!I", len(msgFromServer)) + msgFromServer
       s.send(msgToAgent)

@@ -58,55 +58,55 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("RElbowRoll");
   this->jointNames.push_back("RWristYaw");
 
-  this->toAgent["HeadYaw"]        = "hj1";
-  this->toAgent["HeadPitch"]      = "hj2";
-  this->toAgent["LHipYawPitch"]   = "llj1";
-  this->toAgent["LHipRoll"]       = "llj2";
-  this->toAgent["LHipPitch"]      = "llj3";
-  this->toAgent["LKneePitch"]     = "llj4";
-  this->toAgent["LAnklePitch"]    = "llj5";
-  this->toAgent["LAnkleRoll"]     = "llj6";
-  this->toAgent["LShoulderPitch"] = "laj1";
-  this->toAgent["LShoulderRoll"]  = "laj2";
-  this->toAgent["LElbowYaw"]      = "laj4";
-  this->toAgent["LElbowRoll"]     = "laj3";
-  this->toAgent["LWristYaw"]      = "LWristYaw";
-  this->toAgent["RHipYawPitch"]   = "rlj1";
-  this->toAgent["RHipRoll"]       = "rlj2";
-  this->toAgent["RHipPitch"]      = "rlj3";
-  this->toAgent["RKneePitch"]     = "rlj4";
-  this->toAgent["RAnklePitch"]    = "rlj5";
-  this->toAgent["RAnkleRoll"]     = "rlj6";
-  this->toAgent["RShoulderPitch"] = "raj1";
-  this->toAgent["RShoulderRoll"]  = "raj2";
-  this->toAgent["RElbowYaw"]      = "raj4";
-  this->toAgent["RElbowRoll"]     = "raj3";
-  this->toAgent["RWristYaw"]      = "RWristYaw";
+  this->toAgent["Nao::HeadYaw"]        = "hj1";
+  this->toAgent["Nao::HeadPitch"]      = "hj2";
+  this->toAgent["Nao::LHipYawPitch"]   = "llj1";
+  this->toAgent["Nao::LHipRoll"]       = "llj2";
+  this->toAgent["Nao::LHipPitch"]      = "llj3";
+  this->toAgent["Nao::LKneePitch"]     = "llj4";
+  this->toAgent["Nao::LAnklePitch"]    = "llj5";
+  this->toAgent["Nao::LAnkleRoll"]     = "llj6";
+  this->toAgent["Nao::LShoulderPitch"] = "laj1";
+  this->toAgent["Nao::LShoulderRoll"]  = "laj2";
+  this->toAgent["Nao::LElbowYaw"]      = "laj4";
+  this->toAgent["Nao::LElbowRoll"]     = "laj3";
+  this->toAgent["Nao::LWristYaw"]      = "Nao::LWristYaw";
+  this->toAgent["Nao::RHipYawPitch"]   = "rlj1";
+  this->toAgent["Nao::RHipRoll"]       = "rlj2";
+  this->toAgent["Nao::RHipPitch"]      = "rlj3";
+  this->toAgent["Nao::RKneePitch"]     = "rlj4";
+  this->toAgent["Nao::RAnklePitch"]    = "rlj5";
+  this->toAgent["Nao::RAnkleRoll"]     = "rlj6";
+  this->toAgent["Nao::RShoulderPitch"] = "raj1";
+  this->toAgent["Nao::RShoulderRoll"]  = "raj2";
+  this->toAgent["Nao::RElbowYaw"]      = "raj4";
+  this->toAgent["Nao::RElbowRoll"]     = "raj3";
+  this->toAgent["Nao::RWristYaw"]      = "Nao::RWristYaw";
 
-  this->toServer["he1"]       = "HeadYaw";
-  this->toServer["he2"]       = "HeadPitch";
-  this->toServer["lle1"]      = "LHipYawPitch";
-  this->toServer["lle2"]      = "LHipRoll";
-  this->toServer["lle3"]      = "LHipPitch";
-  this->toServer["lle4"]      = "LKneePitch";
-  this->toServer["lle5"]      = "LAnklePitch";
-  this->toServer["lle6"]      = "LAnkleRoll";
-  this->toServer["lae1"]      = "LShoulderPitch";
-  this->toServer["lae2"]      = "LShoulderRoll";
-  this->toServer["lae4"]      = "LElbowYaw";
-  this->toServer["lae3"]      = "LElbowRoll";
-  this->toServer["LWristYaw"] = "LWristYaw";
-  this->toServer["rle1"]      = "RHipYawPitch";
-  this->toServer["rle2"]      = "RHipRoll";
-  this->toServer["rle3"]      = "RHipPitch";
-  this->toServer["rle4"]      = "RKneePitch";
-  this->toServer["rle5"]      = "RAnklePitch";
-  this->toServer["rle6"]      = "RAnkleRoll";
-  this->toServer["rae1"]      = "RShoulderPitch";
-  this->toServer["rae2"]      = "RShoulderRoll";
-  this->toServer["rae4"]      = "RElbowYaw";
-  this->toServer["raj3"]      = "RElbowRoll";
-  this->toServer["RWristYaw"] = "RWristYaw";
+  this->toServer["he1"]       = "Nao::HeadYaw";
+  this->toServer["he2"]       = "Nao::HeadPitch";
+  this->toServer["lle1"]      = "Nao::LHipYawPitch";
+  this->toServer["lle2"]      = "Nao::LHipRoll";
+  this->toServer["lle3"]      = "Nao::LHipPitch";
+  this->toServer["lle4"]      = "Nao::LKneePitch";
+  this->toServer["lle5"]      = "Nao::LAnklePitch";
+  this->toServer["lle6"]      = "Nao::LAnkleRoll";
+  this->toServer["lae1"]      = "Nao::LShoulderPitch";
+  this->toServer["lae2"]      = "Nao::LShoulderRoll";
+  this->toServer["lae4"]      = "Nao::LElbowYaw";
+  this->toServer["lae3"]      = "Nao::LElbowRoll";
+  this->toServer["Nao::LWristYaw"] = "Nao::LWristYaw";
+  this->toServer["rle1"]      = "Nao::RHipYawPitch";
+  this->toServer["rle2"]      = "Nao::RHipRoll";
+  this->toServer["rle3"]      = "Nao::RHipPitch";
+  this->toServer["rle4"]      = "Nao::RKneePitch";
+  this->toServer["rle5"]      = "Nao::RAnklePitch";
+  this->toServer["rle6"]      = "Nao::RAnkleRoll";
+  this->toServer["rae1"]      = "Nao::RShoulderPitch";
+  this->toServer["rae2"]      = "Nao::RShoulderRoll";
+  this->toServer["rae4"]      = "Nao::RElbowYaw";
+  this->toServer["raj3"]      = "Nao::RElbowRoll";
+  this->toServer["Nao::RWristYaw"] = "Nao::RWristYaw";
 
   // Start up ROS
   std::string name = "set_joints";
@@ -136,6 +136,7 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->stateMsgCounter = 0;
 
+  // Perception noise values.
   this->distanceNoiseSigma = 0.0965;
   this->angle1NoiseSigma = 0.1225;
   this->angle2NoiseSigma = 0.1480;
@@ -208,8 +209,6 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     gzerr << "<head_link> not specified\n";
     return;
   }
-
-
 
   // Get all the hinge joints that are not fixed.
   for (physics::Joint_V::const_iterator iter = _model->GetJoints().begin();
@@ -359,18 +358,18 @@ bool AgentPlugin::SendJoints(
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint(this->modelName + "::Nao::" +
-        this->toServer[this->jointNames[i]]);
+      this->model->GetJoint("Nao::" + this->jointNames[i]);
     if (!joint)
     {
-      std::cerr << "SendJoints() Joint [" << this->modelName << "::Nao::"
-                << this->jointNames[i] << "] not found" << std::endl;
+      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+                << "] not found" << std::endl;
       continue;
     }
 
     // Set the force for this joint.
     joint->SetForce(0, jointValues[i]);
   }
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -407,6 +406,7 @@ void AgentPlugin::SendState()
     // Ignore the wrists.
     if ((*iter)->GetName().find("Wrist") == std::string::npos)
     {
+      //msg.joint_name.push_back((*iter)->GetName());
       msg.joint_name.push_back(this->toAgent[(*iter)->GetName()]);
       msg.joint_angle_1.push_back((*iter)->GetAngle(0).Degree());
       if ((*iter)->HasType(physics::Base::UNIVERSAL_JOINT))
@@ -610,6 +610,3 @@ void AgentPlugin::SendLines(robocup_msgs::AgentState &_msg)
     }
   }
 }
-
-/////////////////////////////////////////////////
-

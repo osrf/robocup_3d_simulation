@@ -78,18 +78,26 @@ namespace gazebo
     /// \brief Controls when the state message is sent.
     private: unsigned int stateMsgCounter;
 
+    /// \brief Pointer to the model.
     private: physics::ModelPtr model;
+
+    /// \brief Pointer to the ball model
     private: physics::ModelPtr ball;
+
+    /// \brief Camera position after applying some noise.
     private: math::Pose cameraPoseNoise;
 
+    /// \brief Noise parameters.
     private: double distanceNoiseSigma;
     private: double angle1NoiseSigma;
     private: double angle2NoiseSigma;
 
+    /// \brief Nao sensors.
     private: std::vector<sensors::ImuSensorPtr> imuSensors;
     private: std::vector<sensors::ContactSensorPtr> touchSensors;
     private: std::vector<sensors::ContactSensorPtr> forceSensors;
 
+    /// \brief Perception view angle.
     private: double viewAngle;
 
     private: class Line
@@ -262,9 +270,15 @@ namespace gazebo
     /// \brief Vector with all the joint names.
     private: std::vector<std::string> jointNames;
 
+    /// \brief List of lines seen from the camera point of view.
     private: std::vector<Line> lines;
+
+    /// \brief Name of the link considered head. This link is a parameter to be
+    /// able to use different robots during the same game.
     private: gazebo::physics::LinkPtr headLink;
 
+    /// \brief Helper map for converting joint names between the agents and the
+    /// the server.
     private: std::map<std::string, std::string> toAgent;
     private: std::map<std::string, std::string> toServer;
   };

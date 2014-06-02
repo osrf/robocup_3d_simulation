@@ -1,7 +1,7 @@
 <sdf version="1.4">
   <model name="teamB_2">
 
-    <!-- A turtlebot -->
+    <!-- A robot -->
     <pose>1.5 11 0 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
