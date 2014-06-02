@@ -94,6 +94,8 @@ namespace gazebo
     /// \brief Check the ball's position looking for goals or out of bounds.
     public: void CheckBall();
 
+    /// \brief Check if two players are close enough. In case of collision, one
+    /// of the players will be placed further away from the other.
     public: void CheckPlayerCollisions();
 
     /// \brief Reset the internal soccer game clock.
@@ -181,26 +183,52 @@ namespace gazebo
     /// \param[in] _info Information used in the update event.
     private: void UpdateStates(const common::UpdateInfo &_info);
 
+    /// \brief Calculates the intersection between a circunference and a line
+    /// passing through its center.
+    /// \param[in] v Vector director of the line.
+    /// \param[in] p_c Center of the circunference and point of the line.
+    /// \param[in] r Radius of the circunference.
+    /// \param[out] int1 Vector3 with the coordinates of the first intersection
+    /// point.
+    /// \param[out] int2 Vector3 with the coordinates of the second intersection
+    /// point.
     private: bool IntersectionCircunferenceLine(const math::Vector3 &v,
                                                 const math::Vector3 &p_c,
                                                 float r,
                                                 math::Vector3 &int1,
                                                 math::Vector3 &int2);
 
+    /// \brief Callback executed to track the contact of the ball with other
+    /// entities. This is used to decide which team was the last one that
+    /// touched the ball when the ball is out of bounds.
+    /// \param[in] _msg Contact message.
     private: void OnBallContacts(ConstContactsPtr &_msg);
 
+    /// \brief During some of the states of the game the players are not allowed
+    /// to move (for example during kickoff). This method releases the players
+    /// when it's time to move the robots (for example in play mode).
     public: void ReleasePlayers();
 
+    /// \brief During some of the states of the game the players are not allowed
+    /// to move (for example during kickoff). This method stops the players by
+    /// creating a joint to the world for each player.
     public: void StopPlayers();
 
+    /// \brief Move the ball to a given position.
+    /// \param[in] _pose Target position.
     public: void MoveBall(const math::Pose &_pose);
 
+    /// \brief Get the ball position in the field.
+    /// \return The position of the ball.
     public: math::Pose GetBall();
 
     /// \brief ROS message callback to receive messages from other robots.
     /// \param[in] _msg Message sent from other player.
+    /// \param[in] _topic The players publish messages on the <robot_name>/say
+    /// topic. This parameter tells you the topic that generated the callback
+    /// (and indirectly the player that sent it).
+    /// \param[in] _team Team's name.
     void OnMessageFromRobot(
-      //const ros::MessageEvent<robocup_msgs::Say const> &_event);
       const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
       const std::string &_team);
 

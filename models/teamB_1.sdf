@@ -1,7 +1,7 @@
 <sdf version="1.4">
   <model name="teamB_1">
 
-    <!-- A turtlebot -->
+    <!-- A robot -->
     <pose>0.5 11 0 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
@@ -24,6 +24,12 @@
 
     <plugin name="agent_plugin" filename="librobocup_agent_plugin.so">
       <robot_namespace>teamB_1</robot_namespace>
+      <view_angle>120</view_angle>
+      <head_link>Nao::HeadPitchLink</head_link>
+      <imu_sensor>Nao::base_link::imu_sensor</imu_sensor>
+      <force_sensor>Nao::RAnkleRollLink::right_foot_contact</force_sensor>
+      <force_sensor>Nao::LAnkleRollLink::left_foot_contact</force_sensor>
+      <!-- <touch_sensor>TBD</touch_sensor> -->
     </plugin>
 
     <!-- Load a plugin to control the sphere with Hydra -->

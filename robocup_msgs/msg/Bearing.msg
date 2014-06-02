@@ -1,5 +1,5 @@
 # A message for simulated visual sensing
 
-Header header
-geometry_msgs/Quaternion heading
-float32 range
+float32 distance
+float32 angle1
+float32 angle2

@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <sdf version='1.5'>
   <model name='Nao'>
     <link name='base_link'>
@@ -14,6 +15,28 @@
           <izz>0.0016103</izz>
         </inertia>
       </inertial>
+      <sensor name='imu_sensor' type='imu'>
+        <always_on>true</always_on>
+        <update_rate>1000</update_rate>
+        <imu>
+          <noise>
+            <type>gaussian</type>
+            <rate>
+              <mean>0</mean>
+              <stddev>0.0002</stddev>
+              <bias_mean>7.5e-06</bias_mean>
+              <bias_stddev>8e-07</bias_stddev>
+            </rate>
+            <accel>
+              <mean>0</mean>
+              <stddev>0.017</stddev>
+              <bias_mean>0.1</bias_mean>
+              <bias_stddev>0.001</bias_stddev>
+            </accel>
+          </noise>
+        </imu>
+      </sensor>
+
       <collision name='base_link_collision_torso'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
@@ -423,6 +446,13 @@
         <linear>0</linear>
         <angular>0</angular>
       </velocity_decay>
+      <sensor name='left_foot_contact' type='contact'>
+        <always_on>true</always_on>
+        <update_rate>1000</update_rate>
+        <contact>
+          <collision>LAnkleRollLink_collision</collision>
+        </contact>
+      </sensor>
     </link>
     <joint name='LAnkleRoll' type='revolute'>
       <child>LAnkleRollLink</child>
@@ -955,6 +985,13 @@
         <linear>0</linear>
         <angular>0</angular>
       </velocity_decay>
+      <sensor name='right_foot_contact' type='contact'>
+        <always_on>true</always_on>
+        <update_rate>1000</update_rate>
+        <contact>
+          <collision>RAnkleRollLink_collision</collision>
+        </contact>
+      </sensor>
     </link>
     <joint name='RAnkleRoll' type='revolute'>
       <child>RAnkleRollLink</child>
