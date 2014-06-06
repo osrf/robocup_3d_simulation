@@ -502,10 +502,10 @@ void AgentPlugin::SendState()
   landmarks["F2R"] = math::Vector3(15, -10, 0);
   landmarks["F2L"] = math::Vector3(-15, -10, 0);
 
-  landmarks["G1L"] = math::Vector3(-13.2, 1.95, 0);
-  landmarks["G1R"] = math::Vector3(13.2, 1.95, 0);
-  landmarks["G2L"] = math::Vector3(-13.2, -1.95, 0);
-  landmarks["G2R"] = math::Vector3(13.2, -1.95, 0);
+  landmarks["G1L"] = math::Vector3(-15, 1.05, 0);
+  landmarks["G1R"] = math::Vector3(15, 1.05, 0);
+  landmarks["G2L"] = math::Vector3(-15, -1.05, 0);
+  landmarks["G2R"] = math::Vector3(15, -1.05, 0);
   landmarks["B"] = this->ball->GetWorldPose().pos;
 
   // \todo: Make this the camera pose
