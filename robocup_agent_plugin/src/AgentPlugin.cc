@@ -22,6 +22,7 @@
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/math/gzmath.hh>
 #include "robocup_agent_plugin/AgentPlugin.hh"
+#include "robocup_msgs/GameStateMonitor.h"
 #include "robocup_msgs/SendJoints.h"
 // #include "robocup_msgs/Say.h"
 
@@ -118,6 +119,12 @@ AgentPlugin::AgentPlugin()
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
 
+  this->gameState.time = ros::Time();
+  this->gameState.half = 1;
+  this->gameState.score_left = 0;
+  this->gameState.score_right = 0;
+  this->gameState.play_mode = "before_kickoff";
+
   // ROS Nodehandle.
   this->node.reset(new ros::NodeHandle("~"));
 }
@@ -126,6 +133,12 @@ AgentPlugin::AgentPlugin()
 AgentPlugin::~AgentPlugin()
 {
   event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+}
+
+void AgentPlugin::GameStateCb(const robocup_msgs::GameStateMonitor &_msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
+  this->gameState = _msg;
 }
 
 /////////////////////////////////////////////////
@@ -314,6 +327,11 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->model = _model;
 
+  // Subscribe to the game state message.
+  this->subscriber =
+    this->node->subscribe("/gameController/game_state", 1000,
+    &AgentPlugin::GameStateCb, this);
+
   // Advertise the service for sending new joint commands.
   this->jointCommandsService =
     this->node->advertiseService("/" + this->modelName + "/send_joints",
@@ -397,6 +415,8 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void AgentPlugin::SendState()
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   robocup_msgs::AgentState msg;
 
   // Output joint state data
@@ -555,6 +575,9 @@ void AgentPlugin::SendState()
   }
 
   this->SendLines(msg);
+
+  // Copy the game state.
+  msg.game_state = this->gameState;
 
   this->agentStatePub.publish(msg);
 }

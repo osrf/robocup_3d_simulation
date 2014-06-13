@@ -12,6 +12,7 @@ import rospy
 from threading import Lock
 from robocup_msgs.msg import AgentState
 from robocup_msgs.srv import SendJoints
+from robocup_msgs.srv import InitAgent
 
 
 class agentInterface:
@@ -340,7 +341,21 @@ class agentInterface:
     for line in data.lines:
       self._serverSeenLines.append(((line.bearings[0].distance, line.bearings[0].angle1, line.bearings[0].angle2), (line.bearings[1].distance, line.bearings[1].angle1, line.bearings[1].angle2)))
 
+    # Update the game state.
+    self._serverGameStatePlayMode = data.game_state.play_mode
+    self._serverGameStateScoreLeft = data.game_state.score_left
+    self._serverGameStateScoreRight = data.game_state.score_right
+    self._serverGameStateTime = data.game_state.time.to_sec()
+
     self.mutex.release()
+
+  def initAgent(self, team, number):
+    rospy.wait_for_service('/gameController/init_agent')
+    try:
+        init_agent_f = rospy.ServiceProxy('/gameController/init_agent', InitAgent)
+        init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/teamA_1.sdf', team, number)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 
   def sendJoints(self):
@@ -354,11 +369,11 @@ class agentInterface:
 
         # Create a dictionary from the list
         toServer = {}
-        print 'agent joint request:'
-        print self._agentJointRequests
+        #print 'agent joint request:'
+        #print self._agentJointRequests
         for joint in self._agentJointRequests:
-          print 'joint:'
-          print joint
+          #print 'joint:'
+          #print joint
           toServer[joint[0]] = float(joint[1])
 
         newJoints = []
@@ -408,10 +423,12 @@ class agentInterface:
     #print host
     #sserver.connect((host, 3100))
 
+    #self.initAgent('team1', 1)
+
     while True:
 
       # Send joints to the server
-      #self.sendJoints()
+      self.sendJoints()
 
       #msgToServer = struct.pack("!I", len(msg)) + msg
       #sserver.send(msgToServer)
@@ -428,7 +445,7 @@ class agentInterface:
 
 
       msgForAgent = self.makeSExprForAgent()
-      print "Message for agent: " + msgForAgent
+      # print "Message for agent: " + msgForAgent
       msgToAgent = struct.pack("!I", len(msgForAgent)) + msgForAgent
       #msgToAgent = struct.pack("!I", len(msgFromServer)) + msgFromServer
       s.send(msgToAgent)

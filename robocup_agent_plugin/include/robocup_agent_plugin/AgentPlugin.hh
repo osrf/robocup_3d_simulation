@@ -23,6 +23,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/physics/physics.hh>
+#include "robocup_msgs/GameStateMonitor.h"
 #include "robocup_msgs/SendJoints.h"
 #include <string>
 #include <vector>
@@ -52,6 +53,8 @@ namespace gazebo
     private: bool SendJoints(robocup_msgs::SendJoints::Request  &_req,
                              robocup_msgs::SendJoints::Response &_res);
 
+    private: void GameStateCb(const robocup_msgs::GameStateMonitor &_msg);
+
     // Debugging
     /// \brief ROS message callback to receive messages from other robots.
     /// \param[in] _msg Message sent from other player.
@@ -71,6 +74,8 @@ namespace gazebo
 
     /// \brief ROS node
     private: boost::scoped_ptr<ros::NodeHandle> node;
+
+    private: ros::Subscriber subscriber;
 
     /// \brief Publisher of agent state information.
     private: ros::Publisher agentStatePub;
@@ -99,6 +104,8 @@ namespace gazebo
 
     /// \brief Perception view angle.
     private: double viewAngle;
+
+    private: robocup_msgs::GameStateMonitor gameState;
 
     private: class Line
     {

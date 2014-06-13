@@ -22,3 +22,5 @@ geometry_msgs/Vector3[] force_val
 Landmark[] landmarks
 
 Line[] lines
+
+GameStateMonitor game_state
