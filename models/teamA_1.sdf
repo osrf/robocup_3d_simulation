@@ -2,16 +2,15 @@
   <model name="teamA_1">
 
     <!-- A robot-->
-    <pose>-0.5 11 0.35 0 0 -1.57</pose>
+    <pose>-0.5 11 0 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
       <uri>model://nao_meshes</uri>
     </include>
 
     <!-- Joint used to lock the model to the world when needed -->
-    <joint name="world_joint" type="revolute">
+    <!--<joint name="world_joint" type="revolute">
       <parent>world</parent>
-      <!--<child>turtlebot::rack</child>-->
       <child>Nao::base_link</child>
       <axis>
         <xyz>0 0 1</xyz>
@@ -20,7 +19,7 @@
           <lower>0</lower>
         </limit>
       </axis>
-    </joint>
+    </joint>-->
 
     <!-- Load a plugin to control the sphere with Hydra
     <plugin name='controller' filename='libHydraDemoPlugin.so'></plugin>

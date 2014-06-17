@@ -363,6 +363,39 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AgentPlugin::Init()
 {
+   std::cout << "Init()" << std::endl;
+   physics::JointControllerPtr jc = this->model->GetJointController();
+
+  for (int i = 0; i < 22; ++i)
+  {
+    // Get the joint.
+    physics::JointPtr joint =
+      this->model->GetJoint("Nao::" + this->jointNames[i]);
+    if (!joint)
+    {
+      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+                << "] not found" << std::endl;
+      continue;
+    }
+
+    common::PID pid;
+
+    if (joint->GetScopedName().find("Ankle") != std::string::npos)
+      // Set the force for this joint.
+      pid.Init(100, 0, 0, 0, 0, 100, -100);
+    else if (joint->GetScopedName().find("Shoulder") != std::string::npos)
+      // Set the force for this joint.
+      pid.Init(0, 0, 0, 0, 0, 100, -100);
+    else
+      // Set the force for this joint.
+      pid.Init(10, 0, 0, 0, 0, 100, -100);
+
+    jc->SetPositionPID(joint->GetScopedName(), pid);
+
+    if (!jc->SetPositionTarget(joint->GetScopedName(), 0))
+      std::cerr << "PID Target failed\n";
+    std::cout << "Joint [" << joint->GetScopedName() << "]" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

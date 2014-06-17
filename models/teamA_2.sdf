@@ -2,7 +2,7 @@
   <model name="teamA_2">
 
     <!-- A robot -->
-    <pose>-1.5 11 0.35 0 0 -1.57</pose>
+    <pose>-1.5 11 0 0 0 -1.57</pose>
     <include>
       <!--<uri>model://turtlebot</uri>-->
       <uri>model://nao_meshes</uri>

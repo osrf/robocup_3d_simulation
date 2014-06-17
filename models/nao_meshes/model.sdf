@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <sdf version='1.5'>
   <model name='Nao'>
+
+    <pose>0 0 0.35 0 0 0</pose>
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
       <inertial>
@@ -106,9 +108,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='HeadPitchLink'>
       <pose>0 0 0.1265 0 -0 0</pose>
@@ -156,9 +161,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LHipYawPitchLink'>
       <pose>0 0.05 -0.085 0 -0 0</pose>
@@ -206,9 +214,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LHipRollLink'>
       <pose>0 0.05 -0.085 0 -0 0</pose>
@@ -256,9 +267,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LHipPitchLink'>
       <pose>0 0.05 -0.085 0 -0 0</pose>
@@ -306,9 +320,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LKneePitchLink'>
       <pose>0 0.05 -0.185 0 -0 0</pose>
@@ -356,9 +373,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LAnklePitchLink'>
       <pose>0 0.05 -0.2879 0 -0 0</pose>
@@ -406,9 +426,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>1.0</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LAnkleRollLink'>
       <pose>0 0.05 -0.2879 0 -0 0</pose>
@@ -463,9 +486,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>1.0</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LShoulderPitchLink'>
       <pose>0 0.098 0.1 0 -0 0</pose>
@@ -513,9 +539,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LShoulderRollLink'>
       <pose>0 0.098 0.1 0 -0 0</pose>
@@ -563,9 +592,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LElbowYawLink'>
       <pose>0.105 0.113 0.1 0 -0 0</pose>
@@ -595,9 +627,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LElbowRollLink'>
       <pose>0.105 0.113 0.1 0 -0 0</pose>
@@ -645,9 +680,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='LWristYawLink'>
       <pose>0.16095 0.113 0.1 0 -0 0</pose>
@@ -695,9 +733,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RHipYawPitchLink'>
       <pose>0 -0.05 -0.085 0 -0 0</pose>
@@ -745,9 +786,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RHipRollLink'>
       <pose>0 -0.05 -0.085 0 -0 0</pose>
@@ -795,9 +839,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RHipPitchLink'>
       <pose>0 -0.05 -0.085 0 -0 0</pose>
@@ -845,9 +892,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RKneePitchLink'>
       <pose>0 -0.05 -0.185 0 -0 0</pose>
@@ -895,9 +945,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RAnklePitchLink'>
       <pose>0 -0.05 -0.2879 0 -0 0</pose>
@@ -945,9 +998,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>1.0</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RAnkleRollLink'>
       <pose>0 -0.05 -0.2879 0 -0 0</pose>
@@ -1002,9 +1058,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>1.0</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RShoulderPitchLink'>
       <pose>0 -0.098 0.1 0 -0 0</pose>
@@ -1052,9 +1111,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RShoulderRollLink'>
       <pose>0 -0.098 0.1 0 -0 0</pose>
@@ -1102,9 +1164,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RElbowYawLink'>
       <pose>0.105 -0.113 0.1 0 -0 0</pose>
@@ -1134,9 +1199,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RElbowRollLink'>
       <pose>0.105 -0.113 0.1 0 -0 0</pose>
@@ -1184,9 +1252,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
     <link name='RWristYawLink'>
       <pose>0.16095 -0.113 0.1 0 -0 0</pose>
@@ -1234,9 +1305,12 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics/>
+        <dynamics>
+          <damping>0.01</damping>
+        </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
+      <physics><ode><implicit_spring_damper>true</implicit_spring_damper></ode></physics>
     </joint>
 
     <!--<plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">

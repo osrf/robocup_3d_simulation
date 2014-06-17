@@ -32,10 +32,11 @@ BeforeKickOffState::BeforeKickOffState(const std::string &_name,
 void BeforeKickOffState::Initialize()
 {
   State::Initialize();
+  this->plugin->StopPlayers();
 }
 
 /////////////////////////////////////////////////
 void BeforeKickOffState::Update()
 {
-  this->plugin->StopPlayers();
+  //this->plugin->StopPlayers();
 }
