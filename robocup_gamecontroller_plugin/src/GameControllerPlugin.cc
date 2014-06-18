@@ -20,6 +20,7 @@
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/physics/physics.hh>
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -203,6 +204,8 @@ bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Request  &req,
   robocup_msgs::InitAgent::Response &res)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
   std::string agent = req.agent;
   std::string teamName = req.team_name;
   int player = req.player_number;
@@ -213,7 +216,7 @@ bool GameControllerPlugin::InitAgent(
   gzlog << "\tNumber: " << player << std::endl;
 
   // Check the player id is correct.
-  if (player <= 0 || player > 11)
+  if (player < 0 || player > 11)
   {
     gzerr << "Incorrect player #(" << player << ")" << std::endl;
     return false;
@@ -241,6 +244,32 @@ bool GameControllerPlugin::InitAgent(
           return false;
   }
 
+  // If requested player number is 0, choose a free uniform number.
+  if (player == 0)
+  {
+    int i;
+    // Potential numbers to choose.
+    for (i = 1; i <= 11; ++i)
+    {
+      bool found = true;
+      // Our current team members.
+      for (int j = 0; j < myTeam->members.size(); ++j)
+      {
+        int existingNumber = myTeam->members.at(j).first;
+        if (i == existingNumber)
+        {
+          found = false;
+          break;
+        }
+      }
+
+      if (found)
+        break;
+    }
+
+    player = i;
+  }
+
   std::ifstream myfile;
   std::string sdfContent = "";
   std::string line;
@@ -259,6 +288,51 @@ bool GameControllerPlugin::InitAgent(
     std::cerr << "File (" << agent.c_str() << " not found" << std::endl;
     return false;
   }
+
+  // Insert the initial robot position for the 'before_kickoff' state.
+  std::string delimiter = "<pose></pose>";
+  size_t index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <pose></pose> delimiter."
+              << std::endl;
+    return false;
+  }
+
+  std::string poseLabel;
+  // Chose your team
+  if (teamName == this->teams.at(0)->name)
+    poseLabel = beforeKickOffState->leftInitPoses.at(player - 1);
+  else if (teamName == this->teams.at(1)->name)
+    poseLabel = beforeKickOffState->rightInitPoses.at(player - 1);
+
+  sdfContent.replace(index, delimiter.size(), poseLabel);
+
+  // Replace the model name.
+  delimiter = "<model name=\"\">";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <model name = \"\"> delimiter."
+              << std::endl;
+    return false;
+  }
+  std::string modelName = "<model name=\"" + teamName + "_" +
+    boost::lexical_cast<std::string>(player) + "\">";
+  sdfContent.replace(index, delimiter.size(), modelName);
+
+  // Replace the namespace.
+  delimiter = "<robot_namespace></robot_namespace>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <robot_namespace></robot_namespace> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string ns = "<robot_namespace>" + teamName + "_" +
+    boost::lexical_cast<std::string>(player) + "</robot_namespace>";
+  sdfContent.replace(index, delimiter.size(), ns);
 
   sdf::SDF agentSDF;
   agentSDF.SetFromString(sdfContent);
@@ -292,7 +366,8 @@ bool GameControllerPlugin::InitAgent(
   *myTeam->pubs[name] = this->node->advertise<
     const robocup_msgs::Say>(std::string("/" + name + "/listen"), 1000);
 
-  res.result = 1;
+  std::cout << "Init agent OK" << std::endl;
+  res.result = player;
   return true;
 }
 

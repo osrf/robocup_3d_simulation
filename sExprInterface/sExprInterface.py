@@ -11,8 +11,10 @@ import threading
 import rospy
 from threading import Lock
 from robocup_msgs.msg import AgentState
+from robocup_msgs.msg import Beam
 from robocup_msgs.srv import SendJoints
 from robocup_msgs.srv import InitAgent
+from robocup_msgs.srv import MoveAgentPose
 
 
 class agentInterface:
@@ -26,6 +28,8 @@ class agentInterface:
     self._initializeServerValues()
 
     self._serverTime = 0
+
+    self._lastStateTime = rospy.Time()
 
     self.mutex = Lock()
 
@@ -277,7 +281,7 @@ class agentInterface:
   def makeSExprForAgent(self):
     msg = ""
     if self._serverTime != None:
-      self._serverTime += 0.02
+      #self._serverTime += 0.02
       msg = msg + self.makeTimeSExpr(self._serverTime)
     if self._serverGameStateTime != None and self._serverGameStatePlayMode != None:
       msg = msg + self.makeGameStateSExpr(self._serverGameStateTime, self._serverGameStatePlayMode, self._serverGameStateScoreLeft, self._serverGameStateScoreRight, self._serverGameStateID, self._serverGameStateSide)
@@ -314,11 +318,20 @@ class agentInterface:
   def callback(self, data):
     self.mutex.acquire()
 
+    # Check elapsed time since the last update.
+    elapsed_time = (data.sim_time.to_sec() - self._lastStateTime.to_sec()) * 1000.0
+    if elapsed_time < 50.0:
+      self.mutex.release()
+      return;
+
+    print 'Elapsed_time: ', elapsed_time
+    print 'Sim time:', data.sim_time.to_sec()
+
     # Clear all values
     self._initializeServerValues()
 
     # Changing the time
-    #self._serverTime += 0.02
+    self._serverTime = data.sim_time.to_sec()
 
     for i in range(len(data.joint_name)):
       # Populating the joints
@@ -347,15 +360,32 @@ class agentInterface:
     self._serverGameStateScoreRight = data.game_state.score_right
     self._serverGameStateTime = data.game_state.time.to_sec()
 
+    self._lastStateTime = data.sim_time
+
     self.mutex.release()
 
   def initAgent(self, team, number):
     rospy.wait_for_service('/gameController/init_agent')
     try:
-        init_agent_f = rospy.ServiceProxy('/gameController/init_agent', InitAgent)
-        init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/teamA_1.sdf', team, number)
+      init_agent_f = rospy.ServiceProxy('/gameController/init_agent', InitAgent)
+      resp = init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/nao_soccer.sdf', team, number)
+      return resp.result
     except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
+      print "Service call failed: %s"%e
+
+  def moveAgent(self, player_id, x, y, theta):
+    rospy.wait_for_service('/gameController/move_agent')
+    try:
+      move_agent_f = rospy.ServiceProxy('/gameController/move_agent', MoveAgentPose)
+
+      pos = Beam()
+      pos.x = x
+      pos.y = y
+      pos.theta = theta
+
+      move_agent_f('teamA', 1, None, pos)
+    except rospy.ServiceException, e:
+      print "Service call failed: %s"%e
 
 
   def sendJoints(self):
@@ -406,8 +436,6 @@ class agentInterface:
 
 
   def run(self, s):
-    rospy.Subscriber("/teamA_1/state", AgentState, self.callback)
-
     msgSize = s.recv(4)
     msgSize = struct.unpack("!L", msgSize)
     #print msgSize[0]
@@ -423,12 +451,14 @@ class agentInterface:
     #print host
     #sserver.connect((host, 3100))
 
-    #self.initAgent('team1', 1)
+    robot_id = self.initAgent('teamA', 0)
+    rospy.Subscriber("/teamA_" + str(robot_id) + "/state", AgentState, self.callback)
+    #self.moveAgent(1, 0, 0, 0)
 
     while True:
 
       # Send joints to the server
-      self.sendJoints()
+      #self.sendJoints()
 
       #msgToServer = struct.pack("!I", len(msg)) + msg
       #sserver.send(msgToServer)

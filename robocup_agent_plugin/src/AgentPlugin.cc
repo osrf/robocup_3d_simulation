@@ -318,7 +318,7 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->node.reset(new ros::NodeHandle(_model->GetName()));
   this->agentStatePub = this->node->advertise<robocup_msgs::AgentState>(
-      "state", 1000);
+    "state", 1000);
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&AgentPlugin::Update, this, _1));
@@ -363,7 +363,6 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AgentPlugin::Init()
 {
-   std::cout << "Init()" << std::endl;
    physics::JointControllerPtr jc = this->model->GetJointController();
 
   for (int i = 0; i < 22; ++i)
@@ -382,7 +381,7 @@ void AgentPlugin::Init()
 
     if (joint->GetScopedName().find("Ankle") != std::string::npos)
       // Set the force for this joint.
-      pid.Init(100, 0, 0, 0, 0, 100, -100);
+      pid.Init(50, 0, 0, 0, 0, 100, -100);
     else if (joint->GetScopedName().find("Shoulder") != std::string::npos)
       // Set the force for this joint.
       pid.Init(0, 0, 0, 0, 0, 100, -100);
@@ -394,7 +393,6 @@ void AgentPlugin::Init()
 
     if (!jc->SetPositionTarget(joint->GetScopedName(), 0))
       std::cerr << "PID Target failed\n";
-    std::cout << "Joint [" << joint->GetScopedName() << "]" << std::endl;
   }
 }
 
@@ -611,6 +609,11 @@ void AgentPlugin::SendState()
 
   // Copy the game state.
   msg.game_state = this->gameState;
+
+  msg.sim_time = ros::Time(this->model->GetWorld()->GetSimTime().Double());
+  std::cout << "Gazebo time:" <<  this->model->GetWorld()->GetSimTime() << std::endl;
+  std::cout << "Gazebo time (double):" <<  this->model->GetWorld()->GetSimTime().Double() << std::endl;
+  std::cout << "ROS time:" << msg.sim_time << std::endl;
 
   this->agentStatePub.publish(msg);
 }

@@ -24,3 +24,5 @@ Landmark[] landmarks
 Line[] lines
 
 GameStateMonitor game_state
+
+time sim_time
