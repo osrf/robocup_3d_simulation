@@ -324,8 +324,8 @@ class agentInterface:
       self.mutex.release()
       return;
 
-    print 'Elapsed_time: ', elapsed_time
-    print 'Sim time:', data.sim_time.to_sec()
+    # print 'Elapsed_time: ', elapsed_time
+    # print 'Sim time:', data.sim_time.to_sec()
 
     # Clear all values
     self._initializeServerValues()

@@ -363,9 +363,9 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AgentPlugin::Init()
 {
-   physics::JointControllerPtr jc = this->model->GetJointController();
+  physics::JointControllerPtr jc = this->model->GetJointController();
 
-  for (int i = 0; i < 22; ++i)
+  /*for (int i = 0; i < 22; ++i)
   {
     // Get the joint.
     physics::JointPtr joint =
@@ -393,7 +393,7 @@ void AgentPlugin::Init()
 
     if (!jc->SetPositionTarget(joint->GetScopedName(), 0))
       std::cerr << "PID Target failed\n";
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////
@@ -611,9 +611,9 @@ void AgentPlugin::SendState()
   msg.game_state = this->gameState;
 
   msg.sim_time = ros::Time(this->model->GetWorld()->GetSimTime().Double());
-  std::cout << "Gazebo time:" <<  this->model->GetWorld()->GetSimTime() << std::endl;
+  /*std::cout << "Gazebo time:" <<  this->model->GetWorld()->GetSimTime() << std::endl;
   std::cout << "Gazebo time (double):" <<  this->model->GetWorld()->GetSimTime().Double() << std::endl;
-  std::cout << "ROS time:" << msg.sim_time << std::endl;
+  std::cout << "ROS time:" << msg.sim_time << std::endl;*/
 
   this->agentStatePub.publish(msg);
 }
