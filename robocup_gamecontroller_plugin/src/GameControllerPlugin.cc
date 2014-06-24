@@ -36,19 +36,19 @@ using namespace gazebo;
 #define G_SQUARE(a) ( (a) * (a) )
 
 // Game state constant initialization
-const std::string GameControllerPlugin::BeforeKickOff   = "before_kickoff";
-const std::string GameControllerPlugin::KickOffLeft     = "kickoff_left";
-const std::string GameControllerPlugin::KickOffRight    = "kickoff_right";
-const std::string GameControllerPlugin::Play            = "play";
-const std::string GameControllerPlugin::KickInLeft      = "kickin_left";
-const std::string GameControllerPlugin::KickInRight     = "kickin_right";
-const std::string GameControllerPlugin::CornerKickLeft  = "corner_left";
-const std::string GameControllerPlugin::CornerKickRight = "corner_right";
+const std::string GameControllerPlugin::BeforeKickOff   = "BeforeKickOff";
+const std::string GameControllerPlugin::KickOffLeft     = "KickOff_Left";
+const std::string GameControllerPlugin::KickOffRight    = "KickOff_Right";
+const std::string GameControllerPlugin::Play            = "PlayOn";
+const std::string GameControllerPlugin::KickInLeft      = "KickIn_Left";
+const std::string GameControllerPlugin::KickInRight     = "KickIn_Right";
+const std::string GameControllerPlugin::CornerKickLeft  = "corner_kick_left";
+const std::string GameControllerPlugin::CornerKickRight = "corner_kick_right";
 const std::string GameControllerPlugin::GoalKickLeft    = "goal_kick_left";
 const std::string GameControllerPlugin::GoalKickRight   = "goal_kick_right";
-const std::string GameControllerPlugin::GameOver        = "gameover";
-const std::string GameControllerPlugin::GoalLeft        = "goal_left";
-const std::string GameControllerPlugin::GoalRight       = "goal_right";
+const std::string GameControllerPlugin::GameOver        = "GameOver";
+const std::string GameControllerPlugin::GoalLeft        = "Goal_Left";
+const std::string GameControllerPlugin::GoalRight       = "Goal_Right";
 const std::string GameControllerPlugin::FreeKickLeft    = "free_kick_left";
 const std::string GameControllerPlugin::FreeKickRight   = "kick_kick_right";
 
