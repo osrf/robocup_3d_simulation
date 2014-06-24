@@ -30,6 +30,7 @@ class agentInterface:
     self._serverTime = 0
 
     self._lastStateTime = rospy.Time()
+    self._lastPerceptionTime = rospy.Time()
 
     self.mutex = Lock()
 
@@ -315,17 +316,17 @@ class agentInterface:
       msg = msg + self.makeHingeJointSExpr(i[0], i[1])
     return msg
 
-  def callback(self, data):
+  def onServerUpdate(self, data):
     self.mutex.acquire()
 
     # Check elapsed time since the last update.
     elapsed_time = (data.sim_time.to_sec() - self._lastStateTime.to_sec()) * 1000.0
-    if elapsed_time < 50.0:
+    if elapsed_time < 20.0:
       self.mutex.release()
       return;
 
     # print 'Elapsed_time: ', elapsed_time
-    # print 'Sim time:', data.sim_time.to_sec()
+    #print 'Sim time:', data.sim_time.to_sec()
 
     # Clear all values
     self._initializeServerValues()
@@ -333,9 +334,28 @@ class agentInterface:
     # Changing the time
     self._serverTime = data.sim_time.to_sec()
 
+    # Update the game state.
+    self._serverGameStatePlayMode = data.game_state.play_mode
+    self._serverGameStateScoreLeft = data.game_state.score_left
+    self._serverGameStateScoreRight = data.game_state.score_right
+    self._serverGameStateTime = data.game_state.time.to_sec()
+
+    # Update joint state.
     for i in range(len(data.joint_name)):
-      # Populating the joints
       self._serverHingeJoints.append((data.joint_name[i], data.joint_angle_1[i]))
+
+    # Update timestamp
+    self._lastStateTime = data.sim_time
+
+    elapsed_time = (data.sim_time.to_sec() - self._lastPerceptionTime.to_sec()) * 1000.0
+    if elapsed_time < 60.0:
+      self.mutex.release()
+      return;
+
+    #print "Perception update"
+
+    self._updatesCounter = 0;
+    # Update perception every three cycles.
 
     # Set the gyro values
     #print self._serverGyro
@@ -354,13 +374,8 @@ class agentInterface:
     for line in data.lines:
       self._serverSeenLines.append(((line.bearings[0].distance, line.bearings[0].angle1, line.bearings[0].angle2), (line.bearings[1].distance, line.bearings[1].angle1, line.bearings[1].angle2)))
 
-    # Update the game state.
-    self._serverGameStatePlayMode = data.game_state.play_mode
-    self._serverGameStateScoreLeft = data.game_state.score_left
-    self._serverGameStateScoreRight = data.game_state.score_right
-    self._serverGameStateTime = data.game_state.time.to_sec()
-
-    self._lastStateTime = data.sim_time
+    # Update perception timestamp
+    self._lastPerceptionTime = data.sim_time
 
     self.mutex.release()
 
@@ -452,7 +467,7 @@ class agentInterface:
     #sserver.connect((host, 3100))
 
     robot_id = self.initAgent('teamA', 0)
-    rospy.Subscriber("/teamA_" + str(robot_id) + "/state", AgentState, self.callback)
+    rospy.Subscriber("/teamA_" + str(robot_id) + "/state", AgentState, self.onServerUpdate)
     #self.moveAgent(1, 0, 0, 0)
 
     while True:

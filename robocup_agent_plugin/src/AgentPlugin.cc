@@ -434,13 +434,13 @@ bool AgentPlugin::SendJoints(
 void AgentPlugin::Update(const common::UpdateInfo &_info)
 {
   // Send the state message every third iteration.
-  if (this->stateMsgCounter == 0)
-  {
-    this->SendState();
-    this->stateMsgCounter = 3;
-  }
+  //if (this->stateMsgCounter == 0)
+  //{
+  this->SendState();
+  //  this->stateMsgCounter = 3;
+  // }
 
-  this->stateMsgCounter--;
+  // this->stateMsgCounter--;
 }
 
 /////////////////////////////////////////////////
