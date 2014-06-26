@@ -8,6 +8,7 @@ import sys
 import struct
 import socket   #for sockets
 import threading
+import time
 import rospy
 from threading import Lock
 from robocup_msgs.msg import AgentState
@@ -31,6 +32,8 @@ class agentInterface:
 
     self._lastStateTime = rospy.Time()
     self._lastPerceptionTime = rospy.Time()
+
+    self._lastMessageSentTime = rospy.Time()
 
     self.mutex = Lock()
 
@@ -344,6 +347,16 @@ class agentInterface:
     for i in range(len(data.joint_name)):
       self._serverHingeJoints.append((data.joint_name[i], data.joint_angle_1[i]))
 
+    # Set the gyro values
+    #print self._serverGyro
+    if self._serverGyro != None:
+      self._serverGyro = ('torso', data.gyro_angular[0].x, data.gyro_angular[0].y, data.gyro_angular[0].z)
+
+    if self._serverAccel != None:
+      self._serverAccel = ('torso', data.gyro_linear[0].x, data.gyro_linear[0].y, data.gyro_linear[0].z)
+
+    # Set the force sensor values
+
     # Update timestamp
     self._lastStateTime = data.sim_time
 
@@ -356,16 +369,6 @@ class agentInterface:
 
     self._updatesCounter = 0;
     # Update perception every three cycles.
-
-    # Set the gyro values
-    #print self._serverGyro
-    if self._serverGyro != None:
-      self._serverGyro = ('torso', data.gyro_angular[0].x, data.gyro_angular[0].y, data.gyro_angular[0].z)
-
-    if self._serverAccel != None:
-      self._serverAccel = ('torso', data.gyro_linear[0].x, data.gyro_linear[0].y, data.gyro_linear[0].z)
-
-    # Set the force sensor values
 
     # Set the perception
     for landmark in data.landmarks:
@@ -472,8 +475,15 @@ class agentInterface:
 
     while True:
 
-      # Send joints to the server
-      #self.sendJoints()
+      self.mutex.acquire()
+      if self._lastMessageSentTime >= self._lastStateTime:
+        self.mutex.release()
+        time.sleep(.001)
+        continue
+
+      print self._lastMessageSentTime, self._lastStateTime, self._serverTime
+      
+      self._lastMessageSentTime = self._lastStateTime
 
       #msgToServer = struct.pack("!I", len(msg)) + msg
       #sserver.send(msgToServer)
@@ -490,6 +500,7 @@ class agentInterface:
 
 
       msgForAgent = self.makeSExprForAgent()
+      self.mutex.release()
       # print "Message for agent: " + msgForAgent
       msgToAgent = struct.pack("!I", len(msgForAgent)) + msgForAgent
       #msgToAgent = struct.pack("!I", len(msgFromServer)) + msgFromServer
@@ -501,6 +512,9 @@ class agentInterface:
       #print "From agent: " + msg
       self._agentTree = self._getTreeFromSExpr(msg)
       self._populateAgentValuesFromTree()
+
+      # Send joints to the server
+      self.sendJoints()
       #print self.agentTree
       #print self.agentValues
       #print self.values
