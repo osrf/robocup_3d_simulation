@@ -66,6 +66,8 @@ namespace gazebo
     private: void SendState();
     private: void SendLines(robocup_msgs::AgentState &_msg);
 
+    private: void OnSyncReceived(ConstTimePtr &_msg);
+
     /// \brief Connection to the update event.
     private: event::ConnectionPtr updateConnection;
 
@@ -267,6 +269,9 @@ namespace gazebo
     // Debugging.
     // ROS publisher for sending messages to other players.
     // private: ros::Publisher sayPub;
+
+    // Gazebo subscription to sync messages from the game controller plugin.
+    private: transport::SubscriberPtr syncSub;
 
     // ROS Service for spawning new agents.
     private: ros::ServiceServer jointCommandsService;

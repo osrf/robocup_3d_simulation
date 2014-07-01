@@ -323,12 +323,12 @@ class agentInterface:
     self.mutex.acquire()
 
     # Check elapsed time since the last update.
-    elapsed_time = (data.sim_time.to_sec() - self._lastStateTime.to_sec()) * 1000.0
-    if elapsed_time < 20.0:
-      self.mutex.release()
-      return;
+    #elapsed_time = (data.sim_time.to_sec() - self._lastStateTime.to_sec()) * 1000.0
+    #if elapsed_time < 19.0:
+    #  self.mutex.release()
+    #  return;
 
-    # print 'Elapsed_time: ', elapsed_time
+    #print 'Elapsed_time: ', elapsed_time
     #print 'Sim time:', data.sim_time.to_sec()
 
     # Clear all values
@@ -482,7 +482,7 @@ class agentInterface:
         continue
 
       print self._lastMessageSentTime, self._lastStateTime, self._serverTime
-      
+
       self._lastMessageSentTime = self._lastStateTime
 
       #msgToServer = struct.pack("!I", len(msg)) + msg

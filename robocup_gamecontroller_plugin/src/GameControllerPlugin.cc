@@ -81,6 +81,8 @@ GameControllerPlugin::GameControllerPlugin()
 
   this->SetCurrent(this->beforeKickOffState.get());
 
+  this->stepCounter = 0;
+
   gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
 
@@ -105,6 +107,10 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
   this->requestPub = this->gzNode->Advertise<msgs::Request>("~/request");
+
+  // Used to sychronize the agent plugins. Every time a new message is published
+  // under this topic, the agent plugins should send a state update.
+  this->syncPub = this->gzNode->Advertise<msgs::Time>("/gameController/sync");
 
   // ROS Nodehandle
   this->node.reset(new ros::NodeHandle("~"));
@@ -651,14 +657,34 @@ void GameControllerPlugin::Publish()
 /////////////////////////////////////////////////
 void GameControllerPlugin::Init()
 {
+
+
 }
 
 /////////////////////////////////////////////////
 void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  this->Update();
-  this->Publish();
-  ros::spinOnce();
+  // 20 ms sim time elapsed.
+  if (this->stepCounter++ == 9)
+  {
+    this->stepCounter = 0;
+
+    // Run a game controller step.
+    this->Update();
+    this->Publish();
+    ros::spinOnce();
+
+    // The content of the message is not used. We just use the message reception
+    // to notify that is time to send state updates.
+    msgs::Time msg;
+    msg.set_sec(0);
+    msg.set_nsec(0);
+    // Notify the agent plugins that it's time to send state updates.
+    this->syncPub->Publish(msg);
+
+    // Wait for 20ms real time.
+    usleep(20000);
+  }
 }
 
 /////////////////////////////////////////////////

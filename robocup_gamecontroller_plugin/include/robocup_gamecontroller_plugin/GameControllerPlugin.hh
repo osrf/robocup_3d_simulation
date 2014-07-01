@@ -247,6 +247,9 @@ namespace gazebo
     /// \brief Request publisher.
     private: transport::PublisherPtr requestPub;
 
+    /// \brief Synchronization publisher.
+    private: transport::PublisherPtr syncPub;
+
     // ROS Node handler
     private: boost::scoped_ptr<ros::NodeHandle> node;
 
@@ -343,6 +346,8 @@ namespace gazebo
 
     /// \brief (left or right, player_name).
     public: std::pair<int, std::string> lastPlayerTouchedBall;
+
+    private: int stepCounter;
 
     struct CompareFirst
     {

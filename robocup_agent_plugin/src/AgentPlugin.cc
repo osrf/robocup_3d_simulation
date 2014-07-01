@@ -106,7 +106,7 @@ AgentPlugin::AgentPlugin()
   this->toServer["rae1"]      = "Nao::RShoulderPitch";
   this->toServer["rae2"]      = "Nao::RShoulderRoll";
   this->toServer["rae4"]      = "Nao::RElbowYaw";
-  this->toServer["raj3"]      = "Nao::RElbowRoll";
+  this->toServer["rae3"]      = "Nao::RElbowRoll";
   this->toServer["Nao::RWristYaw"] = "Nao::RWristYaw";
 
   // Start up ROS
@@ -320,8 +320,8 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->agentStatePub = this->node->advertise<robocup_msgs::AgentState>(
     "state", 1000);
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&AgentPlugin::Update, this, _1));
+  //this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  //    boost::bind(&AgentPlugin::Update, this, _1));
 
   this->modelName = _sdf->Get<std::string>("robot_namespace");
 
@@ -336,6 +336,10 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->jointCommandsService =
     this->node->advertiseService("/" + this->modelName + "/send_joints",
     &AgentPlugin::SendJoints, this);
+
+  // Register the callback for the game controller synchronization message.
+  this->syncSub = this->gzNode->Subscribe(std::string("/gameController/sync"),
+      &AgentPlugin::OnSyncReceived, this);
 
   /* Info: The agent has to advertise a topic '/<robot_name>/say' and publish
    a message in this topic each the agent wants to "say" something. The
@@ -363,9 +367,9 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AgentPlugin::Init()
 {
-  physics::JointControllerPtr jc = this->model->GetJointController();
+  /*physics::JointControllerPtr jc = this->model->GetJointController();
 
-  /*for (int i = 0; i < 22; ++i)
+  for (int i = 0; i < 22; ++i)
   {
     // Get the joint.
     physics::JointPtr joint =
@@ -431,7 +435,13 @@ bool AgentPlugin::SendJoints(
 }*/
 
 /////////////////////////////////////////////////
-void AgentPlugin::Update(const common::UpdateInfo &_info)
+void AgentPlugin::OnSyncReceived(ConstTimePtr &_msg)
+{
+  this->SendState();
+}
+
+/////////////////////////////////////////////////
+/*void AgentPlugin::Update(const common::UpdateInfo &_info)
 {
   // Send the state message every third iteration.
   //if (this->stateMsgCounter == 0)
@@ -441,7 +451,7 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
   // }
 
   // this->stateMsgCounter--;
-}
+}*/
 
 /////////////////////////////////////////////////
 void AgentPlugin::SendState()
