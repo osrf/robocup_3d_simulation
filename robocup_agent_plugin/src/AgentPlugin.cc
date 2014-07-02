@@ -46,7 +46,6 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("LShoulderRoll");
   this->jointNames.push_back("LElbowYaw");
   this->jointNames.push_back("LElbowRoll");
-  this->jointNames.push_back("LWristYaw");
   this->jointNames.push_back("RHipYawPitch");
   this->jointNames.push_back("RHipRoll");
   this->jointNames.push_back("RHipPitch");
@@ -57,6 +56,7 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("RShoulderRoll");
   this->jointNames.push_back("RElbowYaw");
   this->jointNames.push_back("RElbowRoll");
+  this->jointNames.push_back("LWristYaw");
   this->jointNames.push_back("RWristYaw");
 
   this->toAgent["Nao::HeadYaw"]        = "hj1";
@@ -418,6 +418,8 @@ bool AgentPlugin::SendJoints(
                 << "] not found" << std::endl;
       continue;
     }
+
+    std::cout << this->jointNames[i] << ": " <<  jointValues[i] << "\n";
 
     // Set the force for this joint.
     joint->SetForce(0, jointValues[i]);
