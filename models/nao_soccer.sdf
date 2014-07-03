@@ -32,6 +32,8 @@
 
       <!-- Do not modify this -->
       <robot_namespace></robot_namespace>
+      <team_name></team_name>
+      <uniform_number></uniform_number>
 
       <view_angle>120</view_angle>
       <head_link>Nao::HeadPitchLink</head_link>

@@ -59,6 +59,10 @@ AgentPlugin::AgentPlugin()
   this->jointNames.push_back("LWristYaw");
   this->jointNames.push_back("RWristYaw");
 
+  // Initialize joint forces.
+  for (int i = 0; i < 24; ++i)
+    this->jointForces.push_back(0.0);
+
   this->toAgent["Nao::HeadYaw"]        = "hj1";
   this->toAgent["Nao::HeadPitch"]      = "hj2";
   this->toAgent["Nao::LHipYawPitch"]   = "llj1";
@@ -137,7 +141,7 @@ AgentPlugin::~AgentPlugin()
 
 void AgentPlugin::GameStateCb(const robocup_msgs::GameStateMonitor &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
   this->gameState = _msg;
 }
 
@@ -307,6 +311,14 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
   }
 
+  // Get the team name.
+  if (_sdf->HasElement("team_name"))
+    this->teamName = _sdf->Get<std::string>("team_name");
+
+  // Get the uniform number.
+  if (_sdf->HasElement("uniform_number"))
+    this->uniformNumber = _sdf->Get<std::string>("uniform_number");
+
   // Make sure the ROS node for Gazebo has already been initialized
   if (!ros::isInitialized())
   {
@@ -320,8 +332,8 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->agentStatePub = this->node->advertise<robocup_msgs::AgentState>(
     "state", 1000);
 
-  //this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-  //    boost::bind(&AgentPlugin::Update, this, _1));
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    boost::bind(&AgentPlugin::Update, this, _1));
 
   this->modelName = _sdf->Get<std::string>("robot_namespace");
 
@@ -336,6 +348,8 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->jointCommandsService =
     this->node->advertiseService("/" + this->modelName + "/send_joints",
     &AgentPlugin::SendJoints, this);
+
+  this->readyPub = this->gzNode->Advertise<msgs::Time>("/gameController/ready");
 
   // Register the callback for the game controller synchronization message.
   this->syncSub = this->gzNode->Subscribe(std::string("/gameController/sync"),
@@ -386,16 +400,18 @@ void AgentPlugin::Init()
     if (joint->GetScopedName().find("Ankle") != std::string::npos)
       // Set the force for this joint.
       pid.Init(50, 0, 0, 0, 0, 100, -100);
-    else if (joint->GetScopedName().find("Shoulder") != std::string::npos)
+    else if (joint->GetScopedName().find("LShoulder") != std::string::npos)
       // Set the force for this joint.
       pid.Init(0, 0, 0, 0, 0, 100, -100);
     else
       // Set the force for this joint.
       pid.Init(10, 0, 0, 0, 0, 100, -100);
 
+    // Apply the PID.
     jc->SetPositionPID(joint->GetScopedName(), pid);
 
-    if (!jc->SetPositionTarget(joint->GetScopedName(), 0))
+    // Set the target position for the joint.
+    if (!jc->SetPositionTarget(joint->GetScopedName(), 1.0))
       std::cerr << "PID Target failed\n";
   }*/
 }
@@ -405,25 +421,24 @@ bool AgentPlugin::SendJoints(
   robocup_msgs::SendJoints::Request  &req,
   robocup_msgs::SendJoints::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   boost::array<float, 22> jointValues = req.joints;
 
   for (int i = 0; i < 22; ++i)
   {
-    // Get the joint.
-    physics::JointPtr joint =
-      this->model->GetJoint("Nao::" + this->jointNames[i]);
-    if (!joint)
-    {
-      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
-                << "] not found" << std::endl;
-      continue;
-    }
-
-    std::cout << this->jointNames[i] << ": " <<  jointValues[i] << "\n";
-
-    // Set the force for this joint.
-    joint->SetForce(0, jointValues[i]);
+    // Store the desired force.
+    this->jointForces[i] = jointValues[i];
   }
+
+  // Notify the gamecontroller plugin that I'm ready to accept new commands.
+  // Hack: the content is not used.
+  msgs::Time msg2;
+  msg2.set_sec(1);
+  msg2.set_nsec(1);
+  // Notify the agent plugins that it's time to send state updates.
+  this->readyPub->Publish(msg2);
+
   return true;
 }
 
@@ -443,22 +458,37 @@ void AgentPlugin::OnSyncReceived(ConstTimePtr &_msg)
 }
 
 /////////////////////////////////////////////////
-/*void AgentPlugin::Update(const common::UpdateInfo &_info)
+void AgentPlugin::Update(const common::UpdateInfo &_info)
 {
-  // Send the state message every third iteration.
-  //if (this->stateMsgCounter == 0)
-  //{
-  this->SendState();
-  //  this->stateMsgCounter = 3;
-  // }
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  // this->stateMsgCounter--;
-}*/
+  for (int i = 0; i < 22; ++i)
+  {
+    // Get the joint.
+    physics::JointPtr joint =
+      this->model->GetJoint("Nao::" + this->jointNames[i]);
+    if (!joint)
+    {
+      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+                << "] not found" << std::endl;
+      continue;
+    }
+
+    joint->SetForce(0, this->jointForces[i]);
+
+    // Testing SetForce() on the left arm.
+    /*if (joint->GetScopedName().find("LShoulder") != std::string::npos)
+      joint->SetForce(0, 20.0);
+
+    if (joint->GetScopedName().find("LElbow") != std::string::npos)
+      joint->SetForce(0, 20.0);*/
+  }
+}
 
 /////////////////////////////////////////////////
 void AgentPlugin::SendState()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   robocup_msgs::AgentState msg;
 

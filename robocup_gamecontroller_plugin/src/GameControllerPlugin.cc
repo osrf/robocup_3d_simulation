@@ -83,6 +83,9 @@ GameControllerPlugin::GameControllerPlugin()
 
   this->stepCounter = 0;
 
+  this->readyCounter = 0;
+  this->allAgentsReady = false;
+
   gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
 
@@ -111,6 +114,11 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Used to sychronize the agent plugins. Every time a new message is published
   // under this topic, the agent plugins should send a state update.
   this->syncPub = this->gzNode->Advertise<msgs::Time>("/gameController/sync");
+
+  // Used to know when an agent has sent its control commands and its ready for
+  // the next cycle.
+  this->syncSub = this->gzNode->Subscribe(std::string("/gameController/ready"),
+    &GameControllerPlugin::OnReadyReceived, this);
 
   // ROS Nodehandle
   this->node.reset(new ros::NodeHandle("~"));
@@ -186,7 +194,7 @@ void GameControllerPlugin::Initialize()
 /////////////////////////////////////////////////
 void GameControllerPlugin::Update()
 {
-  //boost::mutex::scoped_lock lock(this->mutex);
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (currentState)
     currentState->Update();
@@ -195,8 +203,6 @@ void GameControllerPlugin::Update()
 ////////////////////////////////////////////////
 void GameControllerPlugin::SetCurrent(State *_newState)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-
   // Only update the state if _newState is different than the current state.
   if (this->currentState != _newState)
   {
@@ -210,7 +216,7 @@ bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Request  &req,
   robocup_msgs::InitAgent::Response &res)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   std::string agent = req.agent;
   std::string teamName = req.team_name;
@@ -340,6 +346,31 @@ bool GameControllerPlugin::InitAgent(
     boost::lexical_cast<std::string>(player) + "</robot_namespace>";
   sdfContent.replace(index, delimiter.size(), ns);
 
+  // Replace the team name
+  delimiter = "<team_name></team_name>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <team_name></team_name> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string teamNameElem = "<team_name>" + teamName + "</team_name>";
+  sdfContent.replace(index, delimiter.size(), teamNameElem);
+
+  // Replace the uniform_number
+  delimiter = "<uniform_number></uniform_number>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <robot_namespace></robot_namespace> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string uniformNumber = "<uniform_number>" +
+    boost::lexical_cast<std::string>(player) + "</uniform_number>";
+  sdfContent.replace(index, delimiter.size(), uniformNumber);
+
   sdf::SDF agentSDF;
   agentSDF.SetFromString(sdfContent);
 
@@ -394,6 +425,8 @@ bool GameControllerPlugin::SetGameState(
   robocup_msgs::SetGameState::Request  &req,
   robocup_msgs::SetGameState::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   if (req.play_mode == this->BeforeKickOff)
     this->SetCurrent(this->beforeKickOffState.get());
   else if (req.play_mode == this->KickOffLeft)
@@ -444,6 +477,8 @@ bool GameControllerPlugin::MoveAgentPose(
   robocup_msgs::MoveAgentPose::Request  &req,
   robocup_msgs::MoveAgentPose::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   // Find the team
   int index = -1;
   for (size_t i = 0; i < this->teams.size(); ++i)
@@ -494,6 +529,8 @@ bool GameControllerPlugin::MoveBall(
   robocup_msgs::MoveBall::Request  &req,
   robocup_msgs::MoveBall::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   physics::ModelPtr model = this->world->GetModel("soccer_ball");
   if (model != NULL)
   {
@@ -510,6 +547,8 @@ bool GameControllerPlugin::MoveBall(
 bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
                                     robocup_msgs::DropBall::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   if (this->DropBallImpl(-1))
     res.result = 1;
   else
@@ -581,6 +620,8 @@ bool GameControllerPlugin::DropBallImpl(const int _teamAllowed)
 bool GameControllerPlugin::KillAgent(robocup_msgs::KillAgent::Request  &req,
                                      robocup_msgs::KillAgent::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   res.result = 0;
 
   // Find the team
@@ -664,6 +705,8 @@ void GameControllerPlugin::Init()
 /////////////////////////////////////////////////
 void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
+   boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   // 20 ms sim time elapsed.
   if (this->stepCounter++ == 9)
   {
@@ -682,8 +725,12 @@ void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
     // Notify the agent plugins that it's time to send state updates.
     this->syncPub->Publish(msg);
 
-    // Wait for 20ms real time.
-    usleep(20000);
+    // Wait for agents to be ready.
+    if (!this->readyCondition.timed_wait(lock,
+      boost::posix_time::milliseconds(500)) || this->allAgentsReady)
+
+    this->allAgentsReady = false;
+    this->readyCounter = 0;
   }
 }
 
@@ -849,6 +896,8 @@ bool GameControllerPlugin::IntersectionCircunferenceLine(
 /////////////////////////////////////////////////
 void GameControllerPlugin::OnBallContacts(ConstContactsPtr &_msg)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   for (int k = _msg->contact_size() - 1; k >= 0; --k)
   {
     std::size_t foundC1 =
@@ -963,6 +1012,8 @@ void GameControllerPlugin::OnMessageFromRobot(
  const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
  const std::string &_team)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   // Remove the first "/".
   std::string sender = _topic.substr(1, _topic.size() - 1);
 
@@ -1009,5 +1060,25 @@ void GameControllerPlugin::OnMessageFromRobot(
         }
       }
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::OnReadyReceived(ConstTimePtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  // Get the current number of players.
+  int numPlayers = 0;
+  for (size_t i = 0; i < this->teams.size(); ++i)
+    numPlayers += this->teams.at(i)->members.size();
+
+  this->readyCounter++;
+  if (this->readyCounter == numPlayers)
+  {
+    this->readyCounter = 0;
+    this->allAgentsReady = true;
+    // Notify that is time to move on
+    this->readyCondition.notify_one();
   }
 }

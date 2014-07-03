@@ -21,6 +21,7 @@
 #include <ros/ros.h>
 #include <gazebo/gazebo.hh>
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <map>
 #include <string>
@@ -232,6 +233,8 @@ namespace gazebo
       const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
       const std::string &_team);
 
+    void OnReadyReceived(ConstTimePtr &_msg);
+
     /// \brief Pointer to the world.
     public: physics::WorldPtr world;
 
@@ -249,6 +252,9 @@ namespace gazebo
 
     /// \brief Synchronization publisher.
     private: transport::PublisherPtr syncPub;
+
+    /// \brief Synchronization publisher.
+    private: transport::SubscriberPtr syncSub;
 
     // ROS Node handler
     private: boost::scoped_ptr<ros::NodeHandle> node;
@@ -342,12 +348,19 @@ namespace gazebo
 
     /// \brief Mutex to avoid race conditions while running updates and a ROS
     /// callback is executed.
-    private: boost::mutex mutex;
+    private: boost::recursive_mutex mutex;
 
     /// \brief (left or right, player_name).
     public: std::pair<int, std::string> lastPlayerTouchedBall;
 
     private: int stepCounter;
+
+    /// \brief Condition used for synchronization.
+    private: boost::condition_variable_any readyCondition;
+
+    private: bool allAgentsReady;
+
+    private: int readyCounter;
 
     struct CompareFirst
     {

@@ -257,7 +257,7 @@ namespace gazebo
 
     /// \brief Mutex to avoid race conditions while running updates and a ROS
     /// callback is executed.
-    private: boost::mutex mutex;
+    private: boost::recursive_mutex mutex;
 
     /// \brief Pointer to a node for communication.
     private: transport::NodePtr gzNode;
@@ -273,6 +273,8 @@ namespace gazebo
     // Gazebo subscription to sync messages from the game controller plugin.
     private: transport::SubscriberPtr syncSub;
 
+    private: transport::PublisherPtr readyPub;
+
     // ROS Service for spawning new agents.
     private: ros::ServiceServer jointCommandsService;
 
@@ -281,6 +283,8 @@ namespace gazebo
 
     /// \brief Vector with all the joint names.
     private: std::vector<std::string> jointNames;
+    /// \brief Vector with all the forces.
+    private: std::vector<double> jointForces;
 
     /// \brief List of lines seen from the camera point of view.
     private: std::vector<Line> lines;
@@ -293,6 +297,10 @@ namespace gazebo
     /// the server.
     private: std::map<std::string, std::string> toAgent;
     private: std::map<std::string, std::string> toServer;
+
+    private: std::string uniformNumber;
+
+    private: std::string teamName;
   };
 }
 #endif
