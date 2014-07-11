@@ -726,8 +726,8 @@ void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
     this->syncPub->Publish(msg);
 
     // Wait for agents to be ready.
-    if (!this->readyCondition.timed_wait(lock,
-      boost::posix_time::milliseconds(500)) || this->allAgentsReady)
+    //if (!this->readyCondition.timed_wait(lock,
+    //  boost::posix_time::milliseconds(500)) || this->allAgentsReady)
 
     this->allAgentsReady = false;
     this->readyCounter = 0;

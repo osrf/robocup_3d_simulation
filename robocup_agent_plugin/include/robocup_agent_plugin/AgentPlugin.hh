@@ -275,7 +275,7 @@ namespace gazebo
 
     private: transport::PublisherPtr readyPub;
 
-    // ROS Service for spawning new agents.
+    // ROS Service for modifying the torque applied to a joint.
     private: ros::ServiceServer jointCommandsService;
 
     /// \brief Model name.

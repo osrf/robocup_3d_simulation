@@ -381,7 +381,7 @@ void AgentPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AgentPlugin::Init()
 {
-  /*physics::JointControllerPtr jc = this->model->GetJointController();
+  physics::JointControllerPtr jc = this->model->GetJointController();
 
   for (int i = 0; i < 22; ++i)
   {
@@ -397,7 +397,7 @@ void AgentPlugin::Init()
 
     common::PID pid;
 
-    if (joint->GetScopedName().find("Ankle") != std::string::npos)
+    /*if (joint->GetScopedName().find("Ankle") != std::string::npos)
       // Set the force for this joint.
       pid.Init(50, 0, 0, 0, 0, 100, -100);
     else if (joint->GetScopedName().find("LShoulder") != std::string::npos)
@@ -405,15 +405,21 @@ void AgentPlugin::Init()
       pid.Init(0, 0, 0, 0, 0, 100, -100);
     else
       // Set the force for this joint.
-      pid.Init(10, 0, 0, 0, 0, 100, -100);
+      pid.Init(10, 0, 0, 0, 0, 100, -100);*/
+
+    //if (joint->GetScopedName().find("LShoulderRoll") != std::string::npos)
+    //{
+      // Set the force for this joint.
+    pid.Init(50, 0, 0, 0, 0, 100, -100);
 
     // Apply the PID.
     jc->SetPositionPID(joint->GetScopedName(), pid);
 
-    // Set the target position for the joint.
-    if (!jc->SetPositionTarget(joint->GetScopedName(), 1.0))
-      std::cerr << "PID Target failed\n";
-  }*/
+      // Set the target position for the joint.
+      // if (!jc->SetPositionTarget(joint->GetScopedName(), 1.0))
+        // std::cerr << "PID Target failed\n";
+    //}
+  }
 }
 
 /////////////////////////////////////////////////
@@ -462,7 +468,8 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
 {
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  for (int i = 0; i < 22; ++i)
+  // Torque control.
+  /*for (int i = 0; i < 22; ++i)
   {
     // Get the joint.
     physics::JointPtr joint =
@@ -475,13 +482,27 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
     }
 
     joint->SetForce(0, this->jointForces[i]);
+  }*/
 
-    // Testing SetForce() on the left arm.
-    /*if (joint->GetScopedName().find("LShoulder") != std::string::npos)
-      joint->SetForce(0, 20.0);
+  // Position control.
+  physics::JointControllerPtr jc = this->model->GetJointController();
 
-    if (joint->GetScopedName().find("LElbow") != std::string::npos)
-      joint->SetForce(0, 20.0);*/
+  for (int i = 0; i < 22; ++i)
+  {
+    // Get the joint.
+    physics::JointPtr joint =
+      this->model->GetJoint("Nao::" + this->jointNames[i]);
+    if (!joint)
+    {
+      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+                << "] not found" << std::endl;
+      continue;
+    }
+
+    // Set the target position for the joint.
+    if (!jc->SetPositionTarget(joint->GetScopedName(), this->jointForces[i]))
+      std::cerr << "PID Target failed\n";
+    //}
   }
 }
 

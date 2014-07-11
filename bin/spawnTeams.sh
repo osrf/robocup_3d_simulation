@@ -7,7 +7,7 @@ do
 done
 
 # Spawn the right team
-for i in $(seq 1 1)
-do
-	rosservice call /gameController/init_agent ~/workspace/robocup_3d_simulation/models/nao_soccer.sdf teamB 0 &
-done
+#for i in $(seq 1 1)
+#do
+#	rosservice call /gameController/init_agent ~/workspace/robocup_3d_simulation/models/nao_soccer.sdf teamB 0 &
+#done
