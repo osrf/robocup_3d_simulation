@@ -46,19 +46,19 @@ namespace gazebo
         SoccerField::HalfFieldHeight, SoccerField::HalfFieldWidth, 0));
 
     // Initial player positions
-    const math::Pose LeftInitPoseKickOff1(math::Pose(-0.5, 0, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff1(math::Pose(-0.2, -0.3, 0, 0, 0, 0.5));
     const math::Pose LeftInitPoseKickOff2(
-      math::Pose(-2.0, -3.5, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff3(math::Pose(-2.0, 0, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff4(math::Pose(-2.0, 3.5, 0, 0, 0, 0));
+      math::Pose(-0.2, 0.3, 0, 0, 0, -0.5));
+    const math::Pose LeftInitPoseKickOff3(math::Pose(-2.0, -0.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff4(math::Pose(-5.0, 2.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff5(
-      math::Pose(-4.0, -4.5, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff6(math::Pose(-4.0, 0, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff7(math::Pose(-4.0, 4.5, 0, 0, 0, 0));
+      math::Pose(-5.0, -2.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff6(math::Pose(-5.0, 0.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff7(math::Pose(-10.0, 3.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff8(
-      math::Pose(-6, -5.5, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff9(math::Pose(-6.0, 0, 0, 0, 0, 0));
-    const math::Pose LeftInitPoseKickOff10(math::Pose(-6.0, 5.5, 0, 0, 0, 0));
+      math::Pose(-10, 1.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff9(math::Pose(-10.0, -1.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff10(math::Pose(-10.0, -3.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff11(
       math::Pose(-SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 0));
 
