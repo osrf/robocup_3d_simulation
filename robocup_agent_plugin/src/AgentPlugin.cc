@@ -466,10 +466,10 @@ void AgentPlugin::OnSyncReceived(ConstTimePtr &_msg)
 /////////////////////////////////////////////////
 void AgentPlugin::Update(const common::UpdateInfo &_info)
 {
-  boost::recursive_mutex::scoped_lock lock(this->mutex);
+  /*boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   // Torque control.
-  /*for (int i = 0; i < 22; ++i)
+  for (int i = 0; i < 22; ++i)
   {
     // Get the joint.
     physics::JointPtr joint =
@@ -481,7 +481,7 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
       continue;
     }
 
-    joint->SetForce(0, this->jointForces[i]);
+    // joint->SetForce(0, this->jointForces[i]);
   }*/
 
   // Position control.
@@ -500,10 +500,34 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
     }
 
     // Set the target position for the joint.
-    if (!jc->SetPositionTarget(joint->GetScopedName(), this->jointForces[i]))
+    // if (!jc->SetPositionTarget(joint->GetScopedName(), this->jointForces[i]))
+    if (!jc->SetPositionTarget(joint->GetScopedName(), 0.0))
       std::cerr << "PID Target failed\n";
     //}
   }
+
+  // Velocity control.
+  /*physics::JointControllerPtr jc = this->model->GetJointController();
+
+  for (int i = 0; i < 22; ++i)
+  {
+    // Get the joint.
+    physics::JointPtr joint =
+      this->model->GetJoint("Nao::" + this->jointNames[i]);
+    if (!joint)
+    {
+      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+                << "] not found" << std::endl;
+      continue;
+    }
+
+    //std::cout << this->jointForces[i] << std::endl;
+
+    // Set the target position for the joint.
+    if (!jc->SetVelocityTarget(joint->GetScopedName(), this->jointForces[i]))
+      std::cerr << "PID Target failed\n";
+  }
+  //std::cout << "---" << std::endl;*/
 }
 
 /////////////////////////////////////////////////

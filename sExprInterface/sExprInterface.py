@@ -346,6 +346,7 @@ class agentInterface:
     # Update joint state.
     for i in range(len(data.joint_name)):
       self._serverHingeJoints.append((data.joint_name[i], data.joint_angle_1[i]))
+      print data.joint_name[i], ':', data.joint_angle_1[i]
 
     # Set the gyro values
     #print self._serverGyro
@@ -386,7 +387,7 @@ class agentInterface:
     rospy.wait_for_service('/gameController/init_agent')
     try:
       init_agent_f = rospy.ServiceProxy('/gameController/init_agent', InitAgent)
-      resp = init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/nao_soccer.sdf', team, number)
+      resp = init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/nao_soccer_blue.sdf', team, number)
       return resp.result
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
@@ -509,7 +510,7 @@ class agentInterface:
       msgSize = struct.unpack("!L", msgSize)
       #print msgSize[0]
       msg = s.recv(msgSize[0])
-      #print "From agent: " + msg
+      print "From agent: " + msg
       self._agentTree = self._getTreeFromSExpr(msg)
       self._populateAgentValuesFromTree()
 
@@ -518,7 +519,7 @@ class agentInterface:
       #print self.agentTree
       #print self.agentValues
       #print self.values
-      #self.printAgentValues()
+      self.printAgentValues()
 
 
 

@@ -113,7 +113,7 @@
           <velocity>8.26797</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -170,7 +170,7 @@
           <velocity>7.19407</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -225,7 +225,7 @@
           <velocity>4.16174</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -280,7 +280,7 @@
           <velocity>4.16174</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -337,7 +337,7 @@
           <velocity>6.40239</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -388,13 +388,13 @@
       <axis>
         <xyz>0 -1 0</xyz>
         <limit>
-	  <lower>-2.26892803</lower>
+	      <lower>-2.26892803</lower>
           <upper>0.0174532925</upper>
           <effort>3.2</effort>
           <velocity>6.40239</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -449,7 +449,7 @@
           <velocity>6.40239</velocity>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -470,8 +470,8 @@
         </inertia>
       </inertial>
       <collision name='LAnkleRollLink_collision'>
-        <pose>0 0 0 0 -0 0</pose>
-        <!--<pose>0.02 0.005 -0.037 0 0 0</pose>-->
+        <!--<pose>0 0 0 0 -0 0</pose>-->
+        <pose>0.02 0.005 -0.037 0 0 0</pose>
 
         <surface>
           <contact><ode>
@@ -488,11 +488,11 @@
         </surface>
 
         <geometry>
-          <mesh>
+          <!--<mesh>
             <scale>0.001 0.001 0.001</scale>
             <uri>model://nao_meshes_blue/meshes/V40/collision/LAnkleRoll.dae</uri>
-          </mesh>
-          <!--<box> <size>0.16 0.085 0.015</size></box>-->
+          </mesh>-->
+          <box> <size>0.16 0.085 0.015</size></box>
         </geometry>
       </collision>
       <visual name='LAnkleRollLink_visual'>
@@ -528,7 +528,7 @@
           <!--<velocity>4.16174</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -583,7 +583,7 @@
           <!--<velocity>8.26797</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -640,7 +640,7 @@
           <!--<velocity>7.19407</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -677,7 +677,7 @@
           <!--<velocity>8.26797</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -734,7 +734,7 @@
           <!--<velocity>7.19407</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -789,7 +789,7 @@
           <upper>0</upper>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -846,7 +846,7 @@
           <!--<velocity>4.16174</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -901,7 +901,7 @@
           <!--<velocity>4.16174</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -956,7 +956,7 @@
           <!--<velocity>6.40239</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1013,7 +1013,7 @@
           <!--<velocity>6.40239</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1068,7 +1068,7 @@
           <!--<velocity>6.40239</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1089,8 +1089,8 @@
         </inertia>
       </inertial>
       <collision name='RAnkleRollLink_collision'>
-        <pose>0 0 0 0 -0 0</pose>
-        <!--<pose>0.02 -0.005 -0.037 0 0 0</pose>-->
+        <!--<pose>0 0 0 0 -0 0</pose>-->
+        <pose>0.02 -0.005 -0.037 0 0 0</pose>
 
         <surface>
           <contact><ode>
@@ -1107,11 +1107,11 @@
         </surface>
 
         <geometry>
-          <mesh>
+          <!--<mesh>
             <scale>0.001 0.001 0.001</scale>
             <uri>model://nao_meshes_blue/meshes/V40/collision/LAnkleRoll.dae</uri>
-          </mesh>
-          <!--<box> <size>0.16 0.085 0.015</size></box>-->
+          </mesh>-->
+          <box> <size>0.16 0.085 0.015</size></box>
         </geometry>
       </collision>
       <visual name='RAnkleRollLink_visual'>
@@ -1147,7 +1147,7 @@
           <!--<velocity>4.16174</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1202,7 +1202,7 @@
           <!--<velocity>8.26797</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1259,7 +1259,7 @@
           <!--<velocity>7.19407</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1296,7 +1296,7 @@
           <!--<velocity>8.26797</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1353,7 +1353,7 @@
           <!--<velocity>7.19407</velocity>-->
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
@@ -1408,7 +1408,7 @@
           <upper>0</upper>
         </limit>
         <dynamics>
-          <damping>1.0</damping>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>

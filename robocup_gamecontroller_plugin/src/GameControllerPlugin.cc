@@ -708,7 +708,7 @@ void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
    boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   // 20 ms sim time elapsed.
-  if (this->stepCounter++ == 9)
+  if (this->stepCounter++ == 19)
   {
     this->stepCounter = 0;
 
@@ -723,10 +723,10 @@ void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
     msg.set_sec(0);
     msg.set_nsec(0);
     // Notify the agent plugins that it's time to send state updates.
-    this->syncPub->Publish(msg);
+    //this->syncPub->Publish(msg);
 
     // Wait for agents to be ready.
-    //if (!this->readyCondition.timed_wait(lock,
+    // if (!this->readyCondition.timed_wait(lock,
     //  boost::posix_time::milliseconds(500)) || this->allAgentsReady)
 
     this->allAgentsReady = false;

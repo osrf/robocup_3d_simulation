@@ -2,5 +2,4 @@
 
 string team_name
 uint8 player_id
-AgentState state
 Beam position

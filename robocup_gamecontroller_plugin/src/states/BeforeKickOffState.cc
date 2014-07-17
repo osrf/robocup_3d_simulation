@@ -87,5 +87,4 @@ void BeforeKickOffState::Initialize()
 /////////////////////////////////////////////////
 void BeforeKickOffState::Update()
 {
-  //this->plugin->StopPlayers();
 }
