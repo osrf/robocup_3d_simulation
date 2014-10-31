@@ -39,6 +39,9 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Update();
+
+    public: std::vector<std::string> leftInitPoses;
+    public: std::vector<std::string> rightInitPoses;
   };
 }
 #endif

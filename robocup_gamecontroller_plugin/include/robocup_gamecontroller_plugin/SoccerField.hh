@@ -46,60 +46,63 @@ namespace gazebo
         SoccerField::HalfFieldHeight, SoccerField::HalfFieldWidth, 0));
 
     // Initial player positions
-    const math::Pose LeftInitPoseKickOff1(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+    const math::Pose LeftInitPoseKickOff1(math::Pose(-0.2, -0.3, 0, 0, 0, 0.5));
     const math::Pose LeftInitPoseKickOff2(
-      math::Pose(-0.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff3(math::Pose(-0.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff4(math::Pose(-0.5, 0, 0, 0, 0, 3.14));
+      math::Pose(-0.2, 0.3, 0, 0, 0, -0.5));
+    const math::Pose LeftInitPoseKickOff3(math::Pose(-2.0, -0.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff4(math::Pose(-5.0, 2.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff5(
-      math::Pose(-1.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff6(math::Pose(-1.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff7(math::Pose(-1.5, 0, 0, 0, 0, 3.14));
+      math::Pose(-5.0, -2.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff6(math::Pose(-5.0, 0.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff7(math::Pose(-10.0, 3.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff8(
-      math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff9(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPoseKickOff10(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
+      math::Pose(-10, 1.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff9(math::Pose(-10.0, -1.5, 0, 0, 0, 0));
+    const math::Pose LeftInitPoseKickOff10(math::Pose(-10.0, -3.5, 0, 0, 0, 0));
     const math::Pose LeftInitPoseKickOff11(
-      math::Pose(-SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 3.14));
+      math::Pose(-SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 0));
 
-    const math::Pose LeftInitPose1(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose2(math::Pose(-2.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose3(math::Pose(-2.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose4(math::Pose(-2.5, 0, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose5(math::Pose(-4.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose6(math::Pose(-4.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose7(math::Pose(-4.5, 0, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose8(math::Pose(-6.5, -0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose9(math::Pose(-6.5, 0.5, 0, 0, 0, 3.14));
-    const math::Pose LeftInitPose10(math::Pose(-6.5, 0, 0, 0, 0, 3.14));
+    const math::Pose LeftInitPose1(math::Pose(-2.5, 0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose2(math::Pose(-3.5, -2.0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose3(math::Pose(-3.5, 0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose4(math::Pose(-3.5, 2.0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose5(math::Pose(-5.5, -4.0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose6(math::Pose(-5.5, 0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose7(math::Pose(-5.5, 4.0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose8(math::Pose(-7.5, -5.0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose9(math::Pose(-7.5, 0, 0, 0, 0, 0));
+    const math::Pose LeftInitPose10(math::Pose(-7.5, 5.0, 0, 0, 0, 0));
     const math::Pose LeftInitPose11(
-      math::Pose(-SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 3.14));
+      math::Pose(-SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 0));
 
-    const math::Pose RightInitPoseKickOff1(math::Pose(0.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff2(math::Pose(0.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff3(math::Pose(0.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff4(math::Pose(0.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff5(math::Pose(1.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff6(math::Pose(1.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff7(math::Pose(1.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff8(math::Pose(2.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff9(math::Pose(2.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPoseKickOff10(math::Pose(2.5, 0, 0, 0, 0, 0));
+    const math::Pose RightInitPoseKickOff1(math::Pose(0.5, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff2(
+      math::Pose(2.0, -3.5, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff3(math::Pose(2.0, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff4(math::Pose(2.0, 3.5, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff5(
+      math::Pose(4.0, -4.5, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff6(math::Pose(4.0, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff7(math::Pose(4.0, 4.5, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff8(
+      math::Pose(6.0, -5.5, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff9(math::Pose(6.0, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPoseKickOff10(math::Pose(6.0, 5.5, 0, 0, 0, 3.14));
     const math::Pose RightInitPoseKickOff11(
-      math::Pose(SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 0));
+      math::Pose(SoccerField::HalfFieldHeight - 0.5, 0, 0, 0, 0, 3.14));
 
-    const math::Pose RightInitPose1(math::Pose(2.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPose2(math::Pose(2.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose3(math::Pose(2.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose4(math::Pose(2.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPose5(math::Pose(4.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose6(math::Pose(4.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose7(math::Pose(4.5, 0, 0, 0, 0, 0));
-    const math::Pose RightInitPose8(math::Pose(6.5, -0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose9(math::Pose(6.5, 0.5, 0, 0, 0, 0));
-    const math::Pose RightInitPose10(math::Pose(6.5, 0, 0, 0, 0, 0));
+    const math::Pose RightInitPose1(math::Pose(2.5, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose2(math::Pose(3.5, -2.0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose3(math::Pose(3.5, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose4(math::Pose(3.5, 2.0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose5(math::Pose(5.5, -4.0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose6(math::Pose(5.5, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose7(math::Pose(5.5, 4.0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose8(math::Pose(7.5, -5.0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose9(math::Pose(7.5, 0, 0, 0, 0, 3.14));
+    const math::Pose RightInitPose10(math::Pose(7.5, 5.0, 0, 0, 0, 3.14));
     const math::Pose RightInitPose11(
-      math::Pose(SoccerField::HalfFieldHeight + 0.5, 0, 0, 0, 0, 0));
+      math::Pose(SoccerField::HalfFieldHeight - 0.5, 0, 0, 0, 0, 3.14));
   }
 }
 #endif

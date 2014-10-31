@@ -20,6 +20,7 @@
 #include <gazebo/math/gzmath.hh>
 #include <gazebo/physics/physics.hh>
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -35,19 +36,19 @@ using namespace gazebo;
 #define G_SQUARE(a) ( (a) * (a) )
 
 // Game state constant initialization
-const std::string GameControllerPlugin::BeforeKickOff   = "before_kickoff";
-const std::string GameControllerPlugin::KickOffLeft     = "kickoff_left";
-const std::string GameControllerPlugin::KickOffRight    = "kickoff_right";
-const std::string GameControllerPlugin::Play            = "play";
-const std::string GameControllerPlugin::KickInLeft      = "kickin_left";
-const std::string GameControllerPlugin::KickInRight     = "kickin_right";
-const std::string GameControllerPlugin::CornerKickLeft  = "corner_left";
-const std::string GameControllerPlugin::CornerKickRight = "corner_right";
+const std::string GameControllerPlugin::BeforeKickOff   = "BeforeKickOff";
+const std::string GameControllerPlugin::KickOffLeft     = "KickOff_Left";
+const std::string GameControllerPlugin::KickOffRight    = "KickOff_Right";
+const std::string GameControllerPlugin::Play            = "PlayOn";
+const std::string GameControllerPlugin::KickInLeft      = "KickIn_Left";
+const std::string GameControllerPlugin::KickInRight     = "KickIn_Right";
+const std::string GameControllerPlugin::CornerKickLeft  = "corner_kick_left";
+const std::string GameControllerPlugin::CornerKickRight = "corner_kick_right";
 const std::string GameControllerPlugin::GoalKickLeft    = "goal_kick_left";
 const std::string GameControllerPlugin::GoalKickRight   = "goal_kick_right";
-const std::string GameControllerPlugin::GameOver        = "gameover";
-const std::string GameControllerPlugin::GoalLeft        = "goal_left";
-const std::string GameControllerPlugin::GoalRight       = "goal_right";
+const std::string GameControllerPlugin::GameOver        = "GameOver";
+const std::string GameControllerPlugin::GoalLeft        = "Goal_Left";
+const std::string GameControllerPlugin::GoalRight       = "Goal_Right";
 const std::string GameControllerPlugin::FreeKickLeft    = "free_kick_left";
 const std::string GameControllerPlugin::FreeKickRight   = "kick_kick_right";
 
@@ -80,6 +81,11 @@ GameControllerPlugin::GameControllerPlugin()
 
   this->SetCurrent(this->beforeKickOffState.get());
 
+  this->stepCounter = 0;
+
+  this->readyCounter = 0;
+  this->allAgentsReady = false;
+
   gzlog << "RoboCup 3D simulator game controller running" << std::endl;
 }
 
@@ -104,6 +110,15 @@ void GameControllerPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
   this->requestPub = this->gzNode->Advertise<msgs::Request>("~/request");
+
+  // Used to sychronize the agent plugins. Every time a new message is published
+  // under this topic, the agent plugins should send a state update.
+  this->syncPub = this->gzNode->Advertise<msgs::Time>("/gameController/sync");
+
+  // Used to know when an agent has sent its control commands and its ready for
+  // the next cycle.
+  this->syncSub = this->gzNode->Subscribe(std::string("/gameController/ready"),
+    &GameControllerPlugin::OnReadyReceived, this);
 
   // ROS Nodehandle
   this->node.reset(new ros::NodeHandle("~"));
@@ -179,7 +194,7 @@ void GameControllerPlugin::Initialize()
 /////////////////////////////////////////////////
 void GameControllerPlugin::Update()
 {
-  //boost::mutex::scoped_lock lock(this->mutex);
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (currentState)
     currentState->Update();
@@ -188,8 +203,6 @@ void GameControllerPlugin::Update()
 ////////////////////////////////////////////////
 void GameControllerPlugin::SetCurrent(State *_newState)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-
   // Only update the state if _newState is different than the current state.
   if (this->currentState != _newState)
   {
@@ -203,6 +216,8 @@ bool GameControllerPlugin::InitAgent(
   robocup_msgs::InitAgent::Request  &req,
   robocup_msgs::InitAgent::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   std::string agent = req.agent;
   std::string teamName = req.team_name;
   int player = req.player_number;
@@ -213,7 +228,7 @@ bool GameControllerPlugin::InitAgent(
   gzlog << "\tNumber: " << player << std::endl;
 
   // Check the player id is correct.
-  if (player <= 0 || player > 11)
+  if (player < 0 || player > 11)
   {
     gzerr << "Incorrect player #(" << player << ")" << std::endl;
     return false;
@@ -241,6 +256,32 @@ bool GameControllerPlugin::InitAgent(
           return false;
   }
 
+  // If requested player number is 0, choose a free uniform number.
+  if (player == 0)
+  {
+    int i;
+    // Potential numbers to choose.
+    for (i = 1; i <= 11; ++i)
+    {
+      bool found = true;
+      // Our current team members.
+      for (int j = 0; j < myTeam->members.size(); ++j)
+      {
+        int existingNumber = myTeam->members.at(j).first;
+        if (i == existingNumber)
+        {
+          found = false;
+          break;
+        }
+      }
+
+      if (found)
+        break;
+    }
+
+    player = i;
+  }
+
   std::ifstream myfile;
   std::string sdfContent = "";
   std::string line;
@@ -259,6 +300,76 @@ bool GameControllerPlugin::InitAgent(
     std::cerr << "File (" << agent.c_str() << " not found" << std::endl;
     return false;
   }
+
+  // Insert the initial robot position for the 'before_kickoff' state.
+  std::string delimiter = "<pose></pose>";
+  size_t index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <pose></pose> delimiter."
+              << std::endl;
+    return false;
+  }
+
+  std::string poseLabel;
+  // Chose your team
+  if (teamName == this->teams.at(0)->name)
+    poseLabel = beforeKickOffState->leftInitPoses.at(player - 1);
+  else if (teamName == this->teams.at(1)->name)
+    poseLabel = beforeKickOffState->rightInitPoses.at(player - 1);
+
+  sdfContent.replace(index, delimiter.size(), poseLabel);
+
+  // Replace the model name.
+  delimiter = "<model name=\"\">";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <model name = \"\"> delimiter."
+              << std::endl;
+    return false;
+  }
+  std::string modelName = "<model name=\"" + teamName + "_" +
+    boost::lexical_cast<std::string>(player) + "\">";
+  sdfContent.replace(index, delimiter.size(), modelName);
+
+  // Replace the namespace.
+  delimiter = "<robot_namespace></robot_namespace>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <robot_namespace></robot_namespace> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string ns = "<robot_namespace>" + teamName + "_" +
+    boost::lexical_cast<std::string>(player) + "</robot_namespace>";
+  sdfContent.replace(index, delimiter.size(), ns);
+
+  // Replace the team name
+  delimiter = "<team_name></team_name>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <team_name></team_name> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string teamNameElem = "<team_name>" + teamName + "</team_name>";
+  sdfContent.replace(index, delimiter.size(), teamNameElem);
+
+  // Replace the uniform_number
+  delimiter = "<uniform_number></uniform_number>";
+  index = sdfContent.find(delimiter);
+  if (index == std::string::npos)
+  {
+    std::cout << "I cannot find the <robot_namespace></robot_namespace> "
+              << " delimiter." << std::endl;
+    return false;
+  }
+  std::string uniformNumber = "<uniform_number>" +
+    boost::lexical_cast<std::string>(player) + "</uniform_number>";
+  sdfContent.replace(index, delimiter.size(), uniformNumber);
 
   sdf::SDF agentSDF;
   agentSDF.SetFromString(sdfContent);
@@ -292,7 +403,8 @@ bool GameControllerPlugin::InitAgent(
   *myTeam->pubs[name] = this->node->advertise<
     const robocup_msgs::Say>(std::string("/" + name + "/listen"), 1000);
 
-  res.result = 1;
+  std::cout << "Init agent OK" << std::endl;
+  res.result = player;
   return true;
 }
 
@@ -313,6 +425,8 @@ bool GameControllerPlugin::SetGameState(
   robocup_msgs::SetGameState::Request  &req,
   robocup_msgs::SetGameState::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   if (req.play_mode == this->BeforeKickOff)
     this->SetCurrent(this->beforeKickOffState.get());
   else if (req.play_mode == this->KickOffLeft)
@@ -363,6 +477,8 @@ bool GameControllerPlugin::MoveAgentPose(
   robocup_msgs::MoveAgentPose::Request  &req,
   robocup_msgs::MoveAgentPose::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   // Find the team
   int index = -1;
   for (size_t i = 0; i < this->teams.size(); ++i)
@@ -382,8 +498,8 @@ bool GameControllerPlugin::MoveAgentPose(
 
   // Wrong player #
   Members_It it = std::find_if(this->teams.at(index)->members.begin(),
-                    this->teams.at(index)->members.end(),
-                    CompareFirst(req.player_id));
+                  this->teams.at(index)->members.end(),
+                  CompareFirst(req.player_id));
 
   if (it == this->teams.at(index)->members.end())
   //if (req.player_id <= 0 || req.player_id > 11)
@@ -413,6 +529,8 @@ bool GameControllerPlugin::MoveBall(
   robocup_msgs::MoveBall::Request  &req,
   robocup_msgs::MoveBall::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   physics::ModelPtr model = this->world->GetModel("soccer_ball");
   if (model != NULL)
   {
@@ -429,6 +547,8 @@ bool GameControllerPlugin::MoveBall(
 bool GameControllerPlugin::DropBall(robocup_msgs::DropBall::Request  &req,
                                     robocup_msgs::DropBall::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   if (this->DropBallImpl(-1))
     res.result = 1;
   else
@@ -500,6 +620,8 @@ bool GameControllerPlugin::DropBallImpl(const int _teamAllowed)
 bool GameControllerPlugin::KillAgent(robocup_msgs::KillAgent::Request  &req,
                                      robocup_msgs::KillAgent::Response &res)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   res.result = 0;
 
   // Find the team
@@ -576,14 +698,40 @@ void GameControllerPlugin::Publish()
 /////////////////////////////////////////////////
 void GameControllerPlugin::Init()
 {
+
+
 }
 
 /////////////////////////////////////////////////
 void GameControllerPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
-  this->Update();
-  this->Publish();
-  ros::spinOnce();
+   boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  // 20 ms sim time elapsed.
+  if (this->stepCounter++ == 19)
+  {
+    this->stepCounter = 0;
+
+    // Run a game controller step.
+    this->Update();
+    this->Publish();
+    ros::spinOnce();
+
+    // The content of the message is not used. We just use the message reception
+    // to notify that is time to send state updates.
+    msgs::Time msg;
+    msg.set_sec(0);
+    msg.set_nsec(0);
+    // Notify the agent plugins that it's time to send state updates.
+    //this->syncPub->Publish(msg);
+
+    // Wait for agents to be ready.
+    // if (!this->readyCondition.timed_wait(lock,
+    //  boost::posix_time::milliseconds(500)) || this->allAgentsReady)
+
+    this->allAgentsReady = false;
+    this->readyCounter = 0;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -748,6 +896,8 @@ bool GameControllerPlugin::IntersectionCircunferenceLine(
 /////////////////////////////////////////////////
 void GameControllerPlugin::OnBallContacts(ConstContactsPtr &_msg)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   for (int k = _msg->contact_size() - 1; k >= 0; --k)
   {
     std::size_t foundC1 =
@@ -794,7 +944,7 @@ void GameControllerPlugin::ReleasePlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
         if (!joint)
         {
           std::cerr << "ReleasePlayers() Joint (" << joint << ") not found\n";
@@ -820,7 +970,7 @@ void GameControllerPlugin::StopPlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
         if (!joint)
         {
           std::cerr << "StopPlayers() Joint (" << joint << ") not found\n";
@@ -829,7 +979,7 @@ void GameControllerPlugin::StopPlayers()
 
         joint->Attach(physics::LinkPtr(),
           //model->GetLink(name + "::turtlebot::rack"));
-          model->GetLink(name + "::Nao::HeadPitchLink"));
+          model->GetLink("default::" + name + "::Nao::HeadPitchLink"));
 
         math::Pose pose = model->GetWorldPose();
         model->Reset();
@@ -862,6 +1012,8 @@ void GameControllerPlugin::OnMessageFromRobot(
  const robocup_msgs::Say::ConstPtr& _msg, const std::string &_topic,
  const std::string &_team)
 {
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
   // Remove the first "/".
   std::string sender = _topic.substr(1, _topic.size() - 1);
 
@@ -908,5 +1060,25 @@ void GameControllerPlugin::OnMessageFromRobot(
         }
       }
     }
+  }
+}
+
+/////////////////////////////////////////////////
+void GameControllerPlugin::OnReadyReceived(ConstTimePtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(this->mutex);
+
+  // Get the current number of players.
+  int numPlayers = 0;
+  for (size_t i = 0; i < this->teams.size(); ++i)
+    numPlayers += this->teams.at(i)->members.size();
+
+  this->readyCounter++;
+  if (this->readyCounter == numPlayers)
+  {
+    this->readyCounter = 0;
+    this->allAgentsReady = true;
+    // Notify that is time to move on
+    this->readyCondition.notify_one();
   }
 }

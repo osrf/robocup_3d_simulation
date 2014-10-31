@@ -1,4 +1,7 @@
 # named landmark observations
 
 string name
-Bearing observation
+Bearing bearing
+string team_name
+int32 player_id
+string bodypart
