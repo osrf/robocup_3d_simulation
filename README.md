@@ -1,6 +1,8 @@
 robocup_3d_simulation
 =====================
 
+![Alt text](/naos_robocup.png?raw=true "3D Simulation game simulated in Gazebo")
+
 A repository for Gazebo and ROS based robocup_3d_simulation.
 
 Installation
