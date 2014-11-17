@@ -944,7 +944,7 @@ void GameControllerPlugin::ReleasePlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
         if (!joint)
         {
           std::cerr << "ReleasePlayers() Joint (" << joint << ") not found\n";
@@ -970,7 +970,7 @@ void GameControllerPlugin::StopPlayers()
 
       if (model)
       {
-        physics::JointPtr joint = model->GetJoint("default::" + name + "::world_joint");
+        physics::JointPtr joint = model->GetJoint(name + "::world_joint");
         if (!joint)
         {
           std::cerr << "StopPlayers() Joint (" << joint << ") not found\n";
@@ -979,7 +979,7 @@ void GameControllerPlugin::StopPlayers()
 
         joint->Attach(physics::LinkPtr(),
           //model->GetLink(name + "::turtlebot::rack"));
-          model->GetLink("default::" + name + "::Nao::HeadPitchLink"));
+          model->GetLink(name + "::Nao::HeadPitchLink"));
 
         math::Pose pose = model->GetWorldPose();
         model->Reset();
