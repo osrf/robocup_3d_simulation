@@ -95,12 +95,13 @@ void KickOffLeftState::Initialize()
         std::cerr << "Model (" << name << ") not found." << std::endl;
     }
   }
+
+  this->plugin->StopPlayers();
 }
 
 /////////////////////////////////////////////////
 void KickOffLeftState::Update()
 {
-  this->plugin->StopPlayers();
 
   // After some time, go to play mode.
   common::Time elapsed = this->timer.GetElapsed();

@@ -63,55 +63,55 @@ AgentPlugin::AgentPlugin()
   for (int i = 0; i < 24; ++i)
     this->jointForces.push_back(0.0);
 
-  this->toAgent["Nao::HeadYaw"]        = "hj1";
-  this->toAgent["Nao::HeadPitch"]      = "hj2";
-  this->toAgent["Nao::LHipYawPitch"]   = "llj1";
-  this->toAgent["Nao::LHipRoll"]       = "llj2";
-  this->toAgent["Nao::LHipPitch"]      = "llj3";
-  this->toAgent["Nao::LKneePitch"]     = "llj4";
-  this->toAgent["Nao::LAnklePitch"]    = "llj5";
-  this->toAgent["Nao::LAnkleRoll"]     = "llj6";
-  this->toAgent["Nao::LShoulderPitch"] = "laj1";
-  this->toAgent["Nao::LShoulderRoll"]  = "laj2";
-  this->toAgent["Nao::LElbowYaw"]      = "laj4";
-  this->toAgent["Nao::LElbowRoll"]     = "laj3";
-  this->toAgent["Nao::LWristYaw"]      = "Nao::LWristYaw";
-  this->toAgent["Nao::RHipYawPitch"]   = "rlj1";
-  this->toAgent["Nao::RHipRoll"]       = "rlj2";
-  this->toAgent["Nao::RHipPitch"]      = "rlj3";
-  this->toAgent["Nao::RKneePitch"]     = "rlj4";
-  this->toAgent["Nao::RAnklePitch"]    = "rlj5";
-  this->toAgent["Nao::RAnkleRoll"]     = "rlj6";
-  this->toAgent["Nao::RShoulderPitch"] = "raj1";
-  this->toAgent["Nao::RShoulderRoll"]  = "raj2";
-  this->toAgent["Nao::RElbowYaw"]      = "raj4";
-  this->toAgent["Nao::RElbowRoll"]     = "raj3";
-  this->toAgent["Nao::RWristYaw"]      = "Nao::RWristYaw";
+  this->toAgent["naoH25V40::HeadYaw"]        = "hj1";
+  this->toAgent["naoH25V40::HeadPitch"]      = "hj2";
+  this->toAgent["naoH25V40::LHipYawPitch"]   = "llj1";
+  this->toAgent["naoH25V40::LHipRoll"]       = "llj2";
+  this->toAgent["naoH25V40::LHipPitch"]      = "llj3";
+  this->toAgent["naoH25V40::LKneePitch"]     = "llj4";
+  this->toAgent["naoH25V40::LAnklePitch"]    = "llj5";
+  this->toAgent["naoH25V40::LAnkleRoll"]     = "llj6";
+  this->toAgent["naoH25V40::LShoulderPitch"] = "laj1";
+  this->toAgent["naoH25V40::LShoulderRoll"]  = "laj2";
+  this->toAgent["naoH25V40::LElbowYaw"]      = "laj4";
+  this->toAgent["naoH25V40::LElbowRoll"]     = "laj3";
+  this->toAgent["naoH25V40::LWristYaw"]      = "naoH25V40::LWristYaw";
+  this->toAgent["naoH25V40::RHipYawPitch"]   = "rlj1";
+  this->toAgent["naoH25V40::RHipRoll"]       = "rlj2";
+  this->toAgent["naoH25V40::RHipPitch"]      = "rlj3";
+  this->toAgent["naoH25V40::RKneePitch"]     = "rlj4";
+  this->toAgent["naoH25V40::RAnklePitch"]    = "rlj5";
+  this->toAgent["naoH25V40::RAnkleRoll"]     = "rlj6";
+  this->toAgent["naoH25V40::RShoulderPitch"] = "raj1";
+  this->toAgent["naoH25V40::RShoulderRoll"]  = "raj2";
+  this->toAgent["naoH25V40::RElbowYaw"]      = "raj4";
+  this->toAgent["naoH25V40::RElbowRoll"]     = "raj3";
+  this->toAgent["naoH25V40::RWristYaw"]      = "naoH25V40::RWristYaw";
 
-  this->toServer["he1"]       = "Nao::HeadYaw";
-  this->toServer["he2"]       = "Nao::HeadPitch";
-  this->toServer["lle1"]      = "Nao::LHipYawPitch";
-  this->toServer["lle2"]      = "Nao::LHipRoll";
-  this->toServer["lle3"]      = "Nao::LHipPitch";
-  this->toServer["lle4"]      = "Nao::LKneePitch";
-  this->toServer["lle5"]      = "Nao::LAnklePitch";
-  this->toServer["lle6"]      = "Nao::LAnkleRoll";
-  this->toServer["lae1"]      = "Nao::LShoulderPitch";
-  this->toServer["lae2"]      = "Nao::LShoulderRoll";
-  this->toServer["lae4"]      = "Nao::LElbowYaw";
-  this->toServer["lae3"]      = "Nao::LElbowRoll";
-  this->toServer["Nao::LWristYaw"] = "Nao::LWristYaw";
-  this->toServer["rle1"]      = "Nao::RHipYawPitch";
-  this->toServer["rle2"]      = "Nao::RHipRoll";
-  this->toServer["rle3"]      = "Nao::RHipPitch";
-  this->toServer["rle4"]      = "Nao::RKneePitch";
-  this->toServer["rle5"]      = "Nao::RAnklePitch";
-  this->toServer["rle6"]      = "Nao::RAnkleRoll";
-  this->toServer["rae1"]      = "Nao::RShoulderPitch";
-  this->toServer["rae2"]      = "Nao::RShoulderRoll";
-  this->toServer["rae4"]      = "Nao::RElbowYaw";
-  this->toServer["rae3"]      = "Nao::RElbowRoll";
-  this->toServer["Nao::RWristYaw"] = "Nao::RWristYaw";
+  this->toServer["he1"]                  = "naoH25V40::HeadYaw";
+  this->toServer["he2"]                  = "naoH25V40::HeadPitch";
+  this->toServer["lle1"]                 = "naoH25V40::LHipYawPitch";
+  this->toServer["lle2"]                 = "naoH25V40::LHipRoll";
+  this->toServer["lle3"]                 = "naoH25V40::LHipPitch";
+  this->toServer["lle4"]                 = "naoH25V40::LKneePitch";
+  this->toServer["lle5"]                 = "naoH25V40::LAnklePitch";
+  this->toServer["lle6"]                 = "naoH25V40::LAnkleRoll";
+  this->toServer["lae1"]                 = "naoH25V40::LShoulderPitch";
+  this->toServer["lae2"]                 = "naoH25V40::LShoulderRoll";
+  this->toServer["lae4"]                 = "naoH25V40::LElbowYaw";
+  this->toServer["lae3"]                 = "naoH25V40::LElbowRoll";
+  this->toServer["naoH25V40::LWristYaw"] = "naoH25V40::LWristYaw";
+  this->toServer["rle1"]                 = "naoH25V40::RHipYawPitch";
+  this->toServer["rle2"]                 = "naoH25V40::RHipRoll";
+  this->toServer["rle3"]                 = "naoH25V40::RHipPitch";
+  this->toServer["rle4"]                 = "naoH25V40::RKneePitch";
+  this->toServer["rle5"]                 = "naoH25V40::RAnklePitch";
+  this->toServer["rle6"]                 = "naoH25V40::RAnkleRoll";
+  this->toServer["rae1"]                 = "naoH25V40::RShoulderPitch";
+  this->toServer["rae2"]                 = "naoH25V40::RShoulderRoll";
+  this->toServer["rae4"]                 = "naoH25V40::RElbowYaw";
+  this->toServer["rae3"]                 = "naoH25V40::RElbowRoll";
+  this->toServer["naoH25V40::RWristYaw"] = "naoH25V40::RWristYaw";
 
   // Start up ROS
   std::string name = "set_joints";
@@ -387,11 +387,11 @@ void AgentPlugin::Init()
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint("Nao::" + this->jointNames[i]);
+      this->model->GetJoint("naoH25V40::" + this->jointNames[i]);
     if (!joint)
     {
-      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
-                << "] not found" << std::endl;
+      std::cerr << "SendJoints() Joint [" << "naoH25V40::"
+                << this->jointNames[i] << "] not found" << std::endl;
       continue;
     }
 
@@ -410,7 +410,7 @@ void AgentPlugin::Init()
     //if (joint->GetScopedName().find("LShoulderRoll") != std::string::npos)
     //{
       // Set the force for this joint.
-    pid.Init(50, 0, 0, 0, 0, 100, -100);
+    pid.Init(25, 0, 0, 0, 0, 100, -100);
 
     // Apply the PID.
     jc->SetPositionPID(joint->GetScopedName(), pid);
@@ -424,12 +424,14 @@ void AgentPlugin::Init()
 
 /////////////////////////////////////////////////
 bool AgentPlugin::SendJoints(
-  robocup_msgs::SendJoints::Request  &req,
-  robocup_msgs::SendJoints::Response &res)
+  robocup_msgs::SendJoints::Request  &_req,
+  robocup_msgs::SendJoints::Response &_res)
 {
+  std::cout << "SendJoints" << std::endl;
+
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
-  boost::array<float, 22> jointValues = req.joints;
+  boost::array<float, 22> jointValues = _req.joints;
 
   for (int i = 0; i < 22; ++i)
   {
@@ -442,7 +444,7 @@ bool AgentPlugin::SendJoints(
   msgs::Time msg2;
   msg2.set_sec(1);
   msg2.set_nsec(1);
-  // Notify the agent plugins that it's time to send state updates.
+  // Notify the agent plugin that it's time to send state updates.
   this->readyPub->Publish(msg2);
 
   return true;
@@ -473,11 +475,11 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint("Nao::" + this->jointNames[i]);
+      this->model->GetJoint("naoH25V40::" + this->jointNames[i]);
     if (!joint)
     {
-      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
-                << "] not found" << std::endl;
+      std::cerr << "SendJoints() Joint [" << "naoH25V40::"
+                << this->jointNames[i] << "] not found" << std::endl;
       continue;
     }
 
@@ -491,17 +493,17 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint("Nao::" + this->jointNames[i]);
+      this->model->GetJoint("naoH25V40::" + this->jointNames[i]);
     if (!joint)
     {
-      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
+      std::cerr << "SendJoints() Joint [" << "naoH25V40::" << this->jointNames[i]
                 << "] not found" << std::endl;
       continue;
     }
 
     // Set the target position for the joint.
-    // if (!jc->SetPositionTarget(joint->GetScopedName(), this->jointForces[i]))
-    if (!jc->SetPositionTarget(joint->GetScopedName(), 0.0))
+    if (!jc->SetPositionTarget(joint->GetScopedName(), this->jointForces[i]))
+    //if (!jc->SetPositionTarget(joint->GetScopedName(), 0.0))
       std::cerr << "PID Target failed\n";
     //}
   }
@@ -513,15 +515,15 @@ void AgentPlugin::Update(const common::UpdateInfo &_info)
   {
     // Get the joint.
     physics::JointPtr joint =
-      this->model->GetJoint("Nao::" + this->jointNames[i]);
+      this->model->GetJoint("naoH25V40::" + this->jointNames[i]);
     if (!joint)
     {
-      std::cerr << "SendJoints() Joint [" << "Nao::" << this->jointNames[i]
-                << "] not found" << std::endl;
+      std::cerr << "SendJoints() Joint [" << "naoH25V40::"
+                << this->jointNames[i] << "] not found" << std::endl;
       continue;
     }
 
-    //std::cout << this->jointForces[i] << std::endl;
+    // std::cout << this->jointForces[i] << std::endl;
 
     // Set the target position for the joint.
     if (!jc->SetVelocityTarget(joint->GetScopedName(), this->jointForces[i]))

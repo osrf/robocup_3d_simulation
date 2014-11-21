@@ -5,7 +5,21 @@ robocup_3d_simulation
 
 A repository for Gazebo and ROS based robocup_3d_simulation.
 
-Installation
+Prerequisites
+=============
+
+1. Compile Gazebo from source. Follow instructions [here](http://gazebosim.org/tutorials?tut=install&cat=get_started).
+
+2. Install ROS (Hydro or Indigo):
+
+**Note: Replace `indigo` with `hydro` if you prefer to install ROS Hydro.**
+
+    sudo apt-get install ros-indigo-desktop
+
+3. Install Gazebo
+
+
+Robocup 3DS plugin installation
 ============
 
 1. Clone the repository:
@@ -16,7 +30,7 @@ Installation
 
 2. Create a catkin workspace.
 
-    . /opt/ros/hydro/setup.bash
+    . /opt/ros/indigo/setup.bash
 
     mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
 
@@ -31,13 +45,13 @@ Running
 
 1. Start roscore in a new terminal.
 
-    . /opt/ros/hydro/setup.bash
+    . /opt/ros/indigo/setup.bash
 
     roscore
 
 2. Start gazebo in a new terminal:
 
-    . /opt/ros/hydro/setup.bash
+    . /opt/ros/indigo/setup.bash
 
     . ~/robocup_ws/devel/setup.bash
 
@@ -48,7 +62,7 @@ Running
 
 3. Manually spawn a team of agents:
 
-    . /opt/ros/hydro/setup.bash
+    . /opt/ros/indigo/setup.bash
 
     . ~/robocup_ws/devel/setup.bash
 

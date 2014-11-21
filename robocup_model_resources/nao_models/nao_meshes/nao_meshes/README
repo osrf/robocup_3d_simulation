@@ -1,0 +1,19 @@
+This package contains the official textured meshes for Aldebaran's NAO robot.
+You can use directly the meshes located in the meshes//V40/ directory.
+
+
+Change the color of your NAO
+=============================
+modify the textureNAO.png in the texture directory
+each color block corresponds to a part of the robot. Modify the color of any block and the meshes will change color accordingly
+
+Export meshes from a blender file
+==================================
+You can also convert your meshes yourself from the officiel blender file provided by Aldebaran.
+To do so, run the "exportMeshes.py" script : 
+1) copy the aldebaran blender file to the script directory
+2) go to the script directory
+3) run : rosrun nao_meshes exportMeshes.py -b ~/SoftNao/blender-2.71-linux-glibc211-x86_64/ -f nao-v4textured.blend -s ~/catkin_ws/src/nao_meshes/scripts
+    -b parameter is the path of your blender directory
+    -s in the path of the script directory
+    -f is the name of the blender file to process

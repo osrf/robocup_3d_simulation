@@ -46,5 +46,5 @@ void PlayState::Update()
 {
   this->plugin->CheckTiming();
   this->plugin->CheckBall();
-  this->plugin->CheckPlayerCollisions();
+  //this->plugin->CheckPlayerCollisions();
 }

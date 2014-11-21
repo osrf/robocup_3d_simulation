@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Spawn the left team.
+for i in $(seq 1 2)
+do
+  rosservice call /gameController/init_agent @CMAKE_INSTALL_PREFIX@/share/robocup_model_resources/nao_models/nao_soccer.sdf teamA 0 &
+done
+
+sleep 1
+
+# Spawn the right team.
+for i in $(seq 1 2)
+do
+	rosservice call /gameController/init_agent @CMAKE_INSTALL_PREFIX@/share/robocup_model_resources/nao_models/nao_soccer.sdf teamB 0 &
+done

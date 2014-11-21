@@ -979,7 +979,7 @@ void GameControllerPlugin::StopPlayers()
 
         joint->Attach(physics::LinkPtr(),
           //model->GetLink(name + "::turtlebot::rack"));
-          model->GetLink(name + "::Nao::HeadPitchLink"));
+          model->GetLink(name + "::naoH25V40::Neck"));
 
         math::Pose pose = model->GetWorldPose();
         model->Reset();
