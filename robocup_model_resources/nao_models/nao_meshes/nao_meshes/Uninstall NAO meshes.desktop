@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Version=0.9.4
-Name=Uninstall NAO meshes
-Comment=Uninstall
-Icon=
-Exec=/home/caguero/nao_meshes/uninstall
-Terminal=false
-Path=/home/caguero/nao_meshes

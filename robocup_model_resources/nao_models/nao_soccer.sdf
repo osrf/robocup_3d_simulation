@@ -8,8 +8,7 @@
 
     <!-- A robot-->
     <include>
-      <!-- <uri>model://nao_meshes_blue</uri> -->
-      <uri>model://nao_meshes</uri>
+      <uri>model://nao_soccer</uri>
     </include>
 
     <!-- Joint used to lock the model to the world when needed -->
