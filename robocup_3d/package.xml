@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <name>robocup_3d</name> <!-- This is a meta package! -->
+  <version>0.0.3</version>
+  <description>Robocup 3D simulation metapackage</description>
+
+  <maintainer email="caguero@osrfoundation.org">Carlos Agüero</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>robocup_msgs</run_depend>
+  <run_depend>robocup_utils</run_depend>
+  <run_depend>robocup_model_resources</run_depend>
+  <run_depend>robocup_agent_plugin</run_depend>
+  <run_depend>robocup_gamecontroller_plugin</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
