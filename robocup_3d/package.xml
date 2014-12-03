@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>robocup_3d</name> <!-- This is a meta package! -->
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <description>Robocup 3D simulation metapackage</description>
 
   <maintainer email="caguero@osrfoundation.org">Carlos Agüero</maintainer>

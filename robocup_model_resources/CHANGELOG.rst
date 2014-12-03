@@ -2,8 +2,8 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.4 (2014-12-03)
+------------------
 * Include nao_meshes as a runtime dependency
 * Contributors: Jose Luis Rivero
 
