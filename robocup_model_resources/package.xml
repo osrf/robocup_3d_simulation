@@ -10,6 +10,7 @@
   <buildtool_depend>cmake</buildtool_depend>
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>gazebo</run_depend>
+  <run_depend>nao_meshes</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
