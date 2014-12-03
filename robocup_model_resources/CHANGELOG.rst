@@ -2,6 +2,11 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Include nao_meshes as a runtime dependency
+* Contributors: Jose Luis Rivero
+
 0.0.3 (2014-12-02)
 ------------------
 * Export ROS_PACKAGE_PATH in gazebo environment hook
