@@ -2,8 +2,8 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.5 (2014-12-04)
+------------------
 * Adding ROS_PACKAGE_PATH to the GAZEBO_MODEL_PATH.
 * Contributors: Carlos Agüero
 
