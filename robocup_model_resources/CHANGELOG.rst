@@ -2,6 +2,11 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Adding ROS_PACKAGE_PATH to the GAZEBO_MODEL_PATH.
+* Contributors: Carlos Agüero
+
 0.0.4 (2014-12-03)
 ------------------
 * Include nao_meshes as a runtime dependency
