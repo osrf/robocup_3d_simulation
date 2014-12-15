@@ -10,7 +10,7 @@ Prerequisites
 
 We require Ubuntu Precise or Ubuntu Trusty.
 
-One-line installation
+One-line installation (recommended)
 ============
 
 1. Execute the following line:
