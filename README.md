@@ -52,12 +52,14 @@ Running
 
 1. Start `roscore` in a new terminal:
 
-    . /opt/ros/hydro/setup.bash
+    . /opt/ros/indigo/setup.bash
+
     roscore
 
 2. Start Gazebo with the 3d simulation soccer field in a new terminal:
 
     . /opt/ros/indigo/setup.bash
+
     gazebo robocup3d.world
 
 3. Spawn a team of agents:
@@ -72,6 +74,7 @@ Running
     messages and s-expression. Open a new terminal and execute:
 
         . /opt/ros/indigo/setup.bash
+
         sExprInterface.py localhost 33001
 
     2. You can select your favorite port. Start and connect a real agent with the
