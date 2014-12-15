@@ -10,7 +10,7 @@ One-line installation
 
 1. Execute the following line:
 
-    wget -O /tmp/robocup_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup_install.sh; sudo sh /tmp/robocup_install.sh
+      wget -O /tmp/robocup_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup_install.sh; sudo sh /tmp/robocup_install.sh
 
 Installation from sources
 =========================
@@ -27,7 +27,7 @@ Installation from sources
 
 3. Install the Nao meshes:
 
-  sudo apt-get install ros-indigo-nao-meshes
+    sudo apt-get install ros-indigo-nao-meshes
 
 4. Clone the Robocup 3D simulation repository:
 
