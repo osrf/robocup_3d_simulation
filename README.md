@@ -138,7 +138,7 @@ Spawn a team of agents following the instructions previously detailed.
 
   After a few seconds the game will switch to `PlayOn.
 
-  The list of available game states is: `BeforeKickOff`, `KickOff_Left,
+  The list of available game states is: `BeforeKickOff`, `KickOff_Left`,
   `KickOff_Right`, `PlayOn`, `KickIn_Left`, `KickIn_Right`, `corner_kick_left`,
   `corner_kick_right`, `goal_kick_left`, `goal_kick_right`, `GameOver`,
   `Goal_Left`, `Goal_Right`, `free_kick_left`, `kick_kick_right`.
@@ -149,14 +149,14 @@ Spawn a team of agents following the instructions previously detailed.
   rostopic echo /gameController/game_state
   ~~~
 
-1. Move the ball specifying [<X>, <Y>, <Z>, <VX>, <VY>, <VZ>]:
+1. Move the ball specifying [`<X>`, `<Y>`, `<Z>`, `<VX>`, `<VY>`, `<VZ>`]:
 
   ~~~
   rosservice call /gameController/move_ball 2 1 0 0 0
   ~~~
 
-1. Move a player specifying [<Team name> <uniform number> [<X>, <Y>, <THETA>]:
+1. Move a player specifying [`<Team name>` `<uniform number>` [`<X>`, `<Y>`, `<THETA>`]:
 
   ~~~
-  rosservice call /gameController/move_agent teamA 1 [3,2,0]
+  rosservice call /gameController/move_agent teamA 1 [3, 2, 0]
   ~~~
