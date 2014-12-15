@@ -2,8 +2,8 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.6 (2014-12-15)
+------------------
 * Update the soccer_nao.urdf to use the new Nao meshes path.
 * Contributors: Carlos Agüero
 

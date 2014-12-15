@@ -2,8 +2,8 @@
 Changelog for package robocup_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.6 (2014-12-15)
+------------------
 * Moving sExprInterface.py to utils
 * Update the soccer_nao.urdf to use the new Nao meshes path.
 * Contributors: Carlos Agüero
