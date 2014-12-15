@@ -28,25 +28,26 @@ Installation from sources
 
 3. Install the Nao meshes:
 
-    sudo apt-get install ros-indigo-nao-meshes
+~~~
+sudo apt-get install ros-indigo-nao-meshes
+~~~
 
 4. Clone the Robocup 3D simulation repository:
 
-    cd $HOME
+~~~
+cd $HOME
+git clone https://github.com/osrf/robocup_3d_simulation.git
+~~~
 
-    git clone https://github.com/osrf/robocup_3d_simulation.git
+5. Create a catkin workspace:
 
-2. Create a catkin workspace.
-
-    . /opt/ros/indigo/setup.bash
-
-    mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
-
-    ln -s ~/robocup_3d_simulation
-
-    cd ..
-
-    catkin_make
+~~~
+. /opt/ros/indigo/setup.bash
+mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
+ln -s ~/robocup_3d_simulation
+cd ..
+catkin_make
+~~~
 
 Running
 =======
