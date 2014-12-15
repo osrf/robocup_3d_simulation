@@ -20,34 +20,34 @@ Installation from sources
  [here](http://wiki.ros.org/indigo/Installation/Ubuntu) and install the package
  `ros-indigo-desktop` (Ubuntu Trusty) or `ros-hydro-desktop` (Ubuntu Precise).
 
-2. Install Gazebo4. Follow instructions
+1. Install Gazebo4. Follow instructions
  [here](http://gazebosim.org/tutorials?tut=install_from_source&cat=install) and
  install the branch `gazebo_4.1` or above. From now on we are going to assume
  that the installation is ROS indigo. If you are using hydro, just replace
  `indigo` with `hydro` in the following commands.
 
-3. Install the Nao meshes:
+1. Install the Nao meshes:
 
-~~~
-sudo apt-get install ros-indigo-nao-meshes
-~~~
+  ~~~
+  sudo apt-get install ros-indigo-nao-meshes
+  ~~~
 
-4. Clone the Robocup 3D simulation repository:
+1. Clone the Robocup 3D simulation repository:
 
-~~~
-cd $HOME
-git clone https://github.com/osrf/robocup_3d_simulation.git
-~~~
+  ~~~
+  cd $HOME
+  git clone https://github.com/osrf/robocup_3d_simulation.git
+  ~~~
 
-5. Create a catkin workspace:
+1. Create a catkin workspace:
 
-~~~
-. /opt/ros/indigo/setup.bash
-mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
-ln -s ~/robocup_3d_simulation
-cd ..
-catkin_make
-~~~
+  ~~~
+  . /opt/ros/indigo/setup.bash
+  mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
+  ln -s ~/robocup_3d_simulation
+  cd ..
+  catkin_make
+  ~~~
 
 Running
 =======
