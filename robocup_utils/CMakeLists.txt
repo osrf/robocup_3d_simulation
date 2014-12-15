@@ -132,6 +132,9 @@ install(TARGETS teleoperator
 # Install the script for spawning the teams.
 install(PROGRAMS ${PROJECT_BINARY_DIR}/spawnTeams DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+# Install the script for ROS <-> sExpression bridge.
+install(PROGRAMS ${PROJECT_SOURCE_DIR}/src/sExprInterface.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 # Environment hooks for robocup_utils.
 catkin_add_env_hooks(10.robocup_utils SHELLS bash DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/env-hooks)
 

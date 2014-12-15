@@ -96,10 +96,12 @@ Running
       ./start.sh localhost -p 33001
       ~~~
 
-1. [Optional] Additional agents can be inserted by typing:
+1. [Optional] Additional agents can be inserted by typing the following command,
+  where the last two parameters are the team name and uniform number
+  respectively:
 
   ~~~
-  createAgent nao_soccer.sdf <team_name> <uniform_number>
+  createAgent $ROS_ROOT/../robocup_model_resources/nao_models/nao_soccer.sdf teamA 3
   ~~~
 
 1. [Optional] Run rcssserver3d just to draw the field in the roboviz:
@@ -121,30 +123,34 @@ Interacting with the simulation
 We use ROS for interact with the simulation and modify the state of the game.
 Spawn a team of agents following the instructions previously detailed.
 
-1. Show the state of the game. Open a new terminal and run:
+1. Modify the state of the game. Open a new terminal and run:
 
   ~~~
   . /opt/ros/indigo/setup.bash
-  rostopic
+  rosservice call /gameController/set_game_state KickOff_Left
   ~~~
 
-1. Modify the state of the game.
+  After a few seconds the game will switch to `PlayOn.
+
+  The list of available game states is: `BeforeKickOff`, `KickOff_Left,
+  `KickOff_Right`, `PlayOn`, `KickIn_Left`, `KickIn_Right`, `corner_kick_left`,
+  `corner_kick_right`, `goal_kick_left`, `goal_kick_right`, `GameOver`,
+  `Goal_Left`, `Goal_Right`, `free_kick_left`, `kick_kick_right`.
+
+1. Show the state of the game. Type in the previously open terminal:
 
   ~~~
-
+  rostopic echo /gameController/game_state
   ~~~
 
-1. Move the ball.
+1. Move the ball specifying [<X>, <Y>, <Z>, <VX>, <VY>, <VZ>]:
 
   ~~~
-
+  rosservice call /gameController/move_ball 2 1 0 0 0
   ~~~
 
-1. Move a player:
+1. Move a player specifying [<Team name> <uniform number> [<X>, <Y>, <THETA>]:
 
   ~~~
-
+  rosservice call /gameController/move_agent teamA 1 [3,2,0]
   ~~~
-
-Known limitations.
-
