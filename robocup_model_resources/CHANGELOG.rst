@@ -2,6 +2,11 @@
 Changelog for package robocup_model_resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update the soccer_nao.urdf to use the new Nao meshes path.
+* Contributors: Carlos Agüero
+
 0.0.5 (2014-12-04)
 ------------------
 * Adding ROS_PACKAGE_PATH to the GAZEBO_MODEL_PATH.
@@ -21,5 +26,5 @@ Changelog for package robocup_model_resources
 
 0.0.2 (2014-12-01)
 ------------------
-* Initial version 
+* Initial version
 * Contributors: Carlos Agüero, Nate Koenig

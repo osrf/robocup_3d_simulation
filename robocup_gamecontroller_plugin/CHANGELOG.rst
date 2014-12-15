@@ -1,6 +1,9 @@
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package robocup_gamecontroller_plugin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
 
 0.0.5 (2014-12-04)
 ------------------
@@ -13,5 +16,5 @@ Changelog for package robocup_gamecontroller_plugin
 
 0.0.2 (2014-12-01)
 ------------------
-* Initial version 
+* Initial version
 * Contributors: Carlos Agüero, Nate Koenig
