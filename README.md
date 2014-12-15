@@ -54,48 +54,60 @@ Running
 
 1. Start `roscore` in a new terminal:
 
-    . /opt/ros/indigo/setup.bash
+  ~~~
+  . /opt/ros/indigo/setup.bash
+  roscore
+  ~~~
 
-    roscore
+1. Start Gazebo with the 3d simulation soccer field in a new terminal:
 
-2. Start Gazebo with the 3d simulation soccer field in a new terminal:
+  ~~~
+  . /opt/ros/indigo/setup.bash
+  gazebo robocup3d.world
+  ~~~
 
-    . /opt/ros/indigo/setup.bash
+1. Spawn a team of agents:
 
-    gazebo robocup3d.world
+  ~~~
+  . /opt/ros/indigo/setup.bash
+  spawnTeams
+  ~~~
 
-3. Spawn a team of agents:
-
-    . /opt/ros/indigo/setup.bash
-
-    spawnTeams
-
-4. Run your own agent.:
+1. Run your own agent.:
 
     1. Run the s-expression interface program to be able to convert between ROS
     messages and s-expression. Open a new terminal and execute:
 
-        . /opt/ros/indigo/setup.bash
+      ~~~
+      . /opt/ros/indigo/setup.bash
+      sExprInterface.py localhost 33001
+      ~~~
 
-        sExprInterface.py localhost 33001
-
-    2. You can select your favorite port. Start and connect a real agent with the
+    1. You can select your favorite port. Start and connect a real agent with the
     s-expression interface program in the port you entered in the previous step.
     For example:
 
-        ./start.sh localhost -p 33001
+      ~~~
+      ./start.sh localhost -p 33001
+      ~~~
 
-[Optional] Additional agents can be inserted by typing:
+1. [Optional] Additional agents can be inserted by typing:
 
-    createAgent nao_soccer.sdf <team_name> <uniform_number>
+  ~~~
+  createAgent nao_soccer.sdf <team_name> <uniform_number>
+  ~~~
 
-5. [Optional] Run rcssserver3d just to draw the field in the roboviz:
+1. [Optional] Run rcssserver3d just to draw the field in the roboviz:
 
-    rcssserver3d
+  ~~~
+  rcssserver3d
+  ~~~
 
-6. [Optional] Run roboviz to be able to debug the agents:
+1. [Optional] Run roboviz to be able to debug the agents:
 
-    roboviz.sh
+  ~~~
+  roboviz.sh
+  ~~~
 
 
 Interacting with the simulation
