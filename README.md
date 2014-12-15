@@ -51,7 +51,13 @@ Installation from sources
   mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
   ln -s ~/robocup_3d_simulation
   cd ..
-  catkin_make
+  catkin_make install
+  ~~~
+
+1. Prepare the environment:
+
+  ~~~
+  . install/setup.bash
   ~~~
 
 Running
