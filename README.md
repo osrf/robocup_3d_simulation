@@ -5,6 +5,11 @@ robocup_3d_simulation
 
 A repository for Gazebo and ROS based robocup_3d_simulation.
 
+Prerequisites
+=============
+
+We require Ubuntu Precise or Ubuntu Trusty.
+
 One-line installation
 ============
 
@@ -113,5 +118,33 @@ Running
 Interacting with the simulation
 ===============================
 
-We use ROS for interact with the simulation and mofify the state of the game.
+We use ROS for interact with the simulation and modify the state of the game.
+Spawn a team of agents following the instructions previously detailed.
+
+1. Show the state of the game. Open a new terminal and run:
+
+  ~~~
+  . /opt/ros/indigo/setup.bash
+  rostopic
+  ~~~
+
+1. Modify the state of the game.
+
+  ~~~
+
+  ~~~
+
+1. Move the ball.
+
+  ~~~
+
+  ~~~
+
+1. Move a player:
+
+  ~~~
+
+  ~~~
+
+Known limitations.
 
