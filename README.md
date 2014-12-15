@@ -10,8 +10,9 @@ One-line installation
 
 1. Execute the following line:
 
-      wget -O /tmp/robocup_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup_install.sh; sudo sh /tmp/robocup_install.sh
-
+```
+wget -O /tmp/robocup_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup_install.sh; sudo sh /tmp/robocup_install.sh
+```
 Installation from sources
 =========================
 
