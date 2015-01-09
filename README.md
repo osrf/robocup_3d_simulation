@@ -10,20 +10,24 @@ Prerequisites
 
 We require Ubuntu Precise or Ubuntu Trusty.
 
-One-line installation (recommended)
+Option1. One-line installation (recommended)
 ============
 
-1. Execute the following line:
+1. The following line will download a script that will install a package named
+ros-{$DISTRO}-robocup3d in your machine. It will also install the required
+dependencies, including the package containing the Nao meshes.
 
 ```
 wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
 ```
-Installation from sources
+Option2. Installation from sources (not needed if you used Option1)
 =========================
 
 1. Install ROS. Follow instructions
  [here](http://wiki.ros.org/indigo/Installation/Ubuntu) and install the package
- `ros-indigo-desktop` (Ubuntu Trusty) or `ros-hydro-desktop` (Ubuntu Precise).
+ `ros-indigo-desktop` (Ubuntu Trusty). If you are in Ubuntu Precise you should
+ follow [this instructions](http://wiki.ros.org/hydro/Installation/Ubuntu) and
+ install the package `ros-hydro-desktop`.
 
 1. Install Gazebo4. Follow instructions
  [here](http://gazebosim.org/tutorials?tut=install_from_source&cat=install) and
