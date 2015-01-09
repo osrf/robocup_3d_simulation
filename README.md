@@ -10,7 +10,7 @@ Prerequisites
 
 We require Ubuntu Precise or Ubuntu Trusty.
 
-(a) One-line installation (recommended)
+One-line installation (recommended)
 ============
 
 1. The following line will download a script that will install a package named
@@ -20,7 +20,7 @@ dependencies, including the package containing the Nao meshes.
 ```
 wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
 ```
-(b) Installation from sources
+Installation from sources
 =========================
 
 **You should skip this section if you installed the software using the one-line
