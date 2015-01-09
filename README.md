@@ -20,8 +20,11 @@ dependencies, including the package containing the Nao meshes.
 ```
 wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
 ```
-(b) Installation from sources (not needed if you used (a))
+(b) Installation from sources
 =========================
+
+**You should skip this section if you installed the software using the one-line
+instalation script.**
 
 1. Install ROS. Follow instructions
  [here](http://wiki.ros.org/indigo/Installation/Ubuntu) and install the package
