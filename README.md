@@ -20,6 +20,30 @@ dependencies, including the package containing the Nao meshes.
 ```
 wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
 ```
+
+1. It's a good idea to add the following lines to your `.bashrc` to avoid
+future configuration errors.
+
+Hydro version:
+
+  ~~~
+  echo -e "\n# Gazebo" >> ~/.bashrc
+  echo "source /usr/share/gazebo/setup.sh" >> ~/.bashrc
+  echo "# ROS" >> ~/.bashrc
+  echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ~~~
+
+Indigo version:
+
+  ~~~
+  echo -e "\n# Gazebo" >> ~/.bashrc
+  echo "source /usr/share/gazebo/setup.sh" >> ~/.bashrc
+  echo "# ROS" >> ~/.bashrc
+  echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ~~~
+
 Installation from sources
 =========================
 
@@ -37,6 +61,29 @@ instalation script.**
  install the branch `gazebo_4.1` or above. From now on we are going to assume
  that the installation is ROS indigo. If you are using hydro, just replace
  `indigo` with `hydro` in the following commands.
+
+1. It's a good idea to add the following lines to your `.bashrc` to avoid
+future configuration errors.
+
+Hydro version:
+
+  ~~~
+  echo -e "\n# Gazebo" >> ~/.bashrc
+  echo "source <REPLACE_BY_YOUR_GAZEBO_INSTALLATION_DIRECTORY>/gazebo/setup.sh" >> ~/.bashrc
+  echo "# ROS" >> ~/.bashrc
+  echo "source /opt/ros/hydro/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ~~~
+
+Indigo version:
+
+  ~~~
+  echo -e "\n# Gazebo" >> ~/.bashrc
+  echo "source <REPLACE_BY_YOUR_GAZEBO_INSTALLATION_DIRECTORY>/gazebo/setup.sh" >> ~/.bashrc
+  echo "# ROS" >> ~/.bashrc
+  echo "source /opt/ros/indigo/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  ~~~
 
 1. Install the Nao meshes:
 
