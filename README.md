@@ -24,7 +24,7 @@ dependencies, including the package containing the Nao meshes.
 1. It is convenient if the environment variables are automatically added to your
 bash session every time a new shell is launched.
 
-  Hydro version:
+  For ROS Hydro:
 
   ~~~
   echo -e "\n# Gazebo" >> ~/.bashrc
@@ -34,7 +34,7 @@ bash session every time a new shell is launched.
   source ~/.bashrc
   ~~~
 
-  Indigo version:
+  For ROS Indigo:
 
   ~~~
   echo -e "\n# Gazebo" >> ~/.bashrc
@@ -65,7 +65,7 @@ instalation script.**
 1. It is convenient if the environment variables are automatically added to your
 bash session every time a new shell is launched.
 
-  Hydro version:
+  For ROS Hydro:
 
   ~~~
   echo -e "\n# Gazebo" >> ~/.bashrc
@@ -75,7 +75,7 @@ bash session every time a new shell is launched.
   source ~/.bashrc
   ~~~
 
-  Indigo version:
+  For ROS Indigo:
 
   ~~~
   echo -e "\n# Gazebo" >> ~/.bashrc
