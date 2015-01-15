@@ -62,8 +62,8 @@ instalation script.**
  that the installation is ROS indigo. If you are using hydro, just replace
  `indigo` with `hydro` in the following commands.
 
-1. It's a good idea to add the following lines to your `.bashrc` to avoid
-future configuration errors.
+1. It is convenient if the environment variables are automatically added to your
+bash session every time a new shell is launched.
 
 Hydro version:
 
