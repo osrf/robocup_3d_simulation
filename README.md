@@ -17,12 +17,12 @@ One-line installation (recommended)
 ros-{$DISTRO}-robocup3d in your machine. It will also install the required
 dependencies, including the package containing the Nao meshes.
 
-```
-wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
-```
+   ```
+   wget -O /tmp/robocup3d_install.sh http://osrf-distributions.s3.amazonaws.com/gazebo/robocup3d_install.sh; sudo sh /tmp/robocup3d_install.sh
+   ```
 
-1. It's a good idea to add the following lines to your `.bashrc` to avoid
-future configuration errors.
+1. It is convenient if the environment variables are automatically added to your
+bash session every time a new shell is launched.
 
 Hydro version:
 
