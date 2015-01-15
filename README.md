@@ -101,7 +101,6 @@ bash session every time a new shell is launched.
 1. Create a catkin workspace:
 
   ~~~
-  . /opt/ros/indigo/setup.bash
   mkdir -p ~/robocup_ws/src && cd ~/robocup_ws/src
   ln -s ~/robocup_3d_simulation
   cd ..
@@ -120,21 +119,18 @@ Running
 1. Start `roscore` in a new terminal:
 
   ~~~
-  . /opt/ros/indigo/setup.bash
   roscore
   ~~~
 
 1. Start Gazebo with the 3d simulation soccer field in a new terminal:
 
   ~~~
-  . /opt/ros/indigo/setup.bash
   gazebo robocup3d.world
   ~~~
 
 1. Spawn a team of agents:
 
   ~~~
-  . /opt/ros/indigo/setup.bash
   spawnTeams
   ~~~
 
@@ -144,7 +140,6 @@ Running
     messages and s-expression. Open a new terminal and execute:
 
       ~~~
-      . /opt/ros/indigo/setup.bash
       sExprInterface.py localhost 33001
       ~~~
 
@@ -186,7 +181,6 @@ Spawn a team of agents following the instructions previously detailed.
 1. Modify the state of the game. Open a new terminal and run:
 
   ~~~
-  . /opt/ros/indigo/setup.bash
   rosservice call /gameController/set_game_state KickOff_Left
   ~~~
 
