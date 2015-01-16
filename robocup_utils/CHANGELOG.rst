@@ -2,6 +2,14 @@
 Changelog for package robocup_utils
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.7 (2015-01-16)
+-----------
+* Generating config.py in the PROJECT_BINARY_DIR.
+* Fix typo in the robocup_utils cmakelist
+* Adding config.py.in and tweaking Readme file.
+* Remove hardcoded path from sExpression.py
+* Contributors: Carlos Agüero
+
 0.0.6 (2014-12-15)
 ------------------
 * Moving sExprInterface.py to utils

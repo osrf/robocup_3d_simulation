@@ -2,6 +2,9 @@
 Changelog for package robocup_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.7 (2015-01-16)
+-----------
+
 0.0.6 (2014-12-15)
 ------------------
 
@@ -16,5 +19,5 @@ Changelog for package robocup_msgs
 
 0.0.2 (2014-12-01)
 ------------------
-* Initial version 
+* Initial version
 * Contributors: Carlos Agüero, Nate Koenig
