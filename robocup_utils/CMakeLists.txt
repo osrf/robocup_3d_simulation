@@ -107,7 +107,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/spawnTeams.in ${PROJECT_BINARY_DI
 
 # Configure config.py file with the install directories.
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.py.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/config.py)
+  ${PROJECT_BINARY_DIR}/config.py)
 
 #############
 ## Install ##
@@ -155,7 +155,7 @@ catkin_add_env_hooks(10.robocup_utils SHELLS bash DIRECTORY ${CMAKE_CURRENT_SOUR
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  ${PROJECT_SOURCE_DIR}/src/config.py
+  ${PROJECT_BINARY_DIR}/config.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
