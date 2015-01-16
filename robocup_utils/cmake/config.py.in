@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+ModelResourcesDir = "@CMAKE_INSTALL_PREFIX@/share/robocup_model_resources/"

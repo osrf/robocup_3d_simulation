@@ -200,11 +200,11 @@ Spawn a team of agents following the instructions previously detailed.
 1. Move the ball specifying [`<X>`, `<Y>`, `<Z>`, `<VX>`, `<VY>`, `<VZ>`]:
 
   ~~~
-  rosservice call /gameController/move_ball 2 1 0 0 0
+  rosservice call /gameController/move_ball 2 1 0 0 0 0
   ~~~
 
 1. Move a player specifying [`<Team name>` `<uniform number>` [`<X>`, `<Y>`, `<THETA>`]:
 
   ~~~
-  rosservice call /gameController/move_agent teamA 1 [3, 2, 0]
+  rosservice call /gameController/move_agent teamA 1 [3,2,0]
   ~~~
