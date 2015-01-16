@@ -83,9 +83,13 @@ add_executable(teleoperator src/teleoperator.cc)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(
-  robocup_msgs_generate_messages_cpp
   createAgent
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_dependencies(
   teleoperator
+  ${catkin_EXPORTED_TARGETS}
 )
 
 ## Specify libraries to link a library or executable target against
