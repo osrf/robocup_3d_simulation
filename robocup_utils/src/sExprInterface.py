@@ -1,9 +1,27 @@
 #!/usr/bin/python
 
+"""
+# Copyright (C) 2014-2015 Open Source Robotics Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Script for restoring RoboCup 3D sim game from logfile
 # Written by Patrick MacAlpine (patmac@cs.utexas.edu)
 # Usage: ./sExprInterface.py <logFile> [host] [port]
+"""
 
+import config
+import os
 import sys
 import struct
 import socket   #for sockets
@@ -387,7 +405,8 @@ class agentInterface:
     rospy.wait_for_service('/gameController/init_agent')
     try:
       init_agent_f = rospy.ServiceProxy('/gameController/init_agent', InitAgent)
-      resp = init_agent_f('/home/caguero/workspace/robocup_3d_simulation/models/nao_soccer_blue.sdf', team, number)
+      path = os.path.join(config.ModelResourcesDir, 'nao_models/nao_soccer.sdf')
+      resp = init_agent_f(path, team, number)
       return resp.result
     except rospy.ServiceException, e:
       print "Service call failed: %s"%e
@@ -525,7 +544,6 @@ class agentInterface:
 
 
 #sys.argv = [sys.argv[0], 'localhost', 3400]
-
 
 if len(sys.argv) > 1 and sys.argv[1] == "--help":
   print "Usage: " + sys.argv[0] + " [host] [port]"
